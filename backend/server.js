@@ -11,6 +11,7 @@ import menuRoutes from './routes/menu.js';
 import attendanceRoutes from './routes/attendance.js';
 import feedbackRoutes from './routes/feedback.js';
 import announcementRoutes from './routes/announcements.js';
+import settingsRoutes from './routes/settings.js';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api/menu', menuRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/announcements', announcementRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Base Route
 app.get('/', (req, res) => {
@@ -56,7 +58,7 @@ const startServer = async () => {
 
       // Default Student
       await User.create({
-        name: 'Alex Johnson',
+        name: 'Abhay Chavan',
         email: 'student@mess.com',
         password: 'password123',
         role: 'student',
@@ -70,6 +72,12 @@ const startServer = async () => {
       console.log('Default credentials seeded successfully.');
       console.log('Admin Email: admin@mess.com | Pass: password123');
       console.log('Student Email: student@mess.com | Pass: password123');
+    } else {
+      // Auto-update existing seeded student from Alex Johnson to Abhay Chavan
+      await User.updateMany(
+        { email: 'student@mess.com', name: 'Alex Johnson' },
+        { name: 'Abhay Chavan' }
+      );
     }
   } catch (err) {
     console.error('Error seeding default users:', err.message);

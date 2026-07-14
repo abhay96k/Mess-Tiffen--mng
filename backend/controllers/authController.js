@@ -81,6 +81,8 @@ export const loginUser = async (req, res) => {
         status: user.status,
         billAmount: user.billAmount,
         billStatus: user.billStatus,
+        profileImage: user.profileImage || '',
+        notifications: user.notifications || [],
         token: generateToken(user._id)
       });
     } else {
@@ -108,7 +110,9 @@ export const getMe = async (req, res) => {
         plan: user.plan,
         status: user.status,
         billAmount: user.billAmount,
-        billStatus: user.billStatus
+        billStatus: user.billStatus,
+        profileImage: user.profileImage || '',
+        notifications: user.notifications || []
       });
     } else {
       res.status(404).json({ success: false, message: 'User profile not found' });
@@ -117,3 +121,59 @@ export const getMe = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Update user profile (name, image)
+// @route   PUT /api/auth/profile
+// @access  Private
+export const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      if (req.body.profileImage !== undefined) {
+        user.profileImage = req.body.profileImage;
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        success: true,
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        room: updatedUser.room,
+        plan: updatedUser.plan,
+        status: updatedUser.status,
+        billAmount: updatedUser.billAmount,
+        billStatus: updatedUser.billStatus,
+        profileImage: updatedUser.profileImage || '',
+        notifications: updatedUser.notifications || []
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Mark all user notifications as read
+// @route   PUT /api/auth/notifications/read
+// @access  Private
+export const markNotificationsRead = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      user.notifications = user.notifications.map(n => ({ ...n, read: true }));
+      await user.save();
+      res.json({ success: true, notifications: user.notifications });
+    } else {
+      res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

@@ -14,13 +14,25 @@ const attendanceSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  breakfastPendingSkip: {
+    type: Boolean,
+    default: false
+  },
   lunch: {
+    type: Boolean,
+    default: false
+  },
+  lunchPendingSkip: {
     type: Boolean,
     default: false
   },
   dinner: {
     type: Boolean,
     default: true
+  },
+  dinnerPendingSkip: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

@@ -16,7 +16,7 @@ export const getStudents = async (req, res) => {
 // @route   POST /api/students
 // @access  Private/Admin
 export const addStudent = async (req, res) => {
-  const { name, room, plan, status } = req.body;
+  const { name, room, plan, status, billAmount } = req.body;
   
   // Construct email and default password
   const email = `${name.toLowerCase().replace(/\s+/g, '')}@mess.com`;
@@ -34,9 +34,9 @@ export const addStudent = async (req, res) => {
       password,
       role: 'student',
       room: room || '',
-      plan: plan || '2-Meal Standard',
+      plan: plan || '1st Breakfast',
       status: status || 'active',
-      billAmount: 2400,
+      billAmount: billAmount !== undefined ? Number(billAmount) : 2400,
       billStatus: 'pending'
     });
 
@@ -63,7 +63,7 @@ export const addStudent = async (req, res) => {
 // @route   PUT /api/students/:id
 // @access  Private/Admin
 export const updateStudent = async (req, res) => {
-  const { name, room, plan, status } = req.body;
+  const { name, room, plan, status, billAmount, billStatus } = req.body;
 
   try {
     const student = await User.findById(req.params.id);
@@ -76,6 +76,17 @@ export const updateStudent = async (req, res) => {
     student.room = room || student.room;
     student.plan = plan || student.plan;
     student.status = status || student.status;
+    
+    if (billStatus !== undefined) {
+      student.billStatus = billStatus;
+      if (billStatus === 'paid') {
+        student.billAmount = 0;
+      } else if (billAmount !== undefined) {
+        student.billAmount = Number(billAmount);
+      }
+    } else if (billAmount !== undefined) {
+      student.billAmount = Number(billAmount);
+    }
 
     await student.save();
 

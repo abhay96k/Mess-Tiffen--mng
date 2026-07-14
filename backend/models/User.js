@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   plan: {
     type: String,
-    default: '2-Meal Standard'
+    default: '1st Breakfast'
   },
   status: {
     type: String,
@@ -43,6 +43,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['paid', 'pending'],
     default: 'pending'
+  },
+  profileImage: {
+    type: String,
+    default: ''
+  },
+  notifications: {
+    type: Array,
+    default: []
   }
 }, {
   timestamps: true

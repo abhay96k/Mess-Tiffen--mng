@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0C4D35;
-  --color-primary-light: #E8F0EC;
-  --color-primary-dark: #083424;
+  --color-primary: #10B981;
+  --color-primary-light: #E6F8F3;
+  --color-primary-dark: #059669;
   
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -32,6 +32,40 @@ body {
   text-align: left;
   border: none;
   min-height: 100vh;
+}
+
+/* 3D Volumetric Green Glow Globally */
+.bg-primary {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.25), 0 4px 6px -2px rgba(16, 185, 129, 0.15);
+}
+
+/* 3D Mechanical Press Effect for Primary Interactive Elements */
+button.bg-primary, 
+label.bg-primary,
+a.bg-primary {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  border-bottom: 4px solid #047857 !important;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+button.bg-primary:hover,
+label.bg-primary:hover,
+a.bg-primary:hover {
+  background: linear-gradient(135deg, #34D399 0%, #059669 100%) !important;
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+button.bg-primary:active,
+label.bg-primary:active,
+a.bg-primary:active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1px !important;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Hide scrollbar utility */

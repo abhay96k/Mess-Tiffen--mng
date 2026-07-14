@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { 
-  Users, CheckCircle2, Calendar, DollarSign, Megaphone, 
+  Users, CheckCircle2, Calendar, DollarSign, Megaphone,
   Plus, Trash, LogOut, Edit2, Save, 
-  TrendingUp, Check, X, Star
+  TrendingUp, Check, X, Star,
+  LayoutDashboard, Utensils, User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { studentAPI, menuAPI, feedbackAPI, announcementAPI, attendanceAPI } from '../services/api';
+import { studentAPI, menuAPI, feedbackAPI, attendanceAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
 
 interface AdminDashboardProps {
   userName: string;
@@ -33,7 +34,7 @@ interface FeedbackRecord {
 
 export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   // Navigation tabs
-  const [activeTab, setActiveTab] = useState<'stats' | 'menu' | 'students' | 'attendance' | 'announcements' | 'feedback'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'menu' | 'students' | 'attendance' | 'profile'>('stats');
   
   // Dashboard indicators
   const [loading, setLoading] = useState(true);
@@ -41,12 +42,35 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   const [activePlans, setActivePlans] = useState(0);
   const [revenue, setRevenue] = useState(86400);
 
+  // Profile modal states
+  const [adminEmail, setAdminEmail] = useState('');
+  const [profileImage, setProfileImage] = useState('');
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+      try {
+        const res = await authAPI.updateProfile({ profileImage: base64String });
+        if (res.success) {
+          setProfileImage(res.profileImage);
+        }
+      } catch (error) {
+        console.error('Error uploading admin profile image:', error);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Student directory states
   const [students, setStudents] = useState<StudentRecord[]>([]);
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', room: '', plan: '', status: 'active' as 'active' | 'inactive' });
+  const [editForm, setEditForm] = useState({ name: '', room: '', plan: '', status: 'active' as 'active' | 'inactive', billAmount: 2400, billStatus: 'pending' as 'paid' | 'pending' });
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newStudentForm, setNewStudentForm] = useState({ name: '', room: '', plan: '2-Meal Standard', status: 'active' as 'active' | 'inactive' });
+  const [newStudentForm, setNewStudentForm] = useState({ name: '', room: '', plan: '1st Breakfast', status: 'active' as 'active' | 'inactive', billAmount: 2400 });
 
   // Menu editor states
   const [editingDayIndex, setEditingDayIndex] = useState<number | null>(null);
@@ -55,13 +79,64 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
 
   // Feedbacks reviews
   const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>([]);
+  const [adminConfirmSkip, setAdminConfirmSkip] = useState<{ 
+    userId: string; 
+    studentName: string; 
+    meal: 'breakfast' | 'lunch' | 'dinner'; 
+    currentStatus: string;
+    isPendingSkip?: boolean;
+  } | null>(null);
 
   // Announcements broadcasting states
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
   const [announcementText, setAnnouncementText] = useState('');
   const [broadcastMessage, setBroadcastMessage] = useState<string | null>(null);
 
+
+
   // Daily attendance log state
   const [attendanceLogs, setAttendanceLogs] = useState<any[]>([]);
+
+  // Pricing configurations states
+  const [pricingSettings, setPricingSettings] = useState({
+    breakfastOnly: 800,
+    lunchOnly: 1200,
+    dinnerOnly: 1200,
+    breakfastLunch: 1850,
+    breakfastDinner: 1850,
+    lunchDinner: 2200,
+    allMeals: 2800
+  });
+  const [editingPricing, setEditingPricing] = useState(false);
+  const [pricingForm, setPricingForm] = useState({ ...pricingSettings });
+
+  const handleSavePricing = async () => {
+    try {
+      const res = await settingsAPI.updatePricing(pricingForm);
+      if (res.success) {
+        setPricingSettings(res.data);
+        setEditingPricing(false);
+      }
+    } catch (error) {
+      console.error('Error saving pricing details:', error);
+    }
+  };
+
+  const calculatePriceFromPlan = (planString: string) => {
+    const plans = planString ? planString.split(', ') : [];
+    const hasBreakfast = plans.includes('1st Breakfast');
+    const hasLunch = plans.includes('2nd Lunch');
+    const hasDinner = plans.includes('3rd Dinner');
+
+    if (hasBreakfast && hasLunch && hasDinner) return pricingSettings.allMeals;
+    if (hasBreakfast && hasLunch) return pricingSettings.breakfastLunch;
+    if (hasBreakfast && hasDinner) return pricingSettings.breakfastDinner;
+    if (hasLunch && hasDinner) return pricingSettings.lunchDinner;
+    if (hasBreakfast) return pricingSettings.breakfastOnly;
+    if (hasLunch) return pricingSettings.lunchOnly;
+    if (hasDinner) return pricingSettings.dinnerOnly;
+    return 0;
+  };
 
   const fetchAdminData = async () => {
     try {
@@ -100,6 +175,20 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
         setAttendanceLogs(attendanceRes.data);
       }
 
+      // 5. Fetch Admin Profile details
+      const profile = await authAPI.getMe().catch(() => null);
+      if (profile && profile.success) {
+        setAdminEmail(profile.email || '');
+        setProfileImage(profile.profileImage || '');
+      }
+
+      // 6. Fetch pricing settings
+      const pricingRes = await settingsAPI.getPricing().catch(() => null);
+      if (pricingRes && pricingRes.success) {
+        setPricingSettings(pricingRes.data);
+        setPricingForm(pricingRes.data);
+      }
+
     } catch (error) {
       console.error('Error loading admin portal details:', error);
     } finally {
@@ -117,7 +206,9 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
       name: student.name,
       room: student.room,
       plan: student.plan,
-      status: student.status
+      status: student.status,
+      billAmount: student.billAmount,
+      billStatus: student.billStatus
     });
   };
 
@@ -138,7 +229,7 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
     try {
       const res = await studentAPI.addStudent(newStudentForm);
       if (res.success) {
-        setNewStudentForm({ name: '', room: '', plan: '2-Meal Standard', status: 'active' });
+        setNewStudentForm({ name: '', room: '', plan: '1st Breakfast', status: 'active', billAmount: 2400 });
         setShowAddForm(false);
         fetchAdminData();
       }
@@ -193,10 +284,38 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
         setAnnouncementText('');
         setTimeout(() => {
           setBroadcastMessage(null);
-        }, 3000);
+          setShowAnnouncementModal(false);
+        }, 1500);
       }
     } catch (error) {
       console.error('Error publishing alert message:', error);
+    }
+  };
+
+  const handleToggleAttendance = async (userId: string, meal: 'breakfast' | 'lunch' | 'dinner', currentStatus: string) => {
+    try {
+      const nextStatus = currentStatus !== 'Present';
+      
+      // Optimistic local state update
+      setAttendanceLogs(prev => prev.map(log => {
+        if (log.userId === userId) {
+          return {
+            ...log,
+            [meal]: nextStatus ? 'Present' : 'Absent'
+          };
+        }
+        return log;
+      }));
+
+      // Send to Backend
+      await attendanceAPI.updateAttendance({ userId, meal, status: nextStatus });
+    } catch (error) {
+      console.error('Error toggling student attendance:', error);
+      // Fetch fresh stats to rollback state on backend errors
+      const attendanceRes = await attendanceAPI.getSummary();
+      if (attendanceRes.success) {
+        setAttendanceLogs(attendanceRes.data);
+      }
     }
   };
 
@@ -221,15 +340,24 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
       {/* Header Bar */}
       <div className="bg-primary text-white pt-4 pb-6 px-5 rounded-b-[32px] shadow-lg shrink-0 z-30">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-white/20 rounded-full border border-white/30 flex items-center justify-center font-bold text-sm text-white shadow-xs">
-              AD
+            <button
+              onClick={() => setActiveTab('profile')}
+              className="flex items-center gap-3 text-left focus:outline-none hover:opacity-95 transition-all select-none group"
+              title="View Profile"
+            >
+            {/* Admin Avatar */}
+            <div className="w-11 h-11 bg-white/20 rounded-full border border-white/30 flex items-center justify-center font-bold text-sm text-white shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
+              {profileImage ? (
+                <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+              ) : (
+                userName.split(' ').map(n => n[0]).join('').toUpperCase() || 'AD'
+              )}
             </div>
             <div>
-              <p className="text-[10px] text-white/70 font-semibold tracking-wider uppercase">Portal Admin</p>
-              <h3 className="text-base font-bold text-white leading-tight">{userName}</h3>
+              <p className="text-[10px] text-white/70 font-semibold tracking-wider uppercase flex items-center gap-1 font-extrabold">Portal Admin 👤</p>
+              <h3 className="text-base font-bold text-white leading-tight underline decoration-white/20 group-hover:decoration-white transition-all">{userName}</h3>
             </div>
-          </div>
+          </button>
           <button 
             onClick={onLogout}
             className="p-2 bg-white/10 rounded-full border border-white/20 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-300 transition-all focus:outline-none"
@@ -297,18 +425,24 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
             {/* Quick Actions Shortcuts */}
             <div className="bg-white rounded-3xl p-4 border border-neutral-100 shadow-sm space-y-2">
               <h4 className="font-bold text-neutral-800 text-xs pb-1 border-b border-neutral-50">Quick Actions Shortcut</h4>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-3 gap-1.5 text-xs">
                 <button 
                   onClick={() => setActiveTab('menu')}
-                  className="py-2.5 bg-neutral-105 rounded-xl font-bold hover:bg-neutral-200 text-neutral-700 text-center"
+                  className="py-2.5 bg-neutral-105 rounded-xl font-bold hover:bg-neutral-200 text-neutral-700 text-center text-[10px] whitespace-nowrap"
                 >
-                  📝 Edit Food Menu
+                  🍱 Edit Menu
                 </button>
                 <button 
                   onClick={() => setActiveTab('students')}
-                  className="py-2.5 bg-neutral-105 rounded-xl font-bold hover:bg-neutral-200 text-neutral-700 text-center"
+                  className="py-2.5 bg-neutral-105 rounded-xl font-bold hover:bg-neutral-200 text-neutral-700 text-center text-[10px] whitespace-nowrap"
                 >
-                  ➕ Add New Student
+                  👥 Add Student
+                </button>
+                <button 
+                  onClick={() => setShowAnnouncementModal(true)}
+                  className="py-2.5 bg-neutral-105 rounded-xl font-bold hover:bg-neutral-200 text-neutral-700 text-center text-[10px] whitespace-nowrap"
+                >
+                  📣 Announcement
                 </button>
               </div>
             </div>
@@ -471,43 +605,86 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] text-neutral-400 font-bold block mb-1">Plan Duration</label>
-                      <select
-                        value={newStudentForm.plan}
-                        onChange={(e) => setNewStudentForm({ ...newStudentForm, plan: e.target.value })}
-                        className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2.5 font-bold text-neutral-600"
-                      >
-                        <option value="1-Meal Basic">1-Meal Basic</option>
-                        <option value="2-Meal Standard">2-Meal Standard</option>
-                        <option value="3-Meal Premium">3-Meal Premium</option>
-                      </select>
+                      <label className="text-[10px] text-neutral-400 font-bold block mb-1">Subscription Plans</label>
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        {['1st Breakfast', '2nd Lunch', '3rd Dinner'].map((planOption) => {
+                          const currentPlans = newStudentForm.plan ? newStudentForm.plan.split(', ') : [];
+                          const isActive = currentPlans.includes(planOption);
+                          return (
+                            <button
+                              key={planOption}
+                              type="button"
+                              onClick={() => {
+                                let updated: string[];
+                                if (isActive) {
+                                  updated = currentPlans.filter(p => p !== planOption);
+                                } else {
+                                  updated = [...currentPlans, planOption];
+                                }
+                                // Keep order: Breakfast, Lunch, Dinner
+                                const ordered: string[] = [];
+                                if (updated.includes('1st Breakfast')) ordered.push('1st Breakfast');
+                                if (updated.includes('2nd Lunch')) ordered.push('2nd Lunch');
+                                if (updated.includes('3rd Dinner')) ordered.push('3rd Dinner');
+
+                                const newPrice = calculatePriceFromPlan(ordered.join(', '));
+                                setNewStudentForm({ 
+                                  ...newStudentForm, 
+                                  plan: ordered.join(', ') || '1st Breakfast',
+                                  billAmount: newPrice !== 0 ? newPrice : newStudentForm.billAmount
+                                });
+                              }}
+                              className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+                                isActive 
+                                  ? 'bg-primary-light text-primary border-primary shadow-xs' 
+                                  : 'bg-neutral-50 text-neutral-500 border-neutral-200 hover:bg-neutral-100'
+                              }`}
+                            >
+                              {isActive ? '✓ ' : '+ '} {planOption.replace(/^\d+\w+\s/, '')}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-[10px] text-neutral-400 font-bold block mb-1">Plan Status</label>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setNewStudentForm({ ...newStudentForm, status: 'active' })}
-                        className={`flex-1 py-2 border rounded-xl font-bold transition-all ${
-                          newStudentForm.status === 'active' 
-                            ? 'bg-primary-light/50 border-primary text-primary-dark' 
-                            : 'border-neutral-200 text-neutral-500'
-                        }`}
-                      >
-                        Active
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setNewStudentForm({ ...newStudentForm, status: 'inactive' })}
-                        className={`flex-1 py-2 border rounded-xl font-bold transition-all ${
-                          newStudentForm.status === 'inactive' 
-                            ? 'bg-red-50 border-red-200 text-red-700' 
-                            : 'border-neutral-200 text-neutral-500'
-                        }`}
-                      >
-                        Inactive
-                      </button>
+                  <div className="grid grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="text-[10px] text-neutral-400 font-bold block mb-1">Bill Amount (₹)</label>
+                      <input
+                        type="number"
+                        required
+                        value={newStudentForm.billAmount}
+                        onChange={(e) => setNewStudentForm({ ...newStudentForm, billAmount: Number(e.target.value) })}
+                        placeholder="E.g. 2400"
+                        className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2.5 font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-neutral-400 font-bold block mb-1">Plan Status</label>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setNewStudentForm({ ...newStudentForm, status: 'active' })}
+                          className={`flex-1 py-2 border rounded-xl font-bold transition-all ${
+                            newStudentForm.status === 'active' 
+                              ? 'bg-primary-light/50 border-primary text-primary-dark' 
+                              : 'border-neutral-200 text-neutral-500'
+                          }`}
+                        >
+                          Active
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setNewStudentForm({ ...newStudentForm, status: 'inactive' })}
+                          className={`flex-1 py-2 border rounded-xl font-bold transition-all ${
+                            newStudentForm.status === 'inactive' 
+                              ? 'bg-red-50 border-red-200 text-red-700' 
+                              : 'border-neutral-200 text-neutral-500'
+                          }`}
+                        >
+                          Inactive
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <button
@@ -548,15 +725,84 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                             />
                           </div>
                           <div>
-                            <label className="text-[10px] text-neutral-400 font-bold block mb-0.5">Subscription Plan</label>
+                            <label className="text-[10px] text-neutral-400 font-bold block mb-0.5">Subscription Plans</label>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {['1st Breakfast', '2nd Lunch', '3rd Dinner'].map((planOption) => {
+                                const currentPlans = editForm.plan ? editForm.plan.split(', ') : [];
+                                const isActive = currentPlans.includes(planOption);
+                                return (
+                                  <button
+                                    key={planOption}
+                                    type="button"
+                                    onClick={() => {
+                                      let updated: string[];
+                                      if (isActive) {
+                                        updated = currentPlans.filter(p => p !== planOption);
+                                      } else {
+                                        updated = [...currentPlans, planOption];
+                                      }
+                                      const ordered: string[] = [];
+                                      if (updated.includes('1st Breakfast')) ordered.push('1st Breakfast');
+                                      if (updated.includes('2nd Lunch')) ordered.push('2nd Lunch');
+                                      if (updated.includes('3rd Dinner')) ordered.push('3rd Dinner');
+
+                                      const newPrice = calculatePriceFromPlan(ordered.join(', '));
+                                      setEditForm({ 
+                                        ...editForm, 
+                                        plan: ordered.join(', ') || '1st Breakfast',
+                                        billAmount: newPrice !== 0 ? newPrice : editForm.billAmount
+                                      });
+                                    }}
+                                    className={`px-2.5 py-1.5 rounded-lg border text-[9px] font-bold transition-all cursor-pointer ${
+                                      isActive 
+                                        ? 'bg-primary-light text-primary border-primary shadow-3xs' 
+                                        : 'bg-neutral-50 text-neutral-500 border-neutral-200 hover:bg-neutral-100'
+                                    }`}
+                                  >
+                                    {isActive ? '✓ ' : '+ '} {planOption.replace(/^\d+\w+\s/, '')}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 mt-2 mb-2">
+                          <div>
+                            <label className="text-[10px] text-neutral-400 font-bold block mb-0.5">Bill Amount (₹)</label>
+                            <input
+                              type="number"
+                              value={editForm.billAmount}
+                              onChange={(e) => setEditForm({ ...editForm, billAmount: Number(e.target.value) })}
+                              className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-medium"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-neutral-400 font-bold block mb-0.5">Bill Status</label>
                             <select
-                              value={editForm.plan}
-                              onChange={(e) => setEditForm({ ...editForm, plan: e.target.value })}
+                              value={editForm.billStatus}
+                              onChange={(e) => {
+                                const newStatus = e.target.value as 'paid' | 'pending';
+                                setEditForm({ 
+                                  ...editForm, 
+                                  billStatus: newStatus,
+                                  billAmount: newStatus === 'paid' ? 0 : editForm.billAmount
+                                });
+                              }}
                               className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-bold text-neutral-600"
                             >
-                              <option value="1-Meal Basic">1-Meal Basic</option>
-                              <option value="2-Meal Standard">2-Meal Standard</option>
-                              <option value="3-Meal Premium">3-Meal Premium</option>
+                              <option value="pending">Pending</option>
+                              <option value="paid">Paid</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-neutral-400 font-bold block mb-0.5">Plan Status</label>
+                            <select
+                              value={editForm.status}
+                              onChange={(e) => setEditForm({ ...editForm, status: e.target.value as 'active' | 'inactive' })}
+                              className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-bold text-neutral-600"
+                            >
+                              <option value="active">Active</option>
+                              <option value="inactive">Inactive</option>
                             </select>
                           </div>
                         </div>
@@ -589,12 +835,12 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                             <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                               student.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'
                             }`}>
-                              {student.status}
+                              {student.status === 'active' ? '✔️ Active' : '❌ Inactive'}
                             </span>
                             <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                               student.billStatus === 'paid' ? 'bg-primary-light text-primary border border-primary/20' : 'bg-orange-50 text-orange-700 border border-orange-100'
                             }`}>
-                              Bill: {student.billStatus}
+                              Bill: {student.billStatus === 'paid' ? '✔️ Paid' : '❌ Pending'}
                             </span>
                           </div>
                         </div>
@@ -648,19 +894,73 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                       <p className="text-[9px] text-neutral-400 font-semibold">Room {log.room}</p>
                     </div>
                     <div className="text-center">
-                      <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-                        log.breakfast === 'Present' ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-400'
-                      }`}>{log.breakfast}</span>
+                      <button
+                        onClick={() => {
+                          setAdminConfirmSkip({ 
+                            userId: log.userId, 
+                            studentName: log.name, 
+                            meal: 'breakfast', 
+                            currentStatus: log.breakfast,
+                            isPendingSkip: !!log.breakfastPendingSkip
+                          });
+                        }}
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none ${
+                          log.breakfastPendingSkip
+                            ? 'bg-amber-500 text-white border border-amber-600 animate-pulse'
+                            : log.breakfast === 'Present' 
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                              : 'bg-red-50 text-red-700 border border-red-200'
+                        }`}
+                        title={log.breakfastPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle breakfast attendance'}
+                      >
+                        {log.breakfastPendingSkip ? '⚠️ Request' : log.breakfast === 'Present' ? '✔️ Present' : '❌ Absent'}
+                      </button>
                     </div>
                     <div className="text-center">
-                      <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-                        log.lunch === 'Present' ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-400'
-                      }`}>{log.lunch}</span>
+                      <button
+                        onClick={() => {
+                          setAdminConfirmSkip({ 
+                            userId: log.userId, 
+                            studentName: log.name, 
+                            meal: 'lunch', 
+                            currentStatus: log.lunch,
+                            isPendingSkip: !!log.lunchPendingSkip
+                          });
+                        }}
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none ${
+                          log.lunchPendingSkip
+                            ? 'bg-amber-500 text-white border border-amber-600 animate-pulse'
+                            : log.lunch === 'Present' 
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                              : 'bg-red-50 text-red-700 border border-red-200'
+                        }`}
+                        title={log.lunchPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle lunch attendance'}
+                      >
+                        {log.lunchPendingSkip ? '⚠️ Request' : log.lunch === 'Present' ? '✔️ Present' : '❌ Absent'}
+                      </button>
                     </div>
                     <div className="text-center">
-                      <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-                        log.dinner === 'Present' ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-400'
-                      }`}>{log.dinner}</span>
+                      <button
+                        onClick={() => {
+                          setAdminConfirmSkip({ 
+                            userId: log.userId, 
+                            studentName: log.name, 
+                            meal: 'dinner', 
+                            currentStatus: log.dinner,
+                            isPendingSkip: !!log.dinnerPendingSkip
+                          });
+                        }}
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none ${
+                          log.dinnerPendingSkip
+                            ? 'bg-amber-500 text-white border border-amber-600 animate-pulse'
+                            : log.dinner === 'Present' 
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                              : 'bg-red-50 text-red-700 border border-red-200'
+                        }`}
+                        title={log.dinnerPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle dinner attendance'}
+                      >
+                        {log.dinnerPendingSkip ? '⚠️ Request' : log.dinner === 'Present' ? '✔️ Present' : '❌ Absent'}
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -669,12 +969,312 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
           </div>
         )}
 
-        {/* TAB 5: announcements publisher */}
-        {activeTab === 'announcements' && (
+
+        {/* Profile & Reviews Section */}
+        {activeTab === 'profile' && (
           <div className="space-y-4">
-            <h3 className="text-base font-bold text-neutral-800 px-1">Broadcast Portal</h3>
-            
-            <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm space-y-4 text-xs">
+            {/* Admin Profile Card */}
+            <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm space-y-5">
+              <div className="flex flex-col items-center justify-center text-center space-y-2 py-2 border-b border-neutral-50 pb-4">
+                {/* Uploadable Admin Avatar */}
+                <div className="relative cursor-pointer">
+                  <div className="w-20 h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center font-extrabold text-2xl text-primary shadow-md overflow-hidden relative">
+                    {profileImage ? (
+                      <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                      userName.split(' ').map(n => n[0]).join('').toUpperCase() || 'AD'
+                    )}
+                  </div>
+                  <label className="absolute bottom-0 right-0 w-7 h-7 bg-primary hover:bg-primary-dark text-white rounded-full flex items-center justify-center cursor-pointer border-2 border-white shadow-md transition-all active:scale-90 animate-pulse" title="Upload Photo">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-neutral-800 text-base">{userName}</h4>
+                  <span className="text-[10px] bg-amber-500 text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                    System Administrator
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-3.5 text-xs">
+                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
+                  <span className="font-bold text-neutral-450">Admin Email</span>
+                  <span className="font-bold text-neutral-700">{adminEmail || `${userName.toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
+                </div>
+                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
+                  <span className="font-bold text-neutral-450">Security Access</span>
+                  <span className="font-bold text-neutral-700">Full Operator Permission</span>
+                </div>
+                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
+                  <span className="font-bold text-neutral-450">Operational Scope</span>
+                  <span className="font-bold text-neutral-700">Menu CRUD, Broadcaster, Student Audit</span>
+                </div>
+                <div className="flex justify-between items-center py-0.5 pb-0">
+                  <span className="font-bold text-neutral-450">Connection Status</span>
+                  <span className="font-bold text-emerald-600 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span> Live (Secured)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Standard Pricing Rates Settings */}
+            <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm space-y-3">
+              <div className="flex justify-between items-center border-b border-neutral-50 pb-2">
+                <h3 className="text-base font-bold text-neutral-800">Meal Plan Pricing Rates (₹)</h3>
+                {!editingPricing ? (
+                  <button 
+                    onClick={() => { setPricingForm({ ...pricingSettings }); setEditingPricing(true); }}
+                    className="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-lg hover:bg-primary-dark transition-all cursor-pointer shadow-3xs"
+                  >
+                    Edit Pricing
+                  </button>
+                ) : (
+                  <div className="flex gap-1.5">
+                    <button 
+                      onClick={() => setEditingPricing(false)}
+                      className="px-2.5 py-1 bg-neutral-105 text-neutral-600 text-[10px] font-bold rounded-lg hover:bg-neutral-200 transition-all cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={handleSavePricing}
+                      className="px-2.5 py-1 bg-emerald-600 text-white text-[10px] font-bold rounded-lg hover:bg-emerald-700 transition-all cursor-pointer shadow-3xs"
+                    >
+                      Save
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {!editingPricing ? (
+                <div className="grid grid-cols-2 gap-3 text-xs font-semibold">
+                  <div className="bg-neutral-50 border border-neutral-100 p-3 rounded-2xl flex justify-between items-center">
+                    <span className="text-neutral-500 font-bold">Only Breakfast</span>
+                    <span className="font-extrabold text-neutral-800">₹{pricingSettings.breakfastOnly}</span>
+                  </div>
+                  <div className="bg-neutral-50 border border-neutral-100 p-3 rounded-2xl flex justify-between items-center">
+                    <span className="text-neutral-500 font-bold">Only Lunch</span>
+                    <span className="font-extrabold text-neutral-800">₹{pricingSettings.lunchOnly}</span>
+                  </div>
+                  <div className="bg-neutral-50 border border-neutral-150 p-3 rounded-2xl flex justify-between items-center">
+                    <span className="text-neutral-500 font-bold">Only Dinner</span>
+                    <span className="font-extrabold text-neutral-800">₹{pricingSettings.dinnerOnly}</span>
+                  </div>
+                  <div className="bg-neutral-50 border border-neutral-150 p-3 rounded-2xl flex justify-between items-center">
+                    <span className="text-neutral-500 font-bold">Breakfast + Lunch</span>
+                    <span className="font-extrabold text-neutral-800">₹{pricingSettings.breakfastLunch}</span>
+                  </div>
+                  <div className="bg-neutral-50 border border-neutral-150 p-3 rounded-2xl flex justify-between items-center">
+                    <span className="text-neutral-500 font-bold">Breakfast + Dinner</span>
+                    <span className="font-extrabold text-neutral-800">₹{pricingSettings.breakfastDinner}</span>
+                  </div>
+                  <div className="bg-neutral-50 border border-neutral-150 p-3 rounded-2xl flex justify-between items-center">
+                    <span className="text-neutral-500 font-bold">Lunch + Dinner</span>
+                    <span className="font-extrabold text-neutral-800">₹{pricingSettings.lunchDinner}</span>
+                  </div>
+                  <div className="bg-neutral-50 border border-neutral-150 p-3 rounded-2xl col-span-2 flex justify-between items-center">
+                    <span className="text-neutral-500 font-bold">All Three Meals</span>
+                    <span className="font-extrabold text-neutral-800">₹{pricingSettings.allMeals}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label className="text-[10px] text-neutral-400 font-bold block mb-1">Only Breakfast (₹)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.breakfastOnly}
+                      onChange={(e) => setPricingForm({ ...pricingForm, breakfastOnly: Number(e.target.value) })}
+                      className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-neutral-400 font-bold block mb-1">Only Lunch (₹)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.lunchOnly}
+                      onChange={(e) => setPricingForm({ ...pricingForm, lunchOnly: Number(e.target.value) })}
+                      className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-neutral-400 font-bold block mb-1">Only Dinner (₹)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.dinnerOnly}
+                      onChange={(e) => setPricingForm({ ...pricingForm, dinnerOnly: Number(e.target.value) })}
+                      className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-neutral-400 font-bold block mb-1">Breakfast + Lunch (₹)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.breakfastLunch}
+                      onChange={(e) => setPricingForm({ ...pricingForm, breakfastLunch: Number(e.target.value) })}
+                      className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-neutral-400 font-bold block mb-1">Breakfast + Dinner (₹)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.breakfastDinner}
+                      onChange={(e) => setPricingForm({ ...pricingForm, breakfastDinner: Number(e.target.value) })}
+                      className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-neutral-400 font-bold block mb-1">Lunch + Dinner (₹)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.lunchDinner}
+                      onChange={(e) => setPricingForm({ ...pricingForm, lunchDinner: Number(e.target.value) })}
+                      className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-medium"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="text-[10px] text-neutral-400 font-bold block mb-1">All Three Meals (Breakfast + Lunch + Dinner) (₹)</label>
+                    <input
+                      type="number"
+                      value={pricingForm.allMeals}
+                      onChange={(e) => setPricingForm({ ...pricingForm, allMeals: Number(e.target.value) })}
+                      className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2 font-medium"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Student Reviews List Card */}
+            <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm space-y-3">
+              <h3 className="text-base font-bold text-neutral-800 border-b border-neutral-50 pb-2">Student Reviews & Ratings</h3>
+              
+              <div className="space-y-3">
+                {feedbacks.map((review) => (
+                  <div key={review.id} className="bg-neutral-50 rounded-2xl border border-neutral-150 p-4 shadow-3xs text-xs space-y-2">
+                    <div className="flex items-center justify-between border-b border-neutral-100 pb-2">
+                      <div>
+                        <p className="font-bold text-neutral-800">{review.studentName}</p>
+                        <p className="text-[9px] text-neutral-450 font-semibold">{review.date}</p>
+                      </div>
+                      {/* Stars */}
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-3.5 h-3.5 ${
+                              star <= review.rating 
+                                ? 'text-amber-400 fill-current' 
+                                : 'text-neutral-250'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-neutral-600 font-medium italic leading-relaxed">
+                      "{review.comments}"
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Admin Tab Bottom Navigation Bar */}
+      <div className="bg-white rounded-t-[32px] border-t border-neutral-150/70 pt-3 pb-6 px-4 flex justify-between shrink-0 z-30 select-none shadow-[0_-8px_20px_rgba(0,0,0,0.03)]">
+        
+        {/* Stats Tab */}
+        <button
+          onClick={() => setActiveTab('stats')}
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'stats' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          }`}
+        >
+          <LayoutDashboard className="w-5 h-5" fill={activeTab === 'stats' ? 'currentColor' : 'none'} strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Overview</span>
+        </button>
+
+        {/* Menu Tab */}
+        <button
+          onClick={() => setActiveTab('menu')}
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'menu' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          }`}
+        >
+          <Utensils className="w-5 h-5" strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Menu</span>
+        </button>
+
+        {/* Students Tab */}
+        <button
+          onClick={() => setActiveTab('students')}
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'students' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          }`}
+        >
+          <Users className="w-5 h-5" strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Students</span>
+        </button>
+
+        {/* Attendance Tab */}
+        <button
+          onClick={() => setActiveTab('attendance')}
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'attendance' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          }`}
+        >
+          <Calendar className="w-5 h-5" strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Attendance</span>
+        </button>
+
+        {/* Profile Tab */}
+        <button
+          onClick={() => setActiveTab('profile')}
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'profile' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          }`}
+        >
+          <User className="w-5 h-5" strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Profile</span>
+        </button>
+
+      </div>
+
+      {/* Announcement Modal Popup overlay */}
+      <AnimatePresence>
+        {showAnnouncementModal && (
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-end justify-center z-50">
+            <motion.div
+              initial={{ y: 300, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 300, opacity: 0 }}
+              className="bg-white rounded-t-[36px] w-full p-6 space-y-4 max-h-[80%] overflow-y-auto no-scrollbar relative z-50 text-xs"
+            >
+              <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+                <h3 className="font-bold text-neutral-800 text-base">Broadcast Announcement</h3>
+                <button 
+                  onClick={() => setShowAnnouncementModal(false)}
+                  className="text-xs font-extrabold text-neutral-455 hover:text-neutral-600"
+                >
+                  Cancel
+                </button>
+              </div>
+
               <p className="text-neutral-400 leading-relaxed font-semibold">
                 Compose messages to broadcast to the sliding alert bar on student dashboard screens.
               </p>
@@ -685,9 +1285,9 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                 </div>
               )}
 
-              <form onSubmit={handleBroadcast} className="space-y-3">
+              <form onSubmit={handleBroadcast} className="space-y-4">
                 <div>
-                  <label className="text-[10px] text-neutral-400 font-bold block mb-1.5">Notification Banner Text</label>
+                  <label className="text-[10px] text-neutral-450 font-bold block mb-1.5 uppercase tracking-wider">Notification Banner Text</label>
                   <textarea
                     rows={4}
                     value={announcementText}
@@ -705,118 +1305,59 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                   <Megaphone className="w-4 h-4" /> Broadcast Announcement
                 </button>
               </form>
-            </div>
+            </motion.div>
           </div>
         )}
+      </AnimatePresence>
 
-        {/* TAB 6: feedback reviews */}
-        {activeTab === 'feedback' && (
-          <div className="space-y-4">
-            <h3 className="text-base font-bold text-neutral-800 px-1">Student Reviews & Ratings</h3>
-            
-            <div className="space-y-3">
-              {feedbacks.map((review) => (
-                <div key={review.id} className="bg-white rounded-2xl border border-neutral-100 p-4 shadow-3xs text-xs space-y-2">
-                  <div className="flex items-center justify-between border-b border-neutral-50 pb-2">
-                    <div>
-                      <p className="font-bold text-neutral-800">{review.studentName}</p>
-                      <p className="text-[9px] text-neutral-400 font-semibold">{review.date}</p>
-                    </div>
-                    {/* Stars */}
-                    <div className="flex gap-0.5">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-3.5 h-3.5 ${
-                            star <= review.rating 
-                              ? 'text-amber-400 fill-current' 
-                              : 'text-neutral-250'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-neutral-650 font-medium italic leading-relaxed">
-                    "{review.comments}"
-                  </p>
-                </div>
-              ))}
-            </div>
+      {/* Admin Confirm Skip / Override Modal */}
+      <AnimatePresence>
+        {adminConfirmSkip && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-xl border border-neutral-100 text-xs"
+            >
+              <div className="w-12 h-12 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center text-amber-500 mx-auto text-lg shadow-sm">
+                ⚠️
+              </div>
+              <div>
+                <h4 className="font-extrabold text-neutral-800 text-base">
+                  {adminConfirmSkip.isPendingSkip ? 'Confirm Skip Request' : 'Confirm Attendance Change'}
+                </h4>
+                <p className="text-neutral-550 leading-relaxed mt-1 font-semibold">
+                  {adminConfirmSkip.isPendingSkip ? (
+                    <>Are you sure you want to approve the skip request for student <strong>{adminConfirmSkip.studentName}</strong>'s <strong>{adminConfirmSkip.meal}</strong> today? This will mark them absent.</>
+                  ) : (
+                    <>Are you sure you want to change student <strong>{adminConfirmSkip.studentName}</strong>'s <strong>{adminConfirmSkip.meal}</strong> attendance today from <strong>{adminConfirmSkip.currentStatus}</strong> to <strong>{adminConfirmSkip.currentStatus === 'Present' ? 'Absent' : 'Present'}</strong>?</>
+                  )}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setAdminConfirmSkip(null)}
+                  className="w-full py-2.5 bg-neutral-100 hover:bg-neutral-250 text-neutral-600 font-bold rounded-xl transition-all cursor-pointer focus:outline-none"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleToggleAttendance(adminConfirmSkip.userId, adminConfirmSkip.meal, adminConfirmSkip.currentStatus);
+                    setAdminConfirmSkip(null);
+                  }}
+                  className="w-full py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all cursor-pointer shadow-sm focus:outline-none"
+                >
+                  Confirm
+                </button>
+              </div>
+            </motion.div>
           </div>
         )}
-
-      </div>
-
-      {/* Admin Tab Bottom Navigation Bar */}
-      <div className="bg-white border-t border-neutral-200 py-2.5 px-4 flex justify-between shrink-0 z-30 select-none shadow-md">
-        
-        {/* Stats Tab */}
-        <button
-          onClick={() => setActiveTab('stats')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'stats' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
-          }`}
-        >
-          <span className="text-lg">📊</span>
-          <span className="text-[10px] mt-0.5">Overview</span>
-        </button>
-
-        {/* Menu Tab */}
-        <button
-          onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'menu' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
-          }`}
-        >
-          <span className="text-lg">🍱</span>
-          <span className="text-[10px] mt-0.5">Menu</span>
-        </button>
-
-        {/* Students Tab */}
-        <button
-          onClick={() => setActiveTab('students')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'students' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
-          }`}
-        >
-          <span className="text-lg">👥</span>
-          <span className="text-[10px] mt-0.5">Students</span>
-        </button>
-
-        {/* Attendance Tab */}
-        <button
-          onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'attendance' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
-          }`}
-        >
-          <span className="text-lg">📅</span>
-          <span className="text-[10px] mt-0.5">Attendance</span>
-        </button>
-
-        {/* Announcements Tab */}
-        <button
-          onClick={() => setActiveTab('announcements')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'announcements' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
-          }`}
-        >
-          <span className="text-lg">📣</span>
-          <span className="text-[10px] mt-0.5">Broadcast</span>
-        </button>
-
-        {/* Feedback Tab */}
-        <button
-          onClick={() => setActiveTab('feedback')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'feedback' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
-          }`}
-        >
-          <span className="text-lg">💬</span>
-          <span className="text-[10px] mt-0.5">Feedback</span>
-        </button>
-
-      </div>
+      </AnimatePresence>
 
     </div>
   );

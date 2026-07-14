@@ -50,6 +50,14 @@ export const authAPI = {
   getMe: async () => {
     const response = await api.get('/api/auth/me');
     return response.data;
+  },
+  updateProfile: async (profileData: { name?: string; profileImage?: string }) => {
+    const response = await api.put('/api/auth/profile', profileData);
+    return response.data;
+  },
+  markNotificationsRead: async () => {
+    const response = await api.put('/api/auth/notifications/read');
+    return response.data;
   }
 };
 
@@ -99,6 +107,18 @@ export const attendanceAPI = {
   getSummary: async () => {
     const response = await api.get('/api/attendance/summary');
     return response.data;
+  },
+  updateAttendance: async (payload: { userId: string; meal: 'breakfast' | 'lunch' | 'dinner'; status: boolean }) => {
+    const response = await api.put('/api/attendance/update', payload);
+    return response.data;
+  },
+  requestSkip: async (meal: 'breakfast' | 'lunch' | 'dinner') => {
+    const response = await api.post('/api/attendance/request-skip', { meal });
+    return response.data;
+  },
+  getHistory: async () => {
+    const response = await api.get('/api/attendance/history');
+    return response.data;
   }
 };
 
@@ -120,6 +140,17 @@ export const announcementAPI = {
   },
   publishAnnouncement: async (announcementData: { text: string }) => {
     const response = await api.post('/api/announcements', announcementData);
+    return response.data;
+  }
+};
+
+export const settingsAPI = {
+  getPricing: async () => {
+    const response = await api.get('/api/settings/pricing');
+    return response.data;
+  },
+  updatePricing: async (pricingData: any) => {
+    const response = await api.put('/api/settings/pricing', pricingData);
     return response.data;
   }
 };

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { User, Lock, Eye, EyeOff, Mail, Home } from 'lucide-react';
 import { motion } from 'motion/react';
 import { authAPI } from '../services/api';
+import tiffinLogo from '../assets/tiffin_logo_3d.png';
 
 interface LoginPageProps {
   onLoginSuccess: (user: any, token: string) => void;
@@ -87,11 +88,9 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
     <div className="absolute inset-0 bg-neutral-100 flex flex-col justify-between overflow-y-auto no-scrollbar pb-6">
       {/* Top Brand Section */}
       <div className="flex-1 flex flex-col items-center justify-center py-6 px-6 text-center select-none shrink-0">
-        {/* Figma Logo Placeholder */}
-        <div className="w-16 h-16 bg-neutral-200 rounded-full flex items-center justify-center mb-3 border border-neutral-300 shadow-xs relative overflow-hidden">
-          <svg className="w-8 h-8 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
+        {/* 3D Tiffin Logo */}
+        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-3 border border-neutral-200/80 shadow-xs relative overflow-hidden p-0.5 select-none">
+          <img src={tiffinLogo} alt="Mess Tiffin Logo" className="w-full h-full object-contain rounded-full" />
         </div>
 
         {/* Title */}
@@ -109,10 +108,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
           <div className="flex-1 h-px bg-primary/20"></div>
         </div>
 
-        {/* Tagline */}
-        <p className="text-[10px] font-semibold italic text-neutral-500 max-w-[260px] tracking-wide">
-          Manage Meals. Track Attendance. Simplify Life.
-        </p>
+
       </div>
 
       {/* Bottom Drawer Card */}

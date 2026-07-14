@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { 
-  Bell, LogOut, CheckCircle2, Circle, Calendar, 
+  Bell, LogOut, Calendar, 
   CreditCard, Send, Star, ChevronDown, ChevronUp, 
-  ShieldAlert, Sparkles, Check, CheckCircle
+  ShieldAlert, Sparkles, Check, CheckCircle,
+  Home, Utensils, User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { attendanceAPI, menuAPI, feedbackAPI, announcementAPI, studentAPI, authAPI } from '../services/api';
+import { attendanceAPI, menuAPI, feedbackAPI, studentAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
 
 interface StudentDashboardProps {
   userName: string;
@@ -15,24 +16,70 @@ interface StudentDashboardProps {
 
 interface MealState {
   breakfast: boolean;
+  breakfastPendingSkip?: boolean;
   lunch: boolean;
+  lunchPendingSkip?: boolean;
   dinner: boolean;
+  dinnerPendingSkip?: boolean;
 }
 
 export function StudentDashboard({ userName, userId, onLogout }: StudentDashboardProps) {
   // Navigation & UI states
-  const [activeTab, setActiveTab] = useState<'home' | 'menu' | 'billing' | 'feedback'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'menu' | 'attendance' | 'billing' | 'profile'>('home');
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
   const [loading, setLoading] = useState(true);
 
   // Core Data States
-  const [meals, setMeals] = useState<MealState>({ breakfast: true, lunch: false, dinner: true });
+  const [meals, setMeals] = useState<MealState>({
+    breakfast: true,
+    breakfastPendingSkip: false,
+    lunch: false,
+    lunchPendingSkip: false,
+    dinner: true,
+    dinnerPendingSkip: false
+  });
   const [weeklyMenu, setWeeklyMenu] = useState<any[]>([]);
+  const [confirmMealSkip, setConfirmMealSkip] = useState<'breakfast' | 'lunch' | 'dinner' | null>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
   const [billAmount, setBillAmount] = useState(2400);
   const [billStatus, setBillStatus] = useState('pending');
   const [planName, setPlanName] = useState('2-Meal Standard');
-  const [announcements, setAnnouncements] = useState<string[]>(["📢 Welcome to Mess Tiffin Management System!"]);
+  const [announcements, setAnnouncements] = useState<string[]>([]);
+  const [userEmail, setUserEmail] = useState('');
+  const [roomNumber, setRoomNumber] = useState('304');
+  const [accountStatus, setAccountStatus] = useState('active');
+  const [profileImage, setProfileImage] = useState('');
+
+  const [pricingSettings, setPricingSettings] = useState({
+    breakfastOnly: 800,
+    lunchOnly: 1200,
+    dinnerOnly: 1200,
+    breakfastLunch: 1850,
+    breakfastDinner: 1850,
+    lunchDinner: 2200,
+    allMeals: 2800
+  });
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+      try {
+        const res = await authAPI.updateProfile({ profileImage: base64String });
+        if (res.success) {
+          setProfileImage(res.profileImage);
+        }
+      } catch (error) {
+        console.error('Error uploading profile picture:', error);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Accordion state for Weekly Menu
   const [expandedDay, setExpandedDay] = useState<number | null>(0);
@@ -59,6 +106,13 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         setBillAmount(profile.billAmount);
         setBillStatus(profile.billStatus);
         setPlanName(profile.plan);
+        setUserEmail(profile.email || '');
+        setRoomNumber(profile.room || '304');
+        setAccountStatus(profile.status || 'active');
+        setProfileImage(profile.profileImage || '');
+        setNotifications(profile.notifications || []);
+        const hasUnread = (profile.notifications || []).some((n: any) => !n.read);
+        setHasNotification(hasUnread);
       }
 
       // 2. Fetch today's meal attendance
@@ -66,8 +120,11 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
       if (attendance.success && attendance.data) {
         setMeals({
           breakfast: attendance.data.breakfast,
+          breakfastPendingSkip: attendance.data.breakfastPendingSkip || false,
           lunch: attendance.data.lunch,
-          dinner: attendance.data.dinner
+          lunchPendingSkip: attendance.data.lunchPendingSkip || false,
+          dinner: attendance.data.dinner,
+          dinnerPendingSkip: attendance.data.dinnerPendingSkip || false
         });
       }
 
@@ -83,6 +140,18 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         setAnnouncements(notes.data);
       }
 
+      // 5. Fetch attendance history
+      const historyRes = await attendanceAPI.getHistory();
+      if (historyRes.success) {
+        setAttendanceHistory(historyRes.data);
+      }
+
+      // 6. Fetch pricing settings
+      const pricingRes = await settingsAPI.getPricing().catch(() => null);
+      if (pricingRes && pricingRes.success) {
+        setPricingSettings(pricingRes.data);
+      }
+
     } catch (error) {
       console.error('Error loading student dashboard details:', error);
     } finally {
@@ -92,26 +161,61 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
 
   useEffect(() => {
     fetchData();
-  }, []);
 
-  const handleToggleMeal = async (meal: keyof MealState) => {
+    // Auto-poll every 8 seconds to sync attendance overrides from Admin portal
+    const timer = setInterval(() => {
+      fetchData();
+    }, 8000);
+
+    return () => clearInterval(timer);
+  }, [activeTab]);
+
+  const isMealSkipCutoffExceeded = (meal: 'breakfast' | 'lunch' | 'dinner'): boolean => {
+    const now = new Date();
+    const hour = now.getHours();
+
+    if (meal === 'breakfast') return hour >= 7;
+    if (meal === 'lunch') return hour >= 11;
+    if (meal === 'dinner') return hour >= 18;
+    return false;
+  };
+
+  const handleClearNotifications = async () => {
     try {
-      // Optimitistic UI update
-      setMeals(prev => ({ ...prev, [meal]: !prev[meal] }));
+      await authAPI.markNotificationsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setHasNotification(false);
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+    }
+  };
+
+  const handleRequestSkipMeal = async (meal: 'breakfast' | 'lunch' | 'dinner') => {
+    try {
+      // Optimistic UI update
+      setMeals(prev => ({
+        ...prev,
+        [`${meal}PendingSkip`]: true
+      }));
       
-      // Save in backend
-      const res = await attendanceAPI.toggleMeal(meal);
+      const res = await attendanceAPI.requestSkip(meal);
       if (res.success && res.data) {
         setMeals({
           breakfast: res.data.breakfast,
+          breakfastPendingSkip: res.data.breakfastPendingSkip || false,
           lunch: res.data.lunch,
-          dinner: res.data.dinner
+          lunchPendingSkip: res.data.lunchPendingSkip || false,
+          dinner: res.data.dinner,
+          dinnerPendingSkip: res.data.dinnerPendingSkip || false
         });
       }
     } catch (error) {
-      console.error('Error toggling attendance marker:', error);
-      // Revert if error
-      setMeals(prev => ({ ...prev, [meal]: !prev[meal] }));
+      console.error('Error requesting meal skip:', error);
+      // Revert on error
+      setMeals(prev => ({
+        ...prev,
+        [`${meal}PendingSkip`]: false
+      }));
     }
   };
 
@@ -179,16 +283,24 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
       {/* 1. Header Bar */}
       <div className="bg-primary text-white pt-4 pb-6 px-5 rounded-b-[32px] shadow-lg shrink-0 z-30">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Avatar badge with initials */}
-            <div className="w-11 h-11 bg-white/20 rounded-full border border-white/30 flex items-center justify-center font-bold text-sm text-white shadow-xs">
-              {userName.split(' ').map(n => n[0]).join('').toUpperCase()}
+          <button
+            onClick={() => setActiveTab('profile')}
+            className="flex items-center gap-3 text-left focus:outline-none hover:opacity-95 transition-all select-none group"
+            title="View Profile"
+          >
+            {/* Avatar badge with photo */}
+            <div className="w-11 h-11 bg-white/20 rounded-full border border-white/30 flex items-center justify-center font-bold text-sm text-white shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
+              {profileImage ? (
+                <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+              ) : (
+                userName.split(' ').map(n => n[0]).join('').toUpperCase()
+              )}
             </div>
             <div>
-              <p className="text-[10px] text-white/70 font-semibold tracking-wider uppercase">Good Morning</p>
-              <h3 className="text-base font-bold text-white leading-tight">{userName}</h3>
+              <p className="text-[10px] text-white/70 font-semibold tracking-wider uppercase flex items-center gap-1">Good Morning 👤</p>
+              <h3 className="text-base font-bold text-white leading-tight underline decoration-white/20 group-hover:decoration-white transition-all">{userName}</h3>
             </div>
-          </div>
+          </button>
           <div className="flex items-center gap-2">
             {/* Notification Bell */}
             <button 
@@ -227,116 +339,63 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-4 right-4 bg-white rounded-2xl shadow-xl border border-neutral-100 p-4 z-40"
+            className="absolute top-20 left-4 right-4 bg-white rounded-2xl shadow-xl border border-neutral-100 p-4 z-45"
           >
             <div className="flex items-center justify-between mb-3 border-b border-neutral-100 pb-2">
               <h4 className="font-bold text-neutral-800 text-xs">Notifications</h4>
               <button 
-                onClick={() => setShowNotifications(false)} 
-                className="text-[10px] text-neutral-400 hover:text-neutral-600 font-bold"
+                onClick={handleClearNotifications} 
+                className="text-[10px] text-primary hover:text-primary-dark font-extrabold cursor-pointer focus:outline-none"
               >
-                Clear
+                Mark Read
               </button>
             </div>
-            <div className="space-y-3 max-h-48 overflow-y-auto no-scrollbar">
-              <div className="text-xs p-2.5 rounded-xl bg-primary-light/50 border border-primary-light flex gap-2">
-                <span className="text-base">🎉</span>
-                <div>
-                  <p className="font-bold text-primary-dark">Server Sync Active</p>
-                  <p className="text-neutral-500 text-[10px] mt-0.5">Your student profile is now linked to a live MongoDB backend API.</p>
+            <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+              {notifications.length > 0 ? (
+                notifications.map((notif: any) => (
+                  <div key={notif.id} className={`text-xs p-2.5 rounded-xl border flex gap-2 transition-all ${
+                    notif.read 
+                      ? 'bg-neutral-50/50 border-neutral-100 text-neutral-400 font-semibold' 
+                      : 'bg-emerald-50/30 border-emerald-100 text-neutral-800 font-bold shadow-3xs'
+                  }`}>
+                    <span className="text-sm">🔔</span>
+                    <div className="flex-1">
+                      <p className={`text-[11px] leading-tight ${notif.read ? 'text-neutral-500 font-normal' : 'text-neutral-800 font-semibold'}`}>{notif.text}</p>
+                      <p className="text-neutral-450 text-[8px] mt-0.5 font-medium">
+                        {new Date(notif.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6 text-neutral-450 font-bold text-[10px] space-y-1">
+                  <p className="text-lg">📭</p>
+                  <p>No new notifications today</p>
                 </div>
-              </div>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* 3. Main Scrollable Content */}
+       {/* 3. Main Scrollable Content */}
       <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-4">
-        
+
         {/* Announcements Notice Alert bar */}
-        <div className="bg-yellow-50 border border-yellow-250 rounded-2xl p-3 flex gap-2 items-center text-[11px] font-semibold text-yellow-800 shadow-3xs shrink-0 select-none">
-          <span className="text-sm shrink-0">📢</span>
-          <div className="overflow-hidden relative w-full h-4">
-            <div className="absolute w-full animate-pulse whitespace-nowrap overflow-hidden text-ellipsis">
-              {announcements[0]}
+        {announcements.length > 0 && (
+          <div className="bg-yellow-50 border border-yellow-250 rounded-2xl p-3 flex gap-2 items-center text-[11px] font-semibold text-yellow-800 shadow-3xs shrink-0 select-none">
+            <span className="text-sm shrink-0">📢</span>
+            <div className="overflow-hidden relative w-full h-4">
+              <div className="absolute w-full animate-pulse whitespace-nowrap overflow-hidden text-ellipsis">
+                {announcements[0]}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Tab View Contents */}
         {activeTab === 'home' && (
           <>
-            {/* Meal Attendance Checklist */}
-            <div className="bg-white rounded-3xl p-4 shadow-sm border border-neutral-100 space-y-3">
-              <div className="flex items-center justify-between border-b border-neutral-50 pb-2">
-                <h4 className="font-bold text-neutral-800 text-sm">Today's Attendance</h4>
-                <span className="text-[10px] text-neutral-400 font-semibold uppercase">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-2">
-                {/* Breakfast */}
-                <button
-                  onClick={() => handleToggleMeal('breakfast')}
-                  className={`flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
-                    meals.breakfast 
-                      ? 'bg-primary-light/45 border-primary text-primary-dark font-bold'
-                      : 'bg-neutral-50 border-neutral-200 text-neutral-400 font-semibold'
-                  }`}
-                >
-                  <span className="text-xl">🍳</span>
-                  <span className="text-xs mt-1 text-[11px]">Breakfast</span>
-                  <span className="text-[9px] text-neutral-400 font-medium my-1">8AM - 10AM</span>
-                  {meals.breakfast ? (
-                    <CheckCircle2 className="w-5 h-5 text-primary fill-current text-white" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-neutral-300" />
-                  )}
-                </button>
-
-                {/* Lunch */}
-                <button
-                  onClick={() => handleToggleMeal('lunch')}
-                  className={`flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
-                    meals.lunch 
-                      ? 'bg-primary-light/45 border-primary text-primary-dark font-bold'
-                      : 'bg-neutral-50 border-neutral-200 text-neutral-400 font-semibold'
-                  }`}
-                >
-                  <span className="text-xl">🍲</span>
-                  <span className="text-xs mt-1 text-[11px]">Lunch</span>
-                  <span className="text-[9px] text-neutral-400 font-medium my-1">1PM - 3PM</span>
-                  {meals.lunch ? (
-                    <CheckCircle2 className="w-5 h-5 text-primary fill-current text-white" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-neutral-300" />
-                  )}
-                </button>
-
-                {/* Dinner */}
-                <button
-                  onClick={() => handleToggleMeal('dinner')}
-                  className={`flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
-                    meals.dinner 
-                      ? 'bg-primary-light/45 border-primary text-primary-dark font-bold'
-                      : 'bg-neutral-50 border-neutral-200 text-neutral-400 font-semibold'
-                  }`}
-                >
-                  <span className="text-xl">🍽️</span>
-                  <span className="text-xs mt-1 text-[11px]">Dinner</span>
-                  <span className="text-[9px] text-neutral-400 font-medium my-1">8PM - 10PM</span>
-                  {meals.dinner ? (
-                    <CheckCircle2 className="w-5 h-5 text-primary fill-current text-white" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-neutral-300" />
-                  )}
-                </button>
-              </div>
-              <p className="text-[9px] text-neutral-400 text-center font-medium italic mt-1">
-                *Attendance changes save instantly to the live database.
-              </p>
-            </div>
-
             {/* Active Tiffin Plan Card (Glassmorphic) */}
             <div className="relative rounded-3xl p-5 overflow-hidden text-white shadow-md bg-gradient-to-br from-primary to-primary-dark select-none">
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
@@ -394,6 +453,287 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
             </div>
           </>
         )}
+
+        {/* Dedicated Attendance Tab */}
+        {activeTab === 'attendance' && (
+          <div className="space-y-4">
+            <h3 className="text-base font-bold text-neutral-800 px-1">Meal Attendance Tracker</h3>
+
+            {/* Meal Attendance Checklist */}
+            <div className="bg-white rounded-3xl p-4 shadow-sm border border-neutral-100 space-y-3">
+              <div className="flex items-center justify-between border-b border-neutral-50 pb-2">
+                <h4 className="font-bold text-neutral-800 text-sm">Today's Attendance Checklist</h4>
+                <span className="text-[10px] text-neutral-400 font-semibold uppercase">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-2">
+                {/* Breakfast */}
+                <button
+                  disabled={!meals.breakfast || meals.breakfastPendingSkip || isMealSkipCutoffExceeded('breakfast')}
+                  onClick={() => setConfirmMealSkip('breakfast')}
+                  className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
+                    !meals.breakfast
+                      ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
+                      : meals.breakfastPendingSkip
+                        ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
+                        : isMealSkipCutoffExceeded('breakfast')
+                          ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
+                          : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
+                  }`}
+                  title={
+                    !meals.breakfast
+                      ? 'Skip Request Approved'
+                      : meals.breakfastPendingSkip
+                        ? 'Skip Request Pending Approval'
+                        : isMealSkipCutoffExceeded('breakfast')
+                          ? 'Cut-off time (7:00 AM) has passed'
+                          : 'Click to Apply for Absent'
+                  }
+                >
+                  {/* Top-Right Indicator Mark */}
+                  <div className="absolute top-1.5 right-1.5">
+                    {!meals.breakfast ? (
+                      <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
+                    ) : meals.breakfastPendingSkip ? (
+                      <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
+                    ) : (
+                      <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
+                    )}
+                  </div>
+
+                  <span className="text-xl">🍳</span>
+                  <span className="text-xs mt-1 text-[11px] font-bold">Breakfast</span>
+                  <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">8:00 AM - 10:00 AM</span>
+                  {isMealSkipCutoffExceeded('breakfast') ? (
+                    <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (7:00 AM)</span>
+                  ) : (
+                    <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 7:00 AM</span>
+                  )}
+                  {!meals.breakfast ? (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
+                  ) : meals.breakfastPendingSkip ? (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
+                  ) : (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
+                  )}
+                </button>
+
+                {/* Lunch */}
+                <button
+                  disabled={!meals.lunch || meals.lunchPendingSkip || isMealSkipCutoffExceeded('lunch')}
+                  onClick={() => setConfirmMealSkip('lunch')}
+                  className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
+                    !meals.lunch
+                      ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
+                      : meals.lunchPendingSkip
+                        ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
+                        : isMealSkipCutoffExceeded('lunch')
+                          ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
+                          : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
+                  }`}
+                  title={
+                    !meals.lunch
+                      ? 'Skip Request Approved'
+                      : meals.lunchPendingSkip
+                        ? 'Skip Request Pending Approval'
+                        : isMealSkipCutoffExceeded('lunch')
+                          ? 'Cut-off time (11:00 AM) has passed'
+                          : 'Click to Apply for Absent'
+                  }
+                >
+                  {/* Top-Right Indicator Mark */}
+                  <div className="absolute top-1.5 right-1.5">
+                    {!meals.lunch ? (
+                      <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
+                    ) : meals.lunchPendingSkip ? (
+                      <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
+                    ) : (
+                      <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
+                    )}
+                  </div>
+
+                  <span className="text-xl">🍲</span>
+                  <span className="text-xs mt-1 text-[11px] font-bold">Lunch</span>
+                  <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">1:00 PM - 3:00 PM</span>
+                  {isMealSkipCutoffExceeded('lunch') ? (
+                    <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (11:00 AM)</span>
+                  ) : (
+                    <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 11:00 AM</span>
+                  )}
+                  {!meals.lunch ? (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
+                  ) : meals.lunchPendingSkip ? (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
+                  ) : (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
+                  )}
+                </button>
+
+                {/* Dinner */}
+                <button
+                  disabled={!meals.dinner || meals.dinnerPendingSkip || isMealSkipCutoffExceeded('dinner')}
+                  onClick={() => setConfirmMealSkip('dinner')}
+                  className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
+                    !meals.dinner
+                      ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
+                      : meals.dinnerPendingSkip
+                        ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
+                        : isMealSkipCutoffExceeded('dinner')
+                          ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
+                          : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
+                  }`}
+                  title={
+                    !meals.dinner
+                      ? 'Skip Request Approved'
+                      : meals.dinnerPendingSkip
+                        ? 'Skip Request Pending Approval'
+                        : isMealSkipCutoffExceeded('dinner')
+                          ? 'Cut-off time (6:00 PM) has passed'
+                          : 'Click to Apply for Absent'
+                  }
+                >
+                  {/* Top-Right Indicator Mark */}
+                  <div className="absolute top-1.5 right-1.5">
+                    {!meals.dinner ? (
+                      <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
+                    ) : meals.dinnerPendingSkip ? (
+                      <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
+                    ) : (
+                      <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
+                    )}
+                  </div>
+
+                  <span className="text-xl">🍽️</span>
+                  <span className="text-xs mt-1 text-[11px] font-bold">Dinner</span>
+                  <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">8:00 PM - 10:00 PM</span>
+                  {isMealSkipCutoffExceeded('dinner') ? (
+                    <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (6:00 PM)</span>
+                  ) : (
+                    <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 6:00 PM</span>
+                  )}
+                  {!meals.dinner ? (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
+                  ) : meals.dinnerPendingSkip ? (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
+                  ) : (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
+                  )}
+                </button>
+              </div>
+              <p className="text-[9px] text-neutral-400 text-center font-medium italic mt-1">
+                *Attendance changes save instantly to the live database.
+              </p>
+            </div>
+
+            {/* Attendance History Section */}
+            <div className="bg-white rounded-3xl p-4 shadow-sm border border-neutral-100 space-y-3">
+              <div className="flex items-center justify-between border-b border-neutral-50 pb-2">
+                <h4 className="font-bold text-neutral-800 text-sm">Attendance History</h4>
+                <span className="text-[10px] text-neutral-400 font-semibold uppercase">Past 30 Days</span>
+              </div>
+
+              <div className="divide-y divide-neutral-50 max-h-60 overflow-y-auto no-scrollbar">
+                {attendanceHistory.length > 0 ? (
+                  attendanceHistory.map((record) => (
+                    <div key={record._id} className="py-2.5 flex items-center justify-between text-xs font-semibold">
+                      <div className="space-y-0.5 text-left">
+                        <p className="text-neutral-800 font-bold">
+                          {new Date(record.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                        </p>
+                        <p className="text-[9px] text-neutral-400 font-medium">Daily Log Status</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-right">
+                        {/* Breakfast Indicator */}
+                        <span 
+                          className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                            record.breakfast 
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                              : 'bg-red-50 text-red-700 border border-red-100'
+                          }`}
+                          title="Breakfast"
+                        >
+                          🍳 {record.breakfast ? '✓' : '✗'}
+                        </span>
+                        {/* Lunch Indicator */}
+                        <span 
+                          className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                            record.lunch 
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                              : 'bg-red-50 text-red-700 border border-red-100'
+                          }`}
+                          title="Lunch"
+                        >
+                          🍲 {record.lunch ? '✓' : '✗'}
+                        </span>
+                        {/* Dinner Indicator */}
+                        <span 
+                          className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                            record.dinner 
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                              : 'bg-red-50 text-red-700 border border-red-100'
+                          }`}
+                          title="Dinner"
+                        >
+                          🍽️ {record.dinner ? '✓' : '✗'}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-6 text-neutral-400 font-bold text-[10px] space-y-1">
+                    <p className="text-lg">📭</p>
+                    <p>No historical logs found.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        <AnimatePresence>
+          {confirmMealSkip && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-xl border border-neutral-100 text-xs"
+              >
+                <div className="w-12 h-12 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center text-amber-500 mx-auto text-lg shadow-sm">
+                  ⚠️
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-neutral-800 text-base capitalize">
+                    Request Skip: {confirmMealSkip}
+                  </h4>
+                  <p className="text-neutral-500 leading-relaxed mt-1 font-semibold">
+                    Are you sure you want to cancel today's {confirmMealSkip}? Once approved by the mess admin, you will be marked absent for this meal.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmMealSkip(null)}
+                    className="w-full py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-bold rounded-xl transition-all cursor-pointer focus:outline-none"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleRequestSkipMeal(confirmMealSkip);
+                      setConfirmMealSkip(null);
+                    }}
+                    className="w-full py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all cursor-pointer shadow-sm focus:outline-none"
+                  >
+                    Confirm Skip
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Weekly Menu View */}
         {activeTab === 'menu' && (
@@ -484,84 +824,176 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                 </div>
               </div>
             </div>
+
+            {/* Standard Pricing Rates Guide */}
+            <div className="bg-white rounded-3xl p-4 border border-neutral-100 shadow-sm space-y-3">
+              <h4 className="font-bold text-neutral-800 text-xs border-b border-neutral-50 pb-2">Standard Meal Plan Rates (₹/Month)</h4>
+              
+              <div className="grid grid-cols-2 gap-2.5 text-[10px] font-semibold">
+                <div className="bg-neutral-50 border border-neutral-100 p-2.5 rounded-xl flex justify-between items-center">
+                  <span className="text-neutral-500 font-bold">Only Breakfast</span>
+                  <span className="font-extrabold text-neutral-800">₹{pricingSettings.breakfastOnly}</span>
+                </div>
+                <div className="bg-neutral-50 border border-neutral-100 p-2.5 rounded-xl flex justify-between items-center">
+                  <span className="text-neutral-500 font-bold">Only Lunch</span>
+                  <span className="font-extrabold text-neutral-800">₹{pricingSettings.lunchOnly}</span>
+                </div>
+                <div className="bg-neutral-50 border border-neutral-100 p-2.5 rounded-xl flex justify-between items-center">
+                  <span className="text-neutral-500 font-bold">Only Dinner</span>
+                  <span className="font-extrabold text-neutral-800">₹{pricingSettings.dinnerOnly}</span>
+                </div>
+                <div className="bg-neutral-50 border border-neutral-100 p-2.5 rounded-xl flex justify-between items-center">
+                  <span className="text-neutral-500 font-bold">Breakfast + Lunch</span>
+                  <span className="font-extrabold text-neutral-800">₹{pricingSettings.breakfastLunch}</span>
+                </div>
+                <div className="bg-neutral-50 border border-neutral-100 p-2.5 rounded-xl flex justify-between items-center">
+                  <span className="text-neutral-500 font-bold">Breakfast + Dinner</span>
+                  <span className="font-extrabold text-neutral-800">₹{pricingSettings.breakfastDinner}</span>
+                </div>
+                <div className="bg-neutral-50 border border-neutral-100 p-2.5 rounded-xl flex justify-between items-center">
+                  <span className="text-neutral-500 font-bold">Lunch + Dinner</span>
+                  <span className="font-extrabold text-neutral-800">₹{pricingSettings.lunchDinner}</span>
+                </div>
+                <div className="bg-neutral-50 border border-neutral-100 p-2.5 rounded-xl col-span-2 flex justify-between items-center">
+                  <span className="text-neutral-500 font-bold">All Three Meals</span>
+                  <span className="font-extrabold text-neutral-800">₹{pricingSettings.allMeals}</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Feedback Section */}
-        {activeTab === 'feedback' && (
-          <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm">
-            <h3 className="text-base font-bold text-neutral-800 mb-2">Provide Daily Feedback</h3>
-            <p className="text-xs text-neutral-400 leading-relaxed mb-4">
-              Your feedback is written directly to the database and shared with the kitchen manager.
-            </p>
+        {/* Profile & Feedback Dashboard Section */}
+        {activeTab === 'profile' && (
+          <div className="space-y-4">
+            {/* Profile Information Card */}
+            <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm space-y-5">
+              <div className="flex flex-col items-center justify-center text-center space-y-2 py-2 border-b border-neutral-50 pb-4">
+                {/* Uploadable Avatar */}
+                <div className="relative cursor-pointer">
+                  <div className="w-20 h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center font-extrabold text-2xl text-primary shadow-md overflow-hidden relative">
+                    {profileImage ? (
+                      <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                      userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                    )}
+                  </div>
+                  <label className="absolute bottom-0 right-0 w-7 h-7 bg-primary hover:bg-primary-dark text-white rounded-full flex items-center justify-center cursor-pointer border-2 border-white shadow-md transition-all active:scale-90 animate-pulse" title="Upload Photo">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-neutral-800 text-base">{userName}</h4>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                    {accountStatus === 'active' ? '✔️ Active' : '❌ Inactive'} Student
+                  </span>
+                </div>
+              </div>
 
-            <AnimatePresence mode="wait">
-              {!feedbackSubmitted ? (
-                <form onSubmit={handleFeedbackSubmit} className="space-y-4">
-                  {/* Star Rating */}
-                  <div className="flex flex-col items-center justify-center p-3 bg-neutral-50 rounded-2xl border border-neutral-100">
-                    <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-2">Meal Rating</span>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setFeedbackRating(star)}
-                          className="focus:outline-none transition-transform hover:scale-110"
-                        >
-                          <Star
-                            className={`w-7 h-7 ${
-                              star <= feedbackRating 
-                                ? 'text-amber-400 fill-current' 
-                                : 'text-neutral-300'
-                            }`}
-                          />
-                        </button>
-                      ))}
+              <div className="space-y-3.5 text-xs">
+                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
+                  <span className="font-bold text-neutral-450">Email Address</span>
+                  <span className="font-bold text-neutral-700">{userEmail || `${userName.toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
+                </div>
+                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
+                  <span className="font-bold text-neutral-450">Room Number</span>
+                  <span className="font-bold text-neutral-700">Room {roomNumber}</span>
+                </div>
+                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
+                  <span className="font-bold text-neutral-450">Subscription Plan</span>
+                  <span className="font-bold text-neutral-700">{planName}</span>
+                </div>
+                <div className="flex justify-between items-center py-0.5 pb-0">
+                  <span className="font-bold text-neutral-450">Billing Cycle</span>
+                  <span className="font-bold text-neutral-700">Monthly Pre-paid</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Daily Feedback Form */}
+            <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm">
+              <h3 className="text-base font-bold text-neutral-800 mb-2">Provide Daily Feedback</h3>
+              <p className="text-xs text-neutral-400 leading-relaxed mb-4">
+                Your feedback is written directly to the database and shared with the kitchen manager.
+              </p>
+
+              <AnimatePresence mode="wait">
+                {!feedbackSubmitted ? (
+                  <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+                    {/* Star Rating */}
+                    <div className="flex flex-col items-center justify-center p-3 bg-neutral-50 rounded-2xl border border-neutral-100">
+                      <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-2">Meal Rating</span>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setFeedbackRating(star)}
+                            className="focus:outline-none transition-transform hover:scale-110"
+                          >
+                            <Star
+                              className={`w-7 h-7 ${
+                                star <= feedbackRating 
+                                  ? 'text-amber-400 fill-current' 
+                                  : 'text-neutral-300'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <span className="text-xs font-bold text-neutral-600 mt-2">
+                        {feedbackRating === 5 && "⭐ Excellent - Chef did great!"}
+                        {feedbackRating === 4 && "⭐ Very Good - Delicious!"}
+                        {feedbackRating === 3 && "⭐ Good - Decent meal."}
+                        {feedbackRating === 2 && "⭐ Average - Needs improvement."}
+                        {feedbackRating === 1 && "⭐ Poor - Not satisfied."}
+                      </span>
                     </div>
-                    <span className="text-xs font-bold text-neutral-600 mt-2">
-                      {feedbackRating === 5 && "⭐ Excellent - Chef did great!"}
-                      {feedbackRating === 4 && "⭐ Very Good - Delicious!"}
-                      {feedbackRating === 3 && "⭐ Good - Decent meal."}
-                      {feedbackRating === 2 && "⭐ Average - Needs improvement."}
-                      {feedbackRating === 1 && "⭐ Poor - Not satisfied."}
-                    </span>
-                  </div>
 
-                  {/* Feedback Text Area */}
-                  <div>
-                    <label className="text-xs text-neutral-500 font-bold mb-1.5 block">Review Comments</label>
-                    <textarea
-                      rows={4}
-                      value={feedbackText}
-                      onChange={(e) => setFeedbackText(e.target.value)}
-                      required
-                      placeholder="Write your review here. E.g. Spices were perfect, bread was warm..."
-                      className="w-full bg-neutral-50 border border-neutral-250 rounded-2xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 text-neutral-800 font-medium"
-                    ></textarea>
-                  </div>
+                    {/* Feedback Text Area */}
+                    <div>
+                      <label className="text-xs text-neutral-500 font-bold mb-1.5 block">Review Comments</label>
+                      <textarea
+                        rows={4}
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                        required
+                        placeholder="Write your review here. E.g. Spices were perfect, bread was warm..."
+                        className="w-full bg-neutral-50 border border-neutral-250 rounded-2xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 text-neutral-800 font-medium"
+                      ></textarea>
+                    </div>
 
-                  <button
-                    type="submit"
-                    className="w-full py-3.5 bg-primary text-white font-bold rounded-2xl shadow-sm shadow-primary/20 hover:bg-primary-dark flex items-center justify-center gap-2 transition-all focus:outline-none"
+                    <button
+                      type="submit"
+                      className="w-full py-3.5 bg-primary text-white font-bold rounded-2xl shadow-sm shadow-primary/20 hover:bg-primary-dark flex items-center justify-center gap-2 transition-all focus:outline-none text-xs"
+                    >
+                      <Send className="w-4 h-4" /> Submit Feedback
+                    </button>
+                  </form>
+                ) : (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="flex flex-col items-center justify-center py-8 text-center"
                   >
-                    <Send className="w-4 h-4" /> Submit Feedback
-                  </button>
-                </form>
-              ) : (
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="flex flex-col items-center justify-center py-8 text-center"
-                >
-                  <div className="w-14 h-14 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mb-3">
-                    <Check className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <h4 className="font-bold text-neutral-800 text-sm">Feedback Shared!</h4>
-                  <p className="text-xs text-neutral-400 mt-1">Thank you for making our mess better.</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <div className="w-14 h-14 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mb-3">
+                      <Check className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <h4 className="font-bold text-neutral-800 text-sm">Feedback Shared!</h4>
+                    <p className="text-xs text-neutral-400 mt-1">Thank you for making our mess better.</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         )}
 
@@ -652,7 +1084,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                         <input
                           type="text"
                           required
-                          placeholder="Alex Johnson"
+                          placeholder="Abhay Chavan"
                           className="w-full bg-neutral-50 border border-neutral-250 rounded-xl p-2.5 font-semibold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
@@ -731,50 +1163,61 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
       </AnimatePresence>
 
       {/* 5. Mobile Tab Bottom Navigation Bar */}
-      <div className="bg-white border-t border-neutral-200 py-2.5 px-4 flex justify-between shrink-0 z-30 select-none shadow-md">
+      <div className="bg-white rounded-t-[32px] border-t border-neutral-150/70 pt-3 pb-6 px-4 flex justify-between shrink-0 z-30 select-none shadow-[0_-8px_20px_rgba(0,0,0,0.03)]">
         
         {/* Home Tab */}
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'home' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'home' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
           }`}
         >
-          <span className="text-lg">🏠</span>
-          <span className="text-[10px] mt-0.5">Home</span>
+          <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Home</span>
         </button>
 
         {/* Menu Tab */}
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'menu' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'menu' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
           }`}
         >
-          <span className="text-lg">📋</span>
-          <span className="text-[10px] mt-0.5">Menu</span>
+          <Utensils className="w-5 h-5" strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Menu</span>
         </button>
 
-        {/* Billing Tab */}
+        {/* Attendance Tab */}
+        <button
+          onClick={() => setActiveTab('attendance')}
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'attendance' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          }`}
+        >
+          <Calendar className="w-5 h-5" strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Attendance</span>
+        </button>
+
+        {/* Payments Tab */}
         <button
           onClick={() => setActiveTab('billing')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'billing' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'billing' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
           }`}
         >
-          <span className="text-lg">💳</span>
-          <span className="text-[10px] mt-0.5">Billing</span>
+          <CreditCard className="w-5 h-5" strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Payments</span>
         </button>
 
-        {/* Feedback Tab */}
+        {/* Profile Tab */}
         <button
-          onClick={() => setActiveTab('feedback')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none ${
-            activeTab === 'feedback' ? 'text-primary font-bold scale-105' : 'text-neutral-400 hover:text-neutral-600'
+          onClick={() => setActiveTab('profile')}
+          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
+            activeTab === 'profile' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
           }`}
         >
-          <span className="text-lg">💬</span>
-          <span className="text-[10px] mt-0.5">Feedback</span>
+          <User className="w-5 h-5" strokeWidth={2} />
+          <span className="text-[11px] tracking-wide">Profile</span>
         </button>
 
       </div>
