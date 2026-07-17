@@ -271,7 +271,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   const todayIndex = new Date().getDay(); // 0 is Sunday, 1 is Monday...
   const mappedDayOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const todayDayName = mappedDayOrder[todayIndex];
-  const todayMenu = weeklyMenu.find(m => m.day === todayDayName) || {
+  const todayMenu = (weeklyMenu || []).find(m => m && m.day === todayDayName) || {
     breakfast: 'Idli Sambar',
     lunch: 'Roti, Veg Curry, Rice, Dal',
     dinner: 'Roti, Dal Tadka, Rice'
@@ -293,7 +293,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
               {profileImage ? (
                 <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
               ) : (
-                userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                (userName || 'Student').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()
               )}
             </div>
             <div>
@@ -351,8 +351,8 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
               </button>
             </div>
             <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
-              {notifications.length > 0 ? (
-                notifications.map((notif: any) => (
+              {(notifications || []).length > 0 ? (
+                (notifications || []).map((notif: any) => (
                   <div key={notif.id} className={`text-xs p-2.5 rounded-xl border flex gap-2 transition-all ${
                     notif.read 
                       ? 'bg-neutral-50/50 border-neutral-100 text-neutral-400 font-semibold' 
@@ -633,8 +633,8 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
               </div>
 
               <div className="divide-y divide-neutral-50 max-h-60 overflow-y-auto no-scrollbar">
-                {attendanceHistory.length > 0 ? (
-                  attendanceHistory.map((record) => (
+                {(attendanceHistory || []).length > 0 ? (
+                  (attendanceHistory || []).map((record) => (
                     <div key={record._id} className="py-2.5 flex items-center justify-between text-xs font-semibold">
                       <div className="space-y-0.5 text-left">
                         <p className="text-neutral-800 font-bold">
@@ -740,7 +740,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
           <div className="space-y-3">
             <h3 className="text-base font-bold text-neutral-800 px-1">Weekly Food Menu</h3>
             <div className="space-y-2">
-              {weeklyMenu.map((item, index) => {
+              {(weeklyMenu || []).map((item, index) => {
                 const isExpanded = expandedDay === index;
                 return (
                   <div key={item.day} className="bg-white rounded-2xl border border-neutral-100 overflow-hidden shadow-3xs">
@@ -875,7 +875,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                     {profileImage ? (
                       <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
                     ) : (
-                      userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                      (userName || 'Student').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()
                     )}
                   </div>
                   <label className="absolute bottom-0 right-0 w-7 h-7 bg-primary hover:bg-primary-dark text-white rounded-full flex items-center justify-center cursor-pointer border-2 border-white shadow-md transition-all active:scale-90 animate-pulse" title="Upload Photo">
