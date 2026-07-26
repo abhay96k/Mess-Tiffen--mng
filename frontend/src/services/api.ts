@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://mess-tiffen-mng-2.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://mess-tiffen-mng.onrender.com';
 
 const api = axios.create({
   baseURL: API_URL,
