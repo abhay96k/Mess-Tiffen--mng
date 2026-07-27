@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Lock, Eye, EyeOff, Mail, Home, ArrowRight, Sparkles, ShieldCheck } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, Mail, Home, ArrowRight, ShieldCheck, Utensils } from 'lucide-react';
 import { motion } from 'motion/react';
 import { authAPI } from '../services/api';
 import tiffinLogo from '../assets/tiffin_logo_3d.png';
@@ -73,71 +73,56 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
     }
   };
 
-
-
   return (
-    <div className="absolute inset-0 bg-executive-mesh flex flex-col justify-between overflow-y-auto no-scrollbar pb-6 text-white">
-      {/* Top Brand Section */}
-      <div className="flex-1 flex flex-col items-center justify-center py-6 px-6 text-center select-none shrink-0 relative">
+    <div className="absolute inset-0 bg-slate-50 flex flex-col justify-between overflow-y-auto no-scrollbar pb-6 text-slate-900">
+      
+      {/* Top Header Section */}
+      <div className="flex-1 flex flex-col items-center justify-center py-8 px-6 text-center select-none shrink-0 relative">
         
-        {/* Floating Glass Capsules */}
-        <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-xl border border-white/20 px-3.5 py-1.5 rounded-full text-[11px] font-extrabold flex items-center gap-1.5 shadow-xl text-emerald-300">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
-          <span>v2.0 LIVE</span>
-        </div>
-        <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-xl border border-white/20 px-3.5 py-1.5 rounded-full text-[11px] font-extrabold flex items-center gap-1.5 shadow-xl text-white">
-          <span className="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
-          <span>ONLINE</span>
+        {/* Real World Brand Badge */}
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-extrabold px-3.5 py-1 rounded-full mb-4 flex items-center gap-1.5 shadow-xs">
+          <Utensils className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Smart Meal Management</span>
         </div>
 
-        {/* Hero 3D Logo Icon */}
-        <motion.div 
-          animate={{ y: [0, -6, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="w-24 h-24 bg-white/10 backdrop-blur-2xl rounded-3xl flex items-center justify-center mb-4 border border-white/25 p-3 shadow-2xl relative"
-        >
-          <img src={tiffinLogo} alt="Mess Tiffin Logo" className="w-full h-full object-contain filter drop-shadow-2xl" />
-        </motion.div>
+        {/* Hero App Logo Icon */}
+        <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-3 border border-slate-200 p-3 shadow-md">
+          <img src={tiffinLogo} alt="Mess Tiffin Logo" className="w-full h-full object-contain" />
+        </div>
 
-        {/* Title */}
-        <h1 className="text-3xl font-extrabold text-white tracking-tight drop-shadow-md">
-          Mess Tiffin
+        {/* App Title */}
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+          Mess Tiffin Portal
         </h1>
-        <p className="text-[10px] tracking-[0.28em] text-emerald-400 uppercase font-extrabold mt-1">
-          Smart Meal Management
+        <p className="text-xs text-slate-500 font-medium mt-1">
+          Daily Mess Catering & Attendance System
         </p>
-
-        {/* Live Status Pill Capsule */}
-        <div className="mt-3 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 flex items-center gap-2 text-[11px] font-extrabold text-white shadow-lg">
-          <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-          <span className="text-emerald-200">1000L Daily Fresh Meals</span>
-        </div>
       </div>
 
-      {/* Bottom Executive Glassmorphic Card */}
+      {/* Real World Auth Card Container */}
       <motion.div
-        initial={{ y: 200, opacity: 0 }}
+        initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="w-full bg-executive-card rounded-t-[38px] px-6 pt-6 pb-6 flex flex-col gap-4 shrink-0 shadow-2xl border-t border-white/25"
+        className="w-full bg-white rounded-t-[36px] px-6 pt-6 pb-6 flex flex-col gap-4 shrink-0 shadow-xl border-t border-slate-200"
       >
         {/* Header inside card */}
         <div className="text-center">
-          <h2 className="text-xl font-extrabold text-white tracking-tight">
+          <h2 className="text-xl font-black text-slate-900 tracking-tight">
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </h2>
-          <p className="text-[11px] text-white/60 font-semibold mt-0.5">
-            {isSignUp ? 'Register to start your meal subscription' : 'Sign in to manage your daily meals'}
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
+            {isSignUp ? 'Register for your mess subscription' : 'Sign in to access your meal dashboard'}
           </p>
         </div>
 
-        {/* Auth Mode Toggle Tabs */}
-        <div className="grid grid-cols-2 gap-2 bg-white/10 p-1.5 rounded-2xl backdrop-blur-md border border-white/15 text-xs font-bold">
+        {/* Segmented Auth Mode Switcher */}
+        <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-xs font-bold">
           <button
             type="button"
             onClick={() => { setIsSignUp(false); setErrorMsg(null); }}
             className={`py-2.5 rounded-xl transition-all ${
-              !isSignUp ? 'bg-white text-black font-extrabold shadow-lg scale-[1.02]' : 'text-white/60 hover:text-white'
+              !isSignUp ? 'bg-white text-slate-900 font-black shadow-sm' : 'text-slate-500 hover:text-slate-800'
             }`}
           >
             Sign In
@@ -146,7 +131,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             type="button"
             onClick={() => { setIsSignUp(true); setErrorMsg(null); }}
             className={`py-2.5 rounded-xl transition-all ${
-              isSignUp ? 'bg-white text-black font-extrabold shadow-lg scale-[1.02]' : 'text-white/60 hover:text-white'
+              isSignUp ? 'bg-white text-slate-900 font-black shadow-sm' : 'text-slate-500 hover:text-slate-800'
             }`}
           >
             Sign Up
@@ -155,14 +140,14 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
         {/* Role Switcher on Signup */}
         {isSignUp && (
-          <div className="bg-white/10 p-1 rounded-2xl flex gap-1 border border-white/15">
+          <div className="bg-slate-100 p-1 rounded-xl flex gap-1 border border-slate-200">
             <button
               type="button"
               onClick={() => { setRole('student'); setErrorMsg(null); }}
-              className={`flex-1 py-2 rounded-xl text-[10px] font-extrabold transition-all ${
+              className={`flex-1 py-2 rounded-lg text-[11px] font-extrabold transition-all ${
                 role === 'student'
-                  ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-400/40 shadow-md'
-                  : 'text-white/60 hover:text-white'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Student Account
@@ -170,10 +155,10 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             <button
               type="button"
               onClick={() => { setRole('admin'); setErrorMsg(null); }}
-              className={`flex-1 py-2 rounded-xl text-[10px] font-extrabold transition-all ${
+              className={`flex-1 py-2 rounded-lg text-[11px] font-extrabold transition-all ${
                 role === 'admin'
-                  ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-400/40 shadow-md'
-                  : 'text-white/60 hover:text-white'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Administrator
@@ -183,18 +168,18 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="p-3 bg-rose-500/20 border border-rose-400/40 backdrop-blur-md rounded-2xl text-[11px] font-semibold text-rose-200 flex gap-1.5 items-center">
-            <span className="text-xs">⚠️</span>
+          <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-xs font-bold text-red-700 flex gap-2 items-center">
+            <span>⚠️</span>
             <span>{errorMsg}</span>
           </div>
         )}
 
-        {/* Login/Signup Form */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {/* Registration Name Field */}
           {isSignUp && (
             <div className="relative">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                 <User className="w-4.5 h-4.5" />
               </div>
               <input
@@ -203,14 +188,14 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Full Name"
-                className="w-full input-glass pl-11 pr-4 py-3.5 text-xs font-semibold"
+                className="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-600 text-slate-900 pl-11 pr-4 py-3.5 text-xs font-semibold rounded-2xl transition-all"
               />
             </div>
           )}
 
           {/* Email / Username */}
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
               <Mail className="w-4.5 h-4.5" />
             </div>
             <input
@@ -219,13 +204,13 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={isSignUp ? "Email address" : "Username or Email (student / admin)"}
-              className="w-full input-glass pl-11 pr-4 py-3.5 text-xs font-semibold"
+              className="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-600 text-slate-900 pl-11 pr-4 py-3.5 text-xs font-semibold rounded-2xl transition-all"
             />
           </div>
 
           {/* Password */}
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
               <Lock className="w-4.5 h-4.5" />
             </div>
             <input
@@ -234,12 +219,12 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full input-glass pl-11 pr-11 py-3.5 text-xs font-semibold"
+              className="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-600 text-slate-900 pl-11 pr-11 py-3.5 text-xs font-semibold rounded-2xl transition-all"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white focus:outline-none"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 focus:outline-none"
             >
               {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
             </button>
@@ -247,9 +232,9 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
           {/* Contextual Signup Fields */}
           {isSignUp && role === 'student' && (
-            <div className="grid grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-2 gap-3">
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                   <Home className="w-4.5 h-4.5" />
                 </div>
                 <input
@@ -258,7 +243,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                   value={room}
                   onChange={(e) => setRoom(e.target.value)}
                   placeholder="Room No."
-                  className="w-full input-glass pl-11 pr-4 py-3.5 text-xs font-semibold"
+                  className="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-600 text-slate-900 pl-11 pr-4 py-3.5 text-xs font-semibold rounded-2xl transition-all"
                 />
               </div>
 
@@ -266,11 +251,11 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 <select
                   value={plan}
                   onChange={(e) => setPlan(e.target.value)}
-                  className="w-full input-glass px-4 py-3.5 text-xs font-bold text-white bg-[#14231a]"
+                  className="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-600 text-slate-900 px-4 py-3.5 text-xs font-bold rounded-2xl transition-all"
                 >
-                  <option value="1-Meal Basic" className="bg-[#0f1a14] text-white">1-Meal Basic</option>
-                  <option value="2-Meal Standard" className="bg-[#0f1a14] text-white">2-Meal Standard</option>
-                  <option value="3-Meal Premium" className="bg-[#0f1a14] text-white">3-Meal Premium</option>
+                  <option value="1-Meal Basic">1-Meal Basic</option>
+                  <option value="2-Meal Standard">2-Meal Standard</option>
+                  <option value="3-Meal Premium">3-Meal Premium</option>
                 </select>
               </div>
             </div>
@@ -285,8 +270,8 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 className="flex items-center gap-2 cursor-pointer focus:outline-none group select-none"
               >
                 <div
-                  className={`w-4.5 h-4.5 rounded-full flex items-center justify-center transition-all ${
-                    rememberMe ? 'bg-emerald-400 text-black shadow-md' : 'border border-white/30 bg-white/10'
+                  className={`w-4.5 h-4.5 rounded-md flex items-center justify-center transition-all ${
+                    rememberMe ? 'bg-emerald-600 text-white' : 'border border-slate-300 bg-slate-100'
                   }`}
                 >
                   {rememberMe && (
@@ -295,22 +280,22 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                     </svg>
                   )}
                 </div>
-                <span className="text-[11px] text-white/70 font-semibold">Remember Me</span>
+                <span className="text-xs text-slate-600 font-semibold">Remember Me</span>
               </button>
               
-              <a href="#forgot" className="text-[11px] text-emerald-300 font-bold hover:underline select-none">
+              <a href="#forgot" className="text-xs text-emerald-700 font-extrabold hover:underline select-none">
                 Forgot Password?
               </a>
             </div>
           )}
 
-          {/* Primary Action Button */}
+          {/* Primary Action Buttons */}
           {isSignUp ? (
             <motion.button
               type="submit"
               disabled={loading}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-4 bg-white/10 hover:bg-emerald-600 border border-white/20 hover:border-emerald-500 text-white font-extrabold select-none mt-1 flex items-center justify-center gap-2 text-sm tracking-wide shadow-md hover:shadow-emerald-600/40 transition-all duration-300 rounded-full cursor-pointer group"
+              className="w-full py-4 bg-slate-900 hover:bg-emerald-600 text-white font-extrabold select-none mt-1 flex items-center justify-center gap-2 text-sm tracking-wide shadow-md transition-all duration-200 rounded-full cursor-pointer group"
             >
               {loading && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>}
               <span>{loading ? 'Registering...' : 'Get started'}</span>
@@ -324,7 +309,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 disabled={loading}
                 onClick={() => setRole('student')}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-4 bg-white/10 hover:bg-emerald-600 border border-white/20 hover:border-emerald-500 text-white font-extrabold select-none flex items-center justify-center gap-2 text-sm tracking-wide shadow-md hover:shadow-emerald-600/40 transition-all duration-300 rounded-full cursor-pointer group"
+                className="w-full py-4 bg-slate-900 hover:bg-emerald-600 text-white font-extrabold select-none flex items-center justify-center gap-2 text-sm tracking-wide shadow-md transition-all duration-200 rounded-full cursor-pointer group"
               >
                 {loading && role === 'student' && (
                   <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
@@ -339,19 +324,17 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 disabled={loading}
                 onClick={() => setRole('admin')}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-3.5 bg-white/10 hover:bg-emerald-600 border border-white/20 hover:border-emerald-500 text-white font-extrabold rounded-full transition-all duration-300 select-none flex items-center justify-center gap-2 text-xs shadow-md hover:shadow-emerald-600/40 cursor-pointer group"
+                className="w-full py-3.5 bg-slate-100 hover:bg-emerald-600 border border-slate-200 hover:border-emerald-600 text-slate-800 hover:text-white font-extrabold rounded-full transition-all duration-200 select-none flex items-center justify-center gap-2 text-xs cursor-pointer group"
               >
                 {loading && role === 'admin' && (
-                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-slate-400 border-t-slate-800 rounded-full animate-spin"></div>
                 )}
-                <ShieldCheck className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
+                <ShieldCheck className="w-4 h-4 text-emerald-600 group-hover:text-white transition-colors" />
                 <span>Login as Administrator</span>
               </motion.button>
             </div>
           )}
         </form>
-
-
       </motion.div>
     </div>
   );

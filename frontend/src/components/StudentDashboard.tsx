@@ -323,10 +323,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-executive-mesh text-white relative overflow-hidden select-none">
+    <div className="w-full h-full flex flex-col bg-slate-50 text-slate-900 relative overflow-hidden select-none">
       
-      {/* 1. Executive Ultra Glassmorphic Header Bar */}
-      <div className="bg-white/10 backdrop-blur-2xl text-white pt-4 pb-5 px-5 rounded-b-[32px] border-b border-white/20 shrink-0 z-30 shadow-2xl">
+      {/* 1. Real World Production Header Bar */}
+      <div className="bg-emerald-600 text-white pt-4 pb-5 px-5 rounded-b-[32px] shrink-0 z-30 shadow-md">
         <div className="flex items-center justify-between">
           <button
             onClick={() => setActiveTab('profile')}
@@ -334,7 +334,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
             title="View Profile"
           >
             {/* Avatar badge */}
-            <div className="w-12 h-12 bg-white/15 backdrop-blur-md rounded-full flex items-center justify-center font-bold text-sm text-emerald-300 shadow-xl group-hover:scale-105 transition-transform overflow-hidden p-0.5 border border-white/30">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center font-bold text-sm text-white shadow-sm group-hover:scale-105 transition-transform overflow-hidden p-0.5 border border-white/40">
               {profileImage ? (
                 <img src={profileImage} alt={userName} className="w-full h-full object-cover rounded-full" />
               ) : (
@@ -342,37 +342,37 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
               )}
             </div>
             <div>
-              <p className="text-[10px] text-emerald-400 font-extrabold tracking-wider uppercase flex items-center gap-1">Good Day 👤</p>
-              <h3 className="text-base font-extrabold text-white leading-tight">{userName}</h3>
+              <p className="text-[10px] text-emerald-100 font-extrabold tracking-wider uppercase flex items-center gap-1">Welcome Back 👤</p>
+              <h3 className="text-base font-black text-white leading-tight">{userName}</h3>
             </div>
           </button>
           <div className="flex items-center gap-2">
             {/* Notification Bell */}
             <button 
               onClick={() => { setShowNotifications(!showNotifications); setHasNotification(false); }}
-              className="relative p-2.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 hover:bg-white/25 transition-all focus:outline-none shadow-lg"
+              className="relative p-2.5 bg-white/15 rounded-full border border-white/25 hover:bg-white/25 transition-all focus:outline-none shadow-xs"
             >
               <Bell className="w-4.5 h-4.5 text-white" />
               {hasNotification && (
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-yellow-300 rounded-full animate-ping"></span>
               )}
             </button>
             {/* Logout button */}
             <button 
               onClick={onLogout}
-              className="p-2.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 hover:bg-rose-500/30 transition-all focus:outline-none shadow-lg"
+              className="p-2.5 bg-white/15 rounded-full border border-white/25 hover:bg-red-500/40 transition-all focus:outline-none shadow-xs"
               title="Logout"
             >
-              <LogOut className="w-4.5 h-4.5 text-white hover:text-rose-300" />
+              <LogOut className="w-4.5 h-4.5 text-white hover:text-red-200" />
             </button>
           </div>
         </div>
         
         {/* Room & Subscription Floating Pill Info */}
-        <div className="mt-3.5 flex items-center justify-between text-xs bg-white/10 backdrop-blur-md rounded-full px-4 py-2 border border-white/20 shadow-md">
-          <span className="font-bold text-white/90">📍 Room {roomNumber} (Student)</span>
-          <span className="flex items-center gap-1.5 text-[10px] bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 px-3 py-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm">
-            <span className="w-1.5 h-1.5 bg-emerald-300 rounded-full animate-pulse"></span> {accountStatus} Plan
+        <div className="mt-3.5 flex items-center justify-between text-xs bg-white/15 rounded-full px-4 py-2 border border-white/20 shadow-xs">
+          <span className="font-extrabold text-white">📍 Room {roomNumber} (Student)</span>
+          <span className="flex items-center gap-1.5 text-[10px] bg-white text-emerald-800 px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-xs">
+            <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full"></span> {accountStatus} Plan
           </span>
         </div>
       </div>
@@ -441,63 +441,61 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {/* Tab View Contents */}
         {activeTab === 'home' && (
           <>
-            {/* Active Tiffin Plan Metallic Card (Revolut / Apple Card Executive Style) */}
-            <div className="relative rounded-[32px] p-6 overflow-hidden text-white shadow-2xl bg-gradient-to-br from-[#1c3627] via-[#112319] to-[#09140e] border border-emerald-500/40 select-none">
-              <div className="absolute -top-12 -right-12 w-36 h-36 bg-emerald-400/15 rounded-full blur-2xl"></div>
-              
+            {/* Active Tiffin Subscription Card (Real-World App Style) */}
+            <div className="relative rounded-3xl p-6 overflow-hidden text-white shadow-md bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 border border-emerald-500/30 select-none">
               <div className="flex items-start justify-between relative z-10">
                 <div>
-                  <div className="flex items-center gap-1.5 bg-emerald-400/20 border border-emerald-400/30 px-3 py-1 rounded-full text-[9px] font-extrabold uppercase w-fit tracking-wider text-emerald-300 shadow-sm">
-                    <Sparkles className="w-3 h-3 text-emerald-300" /> Executive Subscription
+                  <div className="flex items-center gap-1.5 bg-white/20 border border-white/30 px-3 py-1 rounded-full text-[10px] font-black uppercase w-fit tracking-wider text-white shadow-xs">
+                    <Sparkles className="w-3 h-3 text-yellow-300" /> Active Subscription
                   </div>
-                  <h4 className="text-2xl font-extrabold mt-3 tracking-tight text-white">{planName}</h4>
-                  <p className="text-xs text-white/70 font-medium mt-0.5">Premium Daily Catering Pass</p>
+                  <h4 className="text-2xl font-black mt-3 tracking-tight text-white">{planName}</h4>
+                  <p className="text-xs text-white/80 font-medium mt-0.5">Daily Packaged Catering</p>
                 </div>
-                <span className="text-4xl leading-none filter drop-shadow-lg">🍱</span>
+                <span className="text-4xl leading-none">🍱</span>
               </div>
 
-              <div className="mt-6 flex items-end justify-between relative z-10 border-t border-white/15 pt-4">
+              <div className="mt-6 flex items-end justify-between relative z-10 border-t border-white/20 pt-4">
                 <div>
-                  <p className="text-[9px] uppercase tracking-wider text-white/50 font-extrabold">Invoice Status</p>
-                  <p className="text-xs font-extrabold mt-0.5 flex items-center gap-1">
-                    <span className={`w-2 h-2 rounded-full ${billStatus === 'paid' ? 'bg-emerald-400' : 'bg-rose-400 animate-pulse'}`}></span>
-                    <span>{billStatus === 'paid' ? 'Settled (Paid)' : 'Pending Balance'}</span>
+                  <p className="text-[10px] uppercase tracking-wider text-white/70 font-extrabold">Bill Status</p>
+                  <p className="text-xs font-black mt-0.5 flex items-center gap-1.5">
+                    <span className={`w-2 h-2 rounded-full ${billStatus === 'paid' ? 'bg-emerald-300' : 'bg-amber-300'}`}></span>
+                    <span>{billStatus === 'paid' ? 'Paid & Active' : 'Payment Due'}</span>
                   </p>
                 </div>
                 <button 
                   onClick={() => setActiveTab('billing')}
-                  className="btn-emerald-glow px-4 py-2 text-xs font-extrabold shadow-lg focus:outline-none"
+                  className="bg-white hover:bg-slate-100 text-emerald-800 px-4 py-2 rounded-full text-xs font-black shadow-sm transition-all focus:outline-none cursor-pointer"
                 >
                   Manage Plan
                 </button>
               </div>
             </div>
 
-            {/* Today's Food Preview (Executive Glass Card) */}
-            <div className="bg-executive-card-sm rounded-[28px] p-5 shadow-xl border border-white/15 space-y-3.5">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                <h4 className="font-extrabold text-white text-sm tracking-tight flex items-center gap-2">
+            {/* Today's Food Preview (Real-World App Card) */}
+            <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-3.5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <h4 className="font-black text-slate-900 text-sm tracking-tight flex items-center gap-2">
                   <span>🍽️</span> Today's Menu ({todayDayName})
                 </h4>
                 <button 
                   onClick={() => setActiveTab('menu')}
-                  className="text-xs font-extrabold text-emerald-400 hover:text-emerald-300 transition-all"
+                  className="text-xs font-black text-emerald-600 hover:text-emerald-700 transition-all cursor-pointer"
                 >
-                  Full Menu →
+                  Full Week →
                 </button>
               </div>
               <div className="space-y-2.5 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-white/10">
-                  <span className="font-bold text-white/60 w-24">Breakfast</span>
-                  <span className="text-white font-extrabold flex-1 text-right">{todayMenu.breakfast}</span>
+                <div className="flex justify-between py-1.5 border-b border-slate-100/60">
+                  <span className="font-bold text-slate-500 w-24">Breakfast</span>
+                  <span className="text-slate-900 font-extrabold flex-1 text-right">{todayMenu.breakfast}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-white/10">
-                  <span className="font-bold text-white/60 w-24">Lunch</span>
-                  <span className="text-white font-extrabold flex-1 text-right">{todayMenu.lunch}</span>
+                <div className="flex justify-between py-1.5 border-b border-slate-100/60">
+                  <span className="font-bold text-slate-500 w-24">Lunch</span>
+                  <span className="text-slate-900 font-extrabold flex-1 text-right">{todayMenu.lunch}</span>
                 </div>
                 <div className="flex justify-between py-1.5">
-                  <span className="font-bold text-white/60 w-24">Dinner</span>
-                  <span className="text-white font-extrabold flex-1 text-right">{todayMenu.dinner}</span>
+                  <span className="font-bold text-slate-500 w-24">Dinner</span>
+                  <span className="text-slate-900 font-extrabold flex-1 text-right">{todayMenu.dinner}</span>
                 </div>
               </div>
             </div>
@@ -1214,62 +1212,62 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         )}
       </AnimatePresence>
 
-      {/* 5. iOS Floating Glass Dock Navigation Bar */}
-      <div className="mx-4 mb-5 ios-dock-bar p-2 flex justify-between shrink-0 z-40 select-none shadow-[0_15px_40px_rgba(0,0,0,0.8)]">
+      {/* Real World Bottom Tab Navigation Bar */}
+      <div className="bg-white/95 backdrop-blur-md border-t border-slate-200/80 pt-2 pb-5 px-4 flex justify-between shrink-0 z-40 select-none shadow-lg">
         
         {/* Home Tab */}
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
-            activeTab === 'home' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'home' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
-          <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2} />
-          <span className="text-[9px] font-extrabold tracking-wide">Home</span>
+          <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2.5} />
+          <span className="text-[10px] font-black tracking-wide">Home</span>
         </button>
 
         {/* Menu Tab */}
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
-            activeTab === 'menu' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'menu' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
-          <Utensils className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[9px] font-extrabold tracking-wide">Menu</span>
+          <Utensils className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[10px] font-black tracking-wide">Menu</span>
         </button>
 
         {/* Attendance Tab */}
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
-            activeTab === 'attendance' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'attendance' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
-          <Calendar className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[9px] font-extrabold tracking-wide">Attendance</span>
+          <Calendar className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[10px] font-black tracking-wide">Attendance</span>
         </button>
 
         {/* Payments Tab */}
         <button
           onClick={() => setActiveTab('billing')}
-          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
-            activeTab === 'billing' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'billing' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
-          <CreditCard className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[9px] font-extrabold tracking-wide">Payments</span>
+          <CreditCard className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[10px] font-black tracking-wide">Payments</span>
         </button>
 
         {/* Profile Tab */}
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
-            activeTab === 'profile' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'profile' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
-          <User className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[9px] font-extrabold tracking-wide">Profile</span>
+          <User className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[10px] font-black tracking-wide">Profile</span>
         </button>
 
       </div>
