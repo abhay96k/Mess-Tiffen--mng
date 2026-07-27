@@ -3,10 +3,11 @@ import {
   Bell, LogOut, Calendar, 
   CreditCard, Send, Star, ChevronDown, ChevronUp, 
   ShieldAlert, Sparkles, Check, CheckCircle,
-  Home, Utensils, User
+  Home, Utensils, User, MapPin
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { attendanceAPI, menuAPI, feedbackAPI, studentAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
+import { NearbyMessMap } from './NearbyMessMap';
 
 interface StudentDashboardProps {
   userName: string;
@@ -25,7 +26,7 @@ interface MealState {
 
 export function StudentDashboard({ userName, userId, onLogout }: StudentDashboardProps) {
   // Navigation & UI states
-  const [activeTab, setActiveTab] = useState<'home' | 'menu' | 'attendance' | 'billing' | 'profile'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'menu' | 'attendance' | 'billing' | 'profile' | 'nearby'>('home');
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -499,8 +500,31 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                 </div>
               </div>
             </div>
+
+            {/* Nearby Mess Quick Explorer Card */}
+            <div 
+              onClick={() => setActiveTab('nearby')}
+              className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-3xl p-4 shadow-sm border border-slate-700/60 flex items-center justify-between cursor-pointer hover:scale-[1.01] transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 rounded-2xl">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <h5 className="font-black text-sm text-white flex items-center gap-1.5">
+                    <span>Nearby Mess Explorer</span>
+                    <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-2 py-0.5 rounded-full uppercase">Interactive Map</span>
+                  </h5>
+                  <p className="text-xs text-slate-300 font-medium">Explore 4+ mess facilities & daily thalis near you</p>
+                </div>
+              </div>
+              <span className="text-xs font-black text-emerald-400 hover:underline">Open Map →</span>
+            </div>
           </>
         )}
+
+        {/* Dedicated Nearby Mess Map Tab */}
+        {activeTab === 'nearby' && <NearbyMessMap />}
 
         {/* Dedicated Attendance Tab */}
         {activeTab === 'attendance' && (
@@ -1213,61 +1237,72 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
       </AnimatePresence>
 
       {/* Real World Bottom Tab Navigation Bar */}
-      <div className="bg-white/95 backdrop-blur-md border-t border-slate-200/80 pt-2 pb-5 px-4 flex justify-between shrink-0 z-40 select-none shadow-lg">
+      <div className="bg-white/95 backdrop-blur-md border-t border-slate-200/80 pt-2 pb-5 px-3 flex justify-between shrink-0 z-40 select-none shadow-lg">
         
         {/* Home Tab */}
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
             activeTab === 'home' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
           <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2.5} />
-          <span className="text-[10px] font-black tracking-wide">Home</span>
+          <span className="text-[9px] font-black tracking-wide">Home</span>
         </button>
 
         {/* Menu Tab */}
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
             activeTab === 'menu' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
           <Utensils className="w-5 h-5" strokeWidth={2.5} />
-          <span className="text-[10px] font-black tracking-wide">Menu</span>
+          <span className="text-[9px] font-black tracking-wide">Menu</span>
+        </button>
+
+        {/* Nearby Map Tab */}
+        <button
+          onClick={() => setActiveTab('nearby')}
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'nearby' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
+          }`}
+        >
+          <MapPin className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[9px] font-black tracking-wide">Nearby</span>
         </button>
 
         {/* Attendance Tab */}
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
             activeTab === 'attendance' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
           <Calendar className="w-5 h-5" strokeWidth={2.5} />
-          <span className="text-[10px] font-black tracking-wide">Attendance</span>
+          <span className="text-[9px] font-black tracking-wide">Attendance</span>
         </button>
 
         {/* Payments Tab */}
         <button
           onClick={() => setActiveTab('billing')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
             activeTab === 'billing' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
           <CreditCard className="w-5 h-5" strokeWidth={2.5} />
-          <span className="text-[10px] font-black tracking-wide">Payments</span>
+          <span className="text-[9px] font-black tracking-wide">Payments</span>
         </button>
 
         {/* Profile Tab */}
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
             activeTab === 'profile' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
           }`}
         >
           <User className="w-5 h-5" strokeWidth={2.5} />
-          <span className="text-[10px] font-black tracking-wide">Profile</span>
+          <span className="text-[9px] font-black tracking-wide">Profile</span>
         </button>
 
       </div>
