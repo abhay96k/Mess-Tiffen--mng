@@ -138,55 +138,59 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
     return 0;
   };
 
-  const fetchAdminData = async () => {
+  const fetchAdminData = async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) setLoading(true);
 
-      // 1. Fetch Students
-      const studentRes = await studentAPI.getStudents();
-      if (studentRes.success) {
-        setStudents(studentRes.data);
-        setStudentsCount(studentRes.count);
+      const [
+        studentRes,
+        menuRes,
+        feedbackRes,
+        attendanceRes,
+        profileRes,
+        pricingRes
+      ] = await Promise.allSettled([
+        studentAPI.getStudents(),
+        menuAPI.getMenu(),
+        feedbackAPI.getFeedbacks(),
+        attendanceAPI.getSummary(),
+        authAPI.getMe(),
+        settingsAPI.getPricing()
+      ]);
+
+      if (studentRes.status === 'fulfilled' && studentRes.value?.success) {
+        const data = studentRes.value.data;
+        setStudents(data);
+        setStudentsCount(studentRes.value.count);
         
-        // Count active
-        const activeCount = studentRes.data.filter((s: any) => s.status === 'active').length;
+        const activeCount = data.filter((s: any) => s.status === 'active').length;
         setActivePlans(activeCount);
 
-        // Sum collected revenue (assuming paid students paid 2400)
-        const paidCount = studentRes.data.filter((s: any) => s.billStatus === 'paid').length;
+        const paidCount = data.filter((s: any) => s.billStatus === 'paid').length;
         setRevenue(paidCount * 2400);
       }
 
-      // 2. Fetch Weekly Menu
-      const menuRes = await menuAPI.getMenu();
-      if (menuRes.success) {
-        setWeeklyMenu(menuRes.data);
+      if (menuRes.status === 'fulfilled' && menuRes.value?.success) {
+        setWeeklyMenu(menuRes.value.data);
       }
 
-      // 3. Fetch Feedbacks
-      const feedbackRes = await feedbackAPI.getFeedbacks();
-      if (feedbackRes.success) {
-        setFeedbacks(feedbackRes.data);
+      if (feedbackRes.status === 'fulfilled' && feedbackRes.value?.success) {
+        setFeedbacks(feedbackRes.value.data);
       }
 
-      // 4. Fetch Attendance Summary
-      const attendanceRes = await attendanceAPI.getSummary();
-      if (attendanceRes.success) {
-        setAttendanceLogs(attendanceRes.data);
+      if (attendanceRes.status === 'fulfilled' && attendanceRes.value?.success) {
+        setAttendanceLogs(attendanceRes.value.data);
       }
 
-      // 5. Fetch Admin Profile details
-      const profile = await authAPI.getMe().catch(() => null);
-      if (profile && profile.success) {
+      if (profileRes.status === 'fulfilled' && profileRes.value?.success) {
+        const profile = profileRes.value;
         setAdminEmail(profile.email || '');
         setProfileImage(profile.profileImage || '');
       }
 
-      // 6. Fetch pricing settings
-      const pricingRes = await settingsAPI.getPricing().catch(() => null);
-      if (pricingRes && pricingRes.success) {
-        setPricingSettings(pricingRes.data);
-        setPricingForm(pricingRes.data);
+      if (pricingRes.status === 'fulfilled' && pricingRes.value?.success) {
+        setPricingSettings(pricingRes.value.data);
+        setPricingForm(pricingRes.value.data);
       }
 
     } catch (error) {
@@ -197,7 +201,13 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   };
 
   useEffect(() => {
-    fetchAdminData();
+    fetchAdminData(true);
+
+    const timer = setInterval(() => {
+      fetchAdminData(false);
+    }, 8000);
+
+    return () => clearInterval(timer);
   }, [activeTab]); // Refetch when tabs switch to pull fresh records
 
   const handleEditStudent = (student: StudentRecord) => {

@@ -95,14 +95,29 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
-  // Fetch all user information from API
-  const fetchData = async () => {
+  // Fetch all user information from API in parallel
+  const fetchData = async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) setLoading(true);
       
-      // 1. Fetch user billing and plan details
-      const profile = await authAPI.getMe();
-      if (profile.success) {
+      const [
+        profileRes,
+        attendanceRes,
+        menuRes,
+        notesRes,
+        historyRes,
+        pricingRes
+      ] = await Promise.allSettled([
+        authAPI.getMe(),
+        attendanceAPI.getToday(),
+        menuAPI.getMenu(),
+        announcementAPI.getAnnouncements(),
+        attendanceAPI.getHistory(),
+        settingsAPI.getPricing()
+      ]);
+
+      if (profileRes.status === 'fulfilled' && profileRes.value?.success) {
+        const profile = profileRes.value;
         setBillAmount(profile.billAmount);
         setBillStatus(profile.billStatus);
         setPlanName(profile.plan);
@@ -115,41 +130,32 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         setHasNotification(hasUnread);
       }
 
-      // 2. Fetch today's meal attendance
-      const attendance = await attendanceAPI.getToday();
-      if (attendance.success && attendance.data) {
+      if (attendanceRes.status === 'fulfilled' && attendanceRes.value?.success && attendanceRes.value.data) {
+        const attendance = attendanceRes.value.data;
         setMeals({
-          breakfast: attendance.data.breakfast,
-          breakfastPendingSkip: attendance.data.breakfastPendingSkip || false,
-          lunch: attendance.data.lunch,
-          lunchPendingSkip: attendance.data.lunchPendingSkip || false,
-          dinner: attendance.data.dinner,
-          dinnerPendingSkip: attendance.data.dinnerPendingSkip || false
+          breakfast: attendance.breakfast,
+          breakfastPendingSkip: attendance.breakfastPendingSkip || false,
+          lunch: attendance.lunch,
+          lunchPendingSkip: attendance.lunchPendingSkip || false,
+          dinner: attendance.dinner,
+          dinnerPendingSkip: attendance.dinnerPendingSkip || false
         });
       }
 
-      // 3. Fetch weekly menu
-      const menu = await menuAPI.getMenu();
-      if (menu.success) {
-        setWeeklyMenu(menu.data);
+      if (menuRes.status === 'fulfilled' && menuRes.value?.success) {
+        setWeeklyMenu(menuRes.value.data);
       }
 
-      // 4. Fetch announcements
-      const notes = await announcementAPI.getAnnouncements();
-      if (notes.success && notes.data.length > 0) {
-        setAnnouncements(notes.data);
+      if (notesRes.status === 'fulfilled' && notesRes.value?.success && notesRes.value.data.length > 0) {
+        setAnnouncements(notesRes.value.data);
       }
 
-      // 5. Fetch attendance history
-      const historyRes = await attendanceAPI.getHistory();
-      if (historyRes.success) {
-        setAttendanceHistory(historyRes.data);
+      if (historyRes.status === 'fulfilled' && historyRes.value?.success) {
+        setAttendanceHistory(historyRes.value.data);
       }
 
-      // 6. Fetch pricing settings
-      const pricingRes = await settingsAPI.getPricing().catch(() => null);
-      if (pricingRes && pricingRes.success) {
-        setPricingSettings(pricingRes.data);
+      if (pricingRes.status === 'fulfilled' && pricingRes.value?.success) {
+        setPricingSettings(pricingRes.value.data);
       }
 
     } catch (error) {
