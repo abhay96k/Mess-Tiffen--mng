@@ -284,56 +284,56 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-neutral-50 relative overflow-hidden select-none">
+    <div className="w-full h-full flex flex-col bg-[#e6eef8] relative overflow-hidden select-none">
       
-      {/* 1. Header Bar */}
-      <div className="bg-primary text-white pt-4 pb-6 px-5 rounded-b-[32px] shadow-lg shrink-0 z-30">
+      {/* 1. Neomorphic Header Bar */}
+      <div className="bg-[#e6eef8] text-slate-800 pt-4 pb-6 px-5 rounded-b-[36px] neu-raised-lg shrink-0 z-30 border-b border-white/80">
         <div className="flex items-center justify-between">
           <button
             onClick={() => setActiveTab('profile')}
             className="flex items-center gap-3 text-left focus:outline-none hover:opacity-95 transition-all select-none group"
             title="View Profile"
           >
-            {/* Avatar badge with photo */}
-            <div className="w-11 h-11 bg-white/20 rounded-full border border-white/30 flex items-center justify-center font-bold text-sm text-white shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
+            {/* Neomorphic Avatar badge */}
+            <div className="w-12 h-12 neu-raised rounded-full flex items-center justify-center font-bold text-sm text-emerald-600 shadow-xs group-hover:scale-105 transition-transform overflow-hidden p-0.5 border-2 border-white">
               {profileImage ? (
-                <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+                <img src={profileImage} alt={userName} className="w-full h-full object-cover rounded-full" />
               ) : (
                 (userName || 'Student').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()
               )}
             </div>
             <div>
-              <p className="text-[10px] text-white/70 font-semibold tracking-wider uppercase flex items-center gap-1">Good Morning 👤</p>
-              <h3 className="text-base font-bold text-white leading-tight underline decoration-white/20 group-hover:decoration-white transition-all">{userName}</h3>
+              <p className="text-[10px] text-emerald-700 font-extrabold tracking-wider uppercase flex items-center gap-1">Good Day 👤</p>
+              <h3 className="text-base font-extrabold text-slate-800 leading-tight">{userName}</h3>
             </div>
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             {/* Notification Bell */}
             <button 
               onClick={() => { setShowNotifications(!showNotifications); setHasNotification(false); }}
-              className="relative p-2 bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition-all focus:outline-none"
+              className="relative p-2.5 neu-button rounded-full focus:outline-none"
             >
-              <Bell className="w-4 h-4 text-white" />
+              <Bell className="w-4.5 h-4.5 text-slate-700" />
               {hasNotification && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
               )}
             </button>
             {/* Logout button */}
             <button 
               onClick={onLogout}
-              className="p-2 bg-white/10 rounded-full border border-white/20 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-300 transition-all focus:outline-none"
+              className="p-2.5 neu-button rounded-full focus:outline-none hover:text-rose-600"
               title="Logout"
             >
-              <LogOut className="w-4 h-4 text-white" />
+              <LogOut className="w-4.5 h-4.5 text-slate-700 hover:text-rose-600" />
             </button>
           </div>
         </div>
         
         {/* Room & Subscription Info */}
-        <div className="mt-4 flex items-center justify-between text-xs bg-white/10 rounded-xl px-3 py-2 border border-white/15">
-          <span className="font-semibold text-white/90">📍 Room 304 (Student)</span>
-          <span className="flex items-center gap-1 text-[10px] bg-emerald-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider text-white">
-            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Active Plan
+        <div className="mt-4 flex items-center justify-between text-xs neu-inset rounded-2xl px-3.5 py-2.5">
+          <span className="font-bold text-slate-700">📍 Room {roomNumber} (Student)</span>
+          <span className="flex items-center gap-1.5 text-[10px] neu-pill-active px-2.5 py-1 font-extrabold uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> {accountStatus} Plan
           </span>
         </div>
       </div>
@@ -1168,62 +1168,62 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         )}
       </AnimatePresence>
 
-      {/* 5. Mobile Tab Bottom Navigation Bar */}
-      <div className="bg-white rounded-t-[32px] border-t border-neutral-150/70 pt-3 pb-6 px-4 flex justify-between shrink-0 z-30 select-none shadow-[0_-8px_20px_rgba(0,0,0,0.03)]">
+      {/* 5. Neomorphic Mobile Tab Bottom Navigation Bar */}
+      <div className="bg-[#e6eef8] rounded-t-[36px] neu-raised-lg border-t border-white/80 pt-3 pb-6 px-4 flex justify-between shrink-0 z-30 select-none">
         
         {/* Home Tab */}
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'home' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
+            activeTab === 'home' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Home</span>
+          <span className="text-[10px] font-bold tracking-wide">Home</span>
         </button>
 
         {/* Menu Tab */}
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'menu' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
+            activeTab === 'menu' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <Utensils className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Menu</span>
+          <span className="text-[10px] font-bold tracking-wide">Menu</span>
         </button>
 
         {/* Attendance Tab */}
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'attendance' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
+            activeTab === 'attendance' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <Calendar className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Attendance</span>
+          <span className="text-[10px] font-bold tracking-wide">Attendance</span>
         </button>
 
         {/* Payments Tab */}
         <button
           onClick={() => setActiveTab('billing')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'billing' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
+            activeTab === 'billing' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <CreditCard className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Payments</span>
+          <span className="text-[10px] font-bold tracking-wide">Payments</span>
         </button>
 
         {/* Profile Tab */}
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'profile' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
+            activeTab === 'profile' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <User className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Profile</span>
+          <span className="text-[10px] font-bold tracking-wide">Profile</span>
         </button>
 
       </div>
