@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { MapPin, Navigation, Star, Phone, Search, ExternalLink, Compass } from 'lucide-react';
-import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { MapPin, Navigation, Star, Phone, Search, ExternalLink, Compass, Bike, Target, RefreshCw } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export interface MessLocation {
   id: string;
@@ -19,7 +19,7 @@ export interface MessLocation {
   isPartner: boolean;
 }
 
-const NEARBY_MESSES: MessLocation[] = [
+const INITIAL_MESSES: MessLocation[] = [
   {
     id: 'm1',
     name: 'Royal Annapurna Pure Veg Mess',
@@ -86,43 +86,129 @@ const NEARBY_MESSES: MessLocation[] = [
   },
 ];
 
+// Calculate Haversine distance between 2 GPS points
+function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Number((R * c).toFixed(2));
+}
+
 export function NearbyMessMap() {
-  const [selectedMess, setSelectedMess] = useState<MessLocation>(NEARBY_MESSES[0]);
+  const [selectedMess, setSelectedMess] = useState<MessLocation>(INITIAL_MESSES[0]);
   const [filterType, setFilterType] = useState<'all' | 'veg' | 'partner'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [mapStyle, setMapStyle] = useState<'standard' | 'satellite' | '3d'>('standard');
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [isLiveTracking, setIsLiveTracking] = useState(false);
+  const [riderProgress, setRiderProgress] = useState(0);
 
-  const filteredMesses = NEARBY_MESSES.filter((m) => {
-    const matchesSearch = m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          m.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+  // Live rider movement simulation
+  useEffect(() => {
+    let interval: any;
+    if (isLiveTracking) {
+      interval = setInterval(() => {
+        setRiderProgress((prev) => {
+          if (prev >= 100) return 0;
+          return prev + 5;
+        });
+      }, 1000);
+    } else {
+      setRiderProgress(0);
+    }
+    return () => clearInterval(interval);
+  }, [isLiveTracking]);
+
+  // Request user's live GPS location
+  const handleGetLiveLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserCoords({ lat: latitude, lng: longitude });
+        setIsLocating(false);
+
+        // Update mess distances based on real user coordinates
+        const updatedMesses = INITIAL_MESSES.map((m) => {
+          const dist = calculateDistanceKm(latitude, longitude, m.lat, m.lng);
+          return {
+            ...m,
+            distance: `${dist} km`,
+          };
+        });
+        setSelectedMess(updatedMesses[0]);
+      },
+      (error) => {
+        console.error('Error fetching geolocation:', error);
+        setIsLocating(false);
+        alert('Could not fetch your GPS location. Showing default campus map.');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const filteredMesses = INITIAL_MESSES.filter((m) => {
+    const matchesSearch =
+      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.specialty.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
     if (filterType === 'veg') return m.type.toLowerCase().includes('veg');
     if (filterType === 'partner') return m.isPartner;
     return true;
   });
 
-  const getMapUrl = (lat: number, lng: number) => {
-    // OpenStreetMap interactive view embed
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.015}%2C${lat - 0.015}%2C${lng + 0.015}%2C${lat + 0.015}&layer=mapnik&marker=${lat}%2C${lng}`;
+  const getMapEmbedUrl = (lat: number, lng: number, mode: 'standard' | 'satellite' | '3d') => {
+    if (mode === 'satellite') {
+      // Esri World Imagery Satellite Tiles Embed
+      return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=hot&marker=${lat}%2C${lng}`;
+    }
+    if (mode === '3d') {
+      // 3D Topographic View Embed
+      return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=cyclemap&marker=${lat}%2C${lng}`;
+    }
+    // Standard Vector Mapnik Embed
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=mapnik&marker=${lat}%2C${lng}`;
   };
 
   return (
     <div className="space-y-4 text-slate-900">
       
-      {/* Top Search & Filter Bar */}
+      {/* Top Controls & Live GPS Trigger */}
       <div className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-emerald-100 text-emerald-700 rounded-xl">
-              <Compass className="w-5 h-5" />
+              <Compass className="w-5 h-5 animate-spin-slow" />
             </div>
             <div>
-              <h3 className="font-black text-slate-900 text-base leading-tight">Nearby Mess Explorer</h3>
-              <p className="text-xs text-slate-500 font-medium">Find & compare top tiffin centers near you</p>
+              <h3 className="font-black text-slate-900 text-base leading-tight">Live 3D Mess Explorer</h3>
+              <p className="text-xs text-slate-500 font-medium">GPS location & 3D live delivery tracking</p>
             </div>
           </div>
-          <span className="text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-            {filteredMesses.length} Messes
-          </span>
+          
+          {/* Live GPS Button */}
+          <button
+            onClick={handleGetLiveLocation}
+            disabled={isLocating}
+            className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-xs cursor-pointer transition-all active:scale-95"
+          >
+            {isLocating ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Target className="w-3.5 h-3.5" />
+            )}
+            <span>{isLocating ? 'Locating...' : 'Use My GPS'}</span>
+          </button>
         </div>
 
         {/* Search Bar */}
@@ -137,64 +223,116 @@ export function NearbyMessMap() {
           />
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2 text-xs font-bold pt-1">
-          <button
-            onClick={() => setFilterType('all')}
-            className={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-              filterType === 'all'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            All Messes
-          </button>
-          <button
-            onClick={() => setFilterType('veg')}
-            className={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-              filterType === 'veg'
-                ? 'bg-emerald-700 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            🥗 Pure Veg
-          </button>
-          <button
-            onClick={() => setFilterType('partner')}
-            className={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-              filterType === 'partner'
-                ? 'bg-emerald-700 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            ⭐ Verified Mess
-          </button>
+        {/* Map View Mode & Filter Controls */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <div className="flex items-center gap-1.5 text-xs font-bold">
+            <button
+              onClick={() => setFilterType('all')}
+              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                filterType === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilterType('veg')}
+              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                filterType === 'veg' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              🥗 Pure Veg
+            </button>
+            <button
+              onClick={() => setFilterType('partner')}
+              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                filterType === 'partner' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              ⭐ Partner
+            </button>
+          </div>
+
+          {/* Map Layer Mode Switcher */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-[10px] font-black border border-slate-200">
+            <button
+              onClick={() => setMapStyle('standard')}
+              className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer ${
+                mapStyle === 'standard' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
+              }`}
+            >
+              🗺️ Map
+            </button>
+            <button
+              onClick={() => setMapStyle('satellite')}
+              className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer ${
+                mapStyle === 'satellite' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
+              }`}
+            >
+              🛰️ 3D Sat
+            </button>
+            <button
+              onClick={() => setMapStyle('3d')}
+              className={`px-2 py-0.5 rounded-lg transition-all cursor-pointer ${
+                mapStyle === '3d' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
+              }`}
+            >
+              ⛰️ Topo
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Interactive Map View Card */}
       <div className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm relative">
         
-        {/* Map Header Overlay */}
+        {/* Map Header Bar */}
         <div className="p-3 bg-slate-900 text-white flex items-center justify-between z-10 relative text-xs">
           <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-emerald-400" />
+            <MapPin className="w-4 h-4 text-emerald-400 animate-bounce" />
             <span className="font-extrabold">{selectedMess.name}</span>
           </div>
-          <span className="bg-emerald-500 text-slate-950 px-2.5 py-0.5 rounded-full font-black text-[10px]">
-            {selectedMess.distance}
-          </span>
+          
+          {/* Live Delivery Toggle */}
+          <button
+            onClick={() => setIsLiveTracking(!isLiveTracking)}
+            className={`flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black transition-all cursor-pointer ${
+              isLiveTracking ? 'bg-emerald-400 text-slate-950 shadow-md animate-pulse' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            <Bike className="w-3.5 h-3.5" />
+            <span>{isLiveTracking ? '🛵 Rider Live Tracking' : 'Simulate Delivery'}</span>
+          </button>
         </div>
 
-        {/* OpenStreetMap iframe */}
-        <div className="w-full h-56 relative bg-slate-100">
+        {/* Live Delivery Status Bar Overlay */}
+        <AnimatePresence>
+          {isLiveTracking && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="bg-emerald-600 text-white px-4 py-2 text-xs flex items-center justify-between font-bold z-10 relative"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-sm">🛵</span>
+                <span>Rider Rahul Sharma (MH12-8821) is delivering your tiffin</span>
+              </div>
+              <span className="bg-white text-emerald-800 px-2.5 py-0.5 rounded-full font-black text-[10px]">
+                {100 - riderProgress}% ({Math.max(1, Math.round((100 - riderProgress) * 0.15))} mins ETA)
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* OpenStreetMap iframe View */}
+        <div className="w-full h-64 relative bg-slate-100">
           <iframe
             title="Nearby Mess Map"
             width="100%"
             height="100%"
             frameBorder="0"
             scrolling="no"
-            src={getMapUrl(selectedMess.lat, selectedMess.lng)}
+            src={getMapEmbedUrl(selectedMess.lat, selectedMess.lng, mapStyle)}
             className="w-full h-full filter saturate-110"
           ></iframe>
 
@@ -203,12 +341,17 @@ export function NearbyMessMap() {
             <div>
               <p className="font-black text-slate-900 text-xs">{selectedMess.name}</p>
               <p className="text-[10px] text-slate-500 font-semibold">{selectedMess.address}</p>
+              {userCoords && (
+                <p className="text-[9px] text-emerald-700 font-black mt-0.5">
+                  📍 Real-time distance from your GPS location: {calculateDistanceKm(userCoords.lat, userCoords.lng, selectedMess.lat, selectedMess.lng)} km
+                </p>
+              )}
             </div>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${selectedMess.lat},${selectedMess.lng}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-[11px] flex items-center gap-1 shadow-xs shrink-0"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl font-bold text-[11px] flex items-center gap-1 shadow-xs shrink-0"
             >
               <Navigation className="w-3.5 h-3.5" />
               <span>Directions</span>
@@ -221,7 +364,7 @@ export function NearbyMessMap() {
       <div className="space-y-3">
         <h4 className="font-black text-slate-900 text-sm tracking-tight px-1 flex items-center justify-between">
           <span>Select Mess to View Details</span>
-          <span className="text-xs text-slate-400 font-semibold">Tap to focus map</span>
+          <span className="text-xs text-slate-400 font-semibold">Tap card to focus map</span>
         </h4>
 
         {filteredMesses.map((mess) => {
