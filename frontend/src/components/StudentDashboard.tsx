@@ -1168,62 +1168,62 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         )}
       </AnimatePresence>
 
-      {/* 5. Black & White Mobile Tab Bottom Navigation Bar */}
-      <div className="bg-glass-card rounded-t-[36px] border-t border-white/20 pt-3 pb-6 px-4 flex justify-between shrink-0 z-30 select-none shadow-2xl">
+      {/* 5. iOS Floating Glass Dock Navigation Bar */}
+      <div className="mx-4 mb-5 ios-dock-bar p-2 flex justify-between shrink-0 z-40 select-none shadow-[0_15px_40px_rgba(0,0,0,0.8)]">
         
         {/* Home Tab */}
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
-            activeTab === 'home' ? 'bg-white text-black font-extrabold shadow-lg' : 'text-zinc-400 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
+            activeTab === 'home' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
           }`}
         >
           <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2} />
-          <span className="text-[10px] font-extrabold tracking-wide">Home</span>
+          <span className="text-[9px] font-extrabold tracking-wide">Home</span>
         </button>
 
         {/* Menu Tab */}
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
-            activeTab === 'menu' ? 'bg-white text-black font-extrabold shadow-lg' : 'text-zinc-400 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
+            activeTab === 'menu' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
           }`}
         >
           <Utensils className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[10px] font-extrabold tracking-wide">Menu</span>
+          <span className="text-[9px] font-extrabold tracking-wide">Menu</span>
         </button>
 
         {/* Attendance Tab */}
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
-            activeTab === 'attendance' ? 'bg-white text-black font-extrabold shadow-lg' : 'text-zinc-400 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
+            activeTab === 'attendance' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
           }`}
         >
           <Calendar className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[10px] font-extrabold tracking-wide">Attendance</span>
+          <span className="text-[9px] font-extrabold tracking-wide">Attendance</span>
         </button>
 
         {/* Payments Tab */}
         <button
           onClick={() => setActiveTab('billing')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
-            activeTab === 'billing' ? 'bg-white text-black font-extrabold shadow-lg' : 'text-zinc-400 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
+            activeTab === 'billing' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
           }`}
         >
           <CreditCard className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[10px] font-extrabold tracking-wide">Payments</span>
+          <span className="text-[9px] font-extrabold tracking-wide">Payments</span>
         </button>
 
         {/* Profile Tab */}
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
-            activeTab === 'profile' ? 'bg-white text-black font-extrabold shadow-lg' : 'text-zinc-400 hover:text-white'
+          className={`flex flex-col items-center justify-center flex-1 py-2 px-2 rounded-full transition-all focus:outline-none gap-0.5 ${
+            activeTab === 'profile' ? 'bg-white text-black font-extrabold shadow-lg scale-105' : 'text-white/60 hover:text-white'
           }`}
         >
           <User className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[10px] font-extrabold tracking-wide">Profile</span>
+          <span className="text-[9px] font-extrabold tracking-wide">Profile</span>
         </button>
 
       </div>

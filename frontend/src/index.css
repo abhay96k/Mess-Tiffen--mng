@@ -5,7 +5,7 @@
   --color-primary-light: #F4F4F5;
   --color-primary-dark: #18181B;
   
-  --font-sans: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 :root {
@@ -34,107 +34,120 @@ body {
 }
 
 /* ===================================================
-   BLACK & WHITE MONOCHROME LUXURY DESIGN SYSTEM
+   iOS / iPHONE GLASSMORPHISM DESIGN SYSTEM UTILITIES
    =================================================== */
 
-/* Pitch Black Gradient Backdrop */
-.bg-forest-gradient, .bg-mono-gradient {
-  background: linear-gradient(155deg, #1f1f23 0%, #0c0c0e 60%, #000000 100%) !important;
+/* Pitch Black Background Gradient */
+.bg-forest-gradient, .bg-mono-gradient, .bg-ios-mesh {
+  background: radial-gradient(circle at 50% 0%, #27272a 0%, #09090b 60%, #000000 100%) !important;
 }
 
-.bg-forest-dark, .bg-mono-dark {
-  background: #09090b !important;
+/* Authentic iOS Thin Material (Ultra Blurred Glass Card) */
+.bg-glass-card, .ios-glass-card {
+  background: rgba(24, 24, 28, 0.68) !important;
+  backdrop-filter: blur(40px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
 }
 
-/* Glassmorphic Dark Charcoal Cards */
-.bg-glass-card {
-  background: rgba(18, 18, 20, 0.88) !important;
-  backdrop-filter: blur(28px) !important;
-  -webkit-backdrop-filter: blur(28px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8) !important;
-}
-
-.bg-glass-card-light {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-}
-
-/* Monochrome Glass Capsules & Pills */
-.bg-glass-pill {
+.bg-glass-card-light, .ios-glass-card-light {
   background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Floating iOS Capsule Dock Bar */
+.ios-dock-bar {
+  background: rgba(26, 26, 32, 0.72) !important;
+  backdrop-filter: blur(50px) saturate(210%) !important;
+  -webkit-backdrop-filter: blur(50px) saturate(210%) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  border-radius: 9999px !important;
+}
+
+/* iOS Floating Glass Pills */
+.bg-glass-pill, .ios-glass-pill {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.22) !important;
   color: #ffffff !important;
   border-radius: 9999px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
-.bg-glass-pill-active {
+.bg-glass-pill-active, .ios-segmented-active {
   background: #ffffff !important;
   color: #000000 !important;
-  border: 1px solid #ffffff !important;
+  border: 0.5px solid #ffffff !important;
   border-radius: 9999px !important;
   font-weight: 800 !important;
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
-/* High Contrast Pure White Action Button */
-.btn-forest-dark, .btn-mono-white {
-  background: #ffffff !important;
-  border: 1px solid #ffffff !important;
+/* iOS High-Gloss Pure White Button */
+.btn-forest-dark, .btn-mono-white, .btn-ios-white {
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.9) !important;
   color: #000000 !important;
-  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
   border-radius: 9999px !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.btn-forest-dark:hover, .btn-mono-white:hover {
-  background: #e4e4e7 !important;
-  border-color: #e4e4e7 !important;
-  box-shadow: 0 14px 30px rgba(255, 255, 255, 0.35) !important;
+.btn-forest-dark:hover, .btn-mono-white:hover, .btn-ios-white:hover {
+  background: #ffffff !important;
+  box-shadow: 0 14px 35px rgba(255, 255, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
   transform: translateY(-1px) !important;
 }
 
-.btn-forest-dark:active, .btn-mono-white:active {
+.btn-forest-dark:active, .btn-mono-white:active, .btn-ios-white:active {
   transform: translateY(1px) !important;
-  background: #d4d4d8 !important;
+  background: #e4e4e7 !important;
 }
 
-/* Secondary Dark Button */
-.btn-mono-dark {
-  background: #18181b !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+/* iOS Glass Button Secondary */
+.btn-mono-dark, .btn-ios-glass {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.22) !important;
   color: #ffffff !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   border-radius: 9999px !important;
   transition: all 0.2s ease !important;
 }
 
-.btn-mono-dark:hover {
-  background: #27272a !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
+.btn-mono-dark:hover, .btn-ios-glass:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
 }
 
-/* Monochrome Input Fields */
-.input-glass {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+/* iOS Glass Input Fields */
+.input-glass, .input-ios-glass {
+  background: rgba(255, 255, 255, 0.09) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.2) !important;
   color: #ffffff !important;
   border-radius: 20px !important;
   transition: all 0.2s ease !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 }
 
-.input-glass::placeholder {
-  color: rgba(255, 255, 255, 0.4) !important;
+.input-glass::placeholder, .input-ios-glass::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
 }
 
-.input-glass:focus {
+.input-glass:focus, .input-ios-glass:focus {
   outline: none !important;
-  border-color: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 0 0 3.5px rgba(255, 255, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Hide scrollbar utility */
