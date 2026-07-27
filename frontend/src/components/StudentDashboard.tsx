@@ -284,18 +284,18 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#e6eef8] relative overflow-hidden select-none">
+    <div className="w-full h-full flex flex-col bg-forest-gradient text-white relative overflow-hidden select-none">
       
-      {/* 1. Neomorphic Header Bar */}
-      <div className="bg-[#e6eef8] text-slate-800 pt-4 pb-6 px-5 rounded-b-[36px] neu-raised-lg shrink-0 z-30 border-b border-white/80">
+      {/* 1. Glassmorphic Forest Header Bar */}
+      <div className="bg-white/10 backdrop-blur-2xl text-white pt-4 pb-5 px-5 rounded-b-[32px] border-b border-white/15 shrink-0 z-30 shadow-xl">
         <div className="flex items-center justify-between">
           <button
             onClick={() => setActiveTab('profile')}
             className="flex items-center gap-3 text-left focus:outline-none hover:opacity-95 transition-all select-none group"
             title="View Profile"
           >
-            {/* Neomorphic Avatar badge */}
-            <div className="w-12 h-12 neu-raised rounded-full flex items-center justify-center font-bold text-sm text-emerald-600 shadow-xs group-hover:scale-105 transition-transform overflow-hidden p-0.5 border-2 border-white">
+            {/* Glassmorphic Avatar badge */}
+            <div className="w-12 h-12 bg-white/15 backdrop-blur-md rounded-full flex items-center justify-center font-bold text-sm text-emerald-300 shadow-md group-hover:scale-105 transition-transform overflow-hidden p-0.5 border border-white/30">
               {profileImage ? (
                 <img src={profileImage} alt={userName} className="w-full h-full object-cover rounded-full" />
               ) : (
@@ -303,37 +303,37 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
               )}
             </div>
             <div>
-              <p className="text-[10px] text-emerald-700 font-extrabold tracking-wider uppercase flex items-center gap-1">Good Day 👤</p>
-              <h3 className="text-base font-extrabold text-slate-800 leading-tight">{userName}</h3>
+              <p className="text-[10px] text-emerald-300 font-extrabold tracking-wider uppercase flex items-center gap-1">Good Day 👤</p>
+              <h3 className="text-base font-extrabold text-white leading-tight">{userName}</h3>
             </div>
           </button>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             {/* Notification Bell */}
             <button 
               onClick={() => { setShowNotifications(!showNotifications); setHasNotification(false); }}
-              className="relative p-2.5 neu-button rounded-full focus:outline-none"
+              className="relative p-2.5 bg-white/15 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/25 transition-all focus:outline-none shadow-md"
             >
-              <Bell className="w-4.5 h-4.5 text-slate-700" />
+              <Bell className="w-4.5 h-4.5 text-white" />
               {hasNotification && (
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-400 rounded-full animate-ping"></span>
               )}
             </button>
             {/* Logout button */}
             <button 
               onClick={onLogout}
-              className="p-2.5 neu-button rounded-full focus:outline-none hover:text-rose-600"
+              className="p-2.5 bg-white/15 backdrop-blur-md rounded-full border border-white/20 hover:bg-rose-500/30 hover:border-rose-400/40 transition-all focus:outline-none shadow-md"
               title="Logout"
             >
-              <LogOut className="w-4.5 h-4.5 text-slate-700 hover:text-rose-600" />
+              <LogOut className="w-4.5 h-4.5 text-white hover:text-rose-300" />
             </button>
           </div>
         </div>
         
-        {/* Room & Subscription Info */}
-        <div className="mt-4 flex items-center justify-between text-xs neu-inset rounded-2xl px-3.5 py-2.5">
-          <span className="font-bold text-slate-700">📍 Room {roomNumber} (Student)</span>
-          <span className="flex items-center gap-1.5 text-[10px] neu-pill-active px-2.5 py-1 font-extrabold uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> {accountStatus} Plan
+        {/* Room & Subscription Floating Pill Info */}
+        <div className="mt-3.5 flex items-center justify-between text-xs bg-white/10 backdrop-blur-md rounded-full px-4 py-2 border border-white/15">
+          <span className="font-bold text-white/90">📍 Room {roomNumber} (Student)</span>
+          <span className="flex items-center gap-1.5 text-[10px] bg-emerald-400/25 border border-emerald-400/40 text-emerald-300 px-3 py-1 rounded-full font-extrabold uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 bg-emerald-300 rounded-full animate-pulse"></span> {accountStatus} Plan
           </span>
         </div>
       </div>
@@ -1168,62 +1168,62 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         )}
       </AnimatePresence>
 
-      {/* 5. Neomorphic Mobile Tab Bottom Navigation Bar */}
-      <div className="bg-[#e6eef8] rounded-t-[36px] neu-raised-lg border-t border-white/80 pt-3 pb-6 px-4 flex justify-between shrink-0 z-30 select-none">
+      {/* 5. Glassmorphic Mobile Tab Bottom Navigation Bar */}
+      <div className="bg-glass-card rounded-t-[36px] border-t border-white/20 pt-3 pb-6 px-4 flex justify-between shrink-0 z-30 select-none shadow-2xl">
         
         {/* Home Tab */}
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
-            activeTab === 'home' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
+            activeTab === 'home' ? 'bg-glass-pill-active font-extrabold shadow-lg' : 'text-white/60 hover:text-white'
           }`}
         >
           <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2} />
-          <span className="text-[10px] font-bold tracking-wide">Home</span>
+          <span className="text-[10px] font-extrabold tracking-wide">Home</span>
         </button>
 
         {/* Menu Tab */}
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
-            activeTab === 'menu' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
+            activeTab === 'menu' ? 'bg-glass-pill-active font-extrabold shadow-lg' : 'text-white/60 hover:text-white'
           }`}
         >
           <Utensils className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[10px] font-bold tracking-wide">Menu</span>
+          <span className="text-[10px] font-extrabold tracking-wide">Menu</span>
         </button>
 
         {/* Attendance Tab */}
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
-            activeTab === 'attendance' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
+            activeTab === 'attendance' ? 'bg-glass-pill-active font-extrabold shadow-lg' : 'text-white/60 hover:text-white'
           }`}
         >
           <Calendar className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[10px] font-bold tracking-wide">Attendance</span>
+          <span className="text-[10px] font-extrabold tracking-wide">Attendance</span>
         </button>
 
         {/* Payments Tab */}
         <button
           onClick={() => setActiveTab('billing')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
-            activeTab === 'billing' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
+            activeTab === 'billing' ? 'bg-glass-pill-active font-extrabold shadow-lg' : 'text-white/60 hover:text-white'
           }`}
         >
           <CreditCard className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[10px] font-bold tracking-wide">Payments</span>
+          <span className="text-[10px] font-extrabold tracking-wide">Payments</span>
         </button>
 
         {/* Profile Tab */}
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-2xl transition-all focus:outline-none gap-1 ${
-            activeTab === 'profile' ? 'neu-pill-active font-bold' : 'text-slate-500 hover:text-slate-800'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-2 rounded-full transition-all focus:outline-none gap-1 ${
+            activeTab === 'profile' ? 'bg-glass-pill-active font-extrabold shadow-lg' : 'text-white/60 hover:text-white'
           }`}
         >
           <User className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[10px] font-bold tracking-wide">Profile</span>
+          <span className="text-[10px] font-extrabold tracking-wide">Profile</span>
         </button>
 
       </div>

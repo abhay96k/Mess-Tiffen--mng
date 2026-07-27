@@ -1,29 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #10B981;
-  --color-primary-light: #E6F8F3;
+  --color-primary: #34D399;
+  --color-primary-light: #10B981;
   --color-primary-dark: #059669;
   
-  --font-sans: "Poppins", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  --neu-bg: #e6eef8;
-  --neu-shadow-dark: #c1cbd8;
-  --neu-shadow-light: #ffffff;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #dce4ee;
+  background: #14231a;
   font-family: var(--font-sans);
-  color: #2d3748;
+  color: #ffffff;
   min-height: 100vh;
 }
 
@@ -38,120 +34,108 @@ body {
 }
 
 /* ===================================================
-   NEOMORPHISM (SOFT UI) DESIGN SYSTEM UTILITIES
+   GLASSMORPHIC FOREST LUXURY DESIGN SYSTEM UTILITIES
    =================================================== */
 
-/* Neomorphic Raised Card (Extruded Outer Shadow) */
-.neu-raised {
-  background: #e6eef8 !important;
-  box-shadow: 8px 8px 18px var(--neu-shadow-dark), -8px -8px 18px var(--neu-shadow-light) !important;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+/* Rich Forest Gradient Background */
+.bg-forest-gradient {
+  background: linear-gradient(155deg, #446755 0%, #2a4638 50%, #172a1f 100%) !important;
 }
 
-.neu-raised-sm {
-  background: #e6eef8 !important;
-  box-shadow: 4px 4px 10px var(--neu-shadow-dark), -4px -4px 10px var(--neu-shadow-light) !important;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+.bg-forest-dark {
+  background: #132219 !important;
 }
 
-.neu-raised-lg {
-  background: #e6eef8 !important;
-  box-shadow: 12px 12px 28px var(--neu-shadow-dark), -12px -12px 28px var(--neu-shadow-light) !important;
-  border-radius: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+/* Frosted Glass Floating Card Container */
+.bg-glass-card {
+  background: rgba(30, 52, 40, 0.78) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45) !important;
 }
 
-/* Neomorphic Inset / Debossed (Inner Shadow) */
-.neu-inset {
-  background: #e6eef8 !important;
-  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light) !important;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+.bg-glass-card-light {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
 }
 
-.neu-inset-sm {
-  background: #e6eef8 !important;
-  box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light) !important;
-  border-radius: 14px;
+/* Glass Capsules & Floating Pills */
+.bg-glass-pill {
+  background: rgba(255, 255, 255, 0.14) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+  border-radius: 9999px !important;
 }
 
-/* Neomorphic Soft Button */
-.neu-button {
-  background: linear-gradient(145deg, #f7fdff, #cfd7df) !important;
-  box-shadow: 6px 6px 14px var(--neu-shadow-dark), -6px -6px 14px var(--neu-shadow-light) !important;
-  border-radius: 18px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  color: #2d3748;
+.bg-glass-pill-active {
+  background: rgba(52, 211, 153, 0.22) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(52, 211, 153, 0.45) !important;
+  color: #34D399 !important;
+  border-radius: 9999px !important;
 }
 
-.neu-button:hover {
-  background: linear-gradient(145deg, #ffffff, #d5dde5) !important;
-  box-shadow: 8px 8px 18px var(--neu-shadow-dark), -8px -8px 18px var(--neu-shadow-light) !important;
-  transform: translateY(-1px);
+/* Primary Forest Dark Pill Button */
+.btn-forest-dark {
+  background: #112217 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45) !important;
+  border-radius: 9999px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.neu-button:active,
-.neu-button-pressed {
-  background: #e6eef8 !important;
-  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light) !important;
-  transform: translateY(1px);
+.btn-forest-dark:hover {
+  background: #1a3222 !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55) !important;
+  transform: translateY(-1px) !important;
 }
 
-/* Neomorphic Accent / Primary Button (Soft Green Glow) */
-.neu-button-accent {
-  background: linear-gradient(145deg, #10B981, #059669) !important;
-  box-shadow: 6px 6px 14px rgba(16, 185, 129, 0.35), -4px -4px 10px rgba(255, 255, 255, 0.8) !important;
-  color: white !important;
-  border-radius: 20px;
-  transition: all 0.2s ease;
+.btn-forest-dark:active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Emerald Glow Button */
+.btn-emerald-glow {
+  background: linear-gradient(135deg, #34D399 0%, #059669 100%) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(52, 211, 153, 0.35) !important;
+  border-radius: 9999px !important;
+  transition: all 0.2s ease !important;
 }
 
-.neu-button-accent:hover {
-  background: linear-gradient(145deg, #34D399, #047857) !important;
-  box-shadow: 8px 8px 20px rgba(16, 185, 129, 0.45), -4px -4px 12px rgba(255, 255, 255, 0.9) !important;
-  transform: translateY(-1px);
+.btn-emerald-glow:hover {
+  background: linear-gradient(135deg, #6EE7B7 0%, #047857 100%) !important;
+  box-shadow: 0 14px 30px rgba(52, 211, 153, 0.5) !important;
+  transform: translateY(-1px) !important;
 }
 
-.neu-button-accent:active {
-  background: #059669 !important;
-  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.25), inset -3px -3px 6px rgba(52, 211, 153, 0.4) !important;
-  transform: translateY(1px);
+/* Glass Inputs */
+.input-glass {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  border-radius: 20px !important;
+  transition: all 0.2s ease !important;
 }
 
-/* Neomorphic Input Field */
-.neu-input {
-  background: #e6eef8 !important;
-  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light) !important;
-  border-radius: 18px;
-  border: 1px solid transparent !important;
-  transition: all 0.2s ease;
-  color: #2d3748 !important;
+.input-glass::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
 }
 
-.neu-input:focus {
+.input-glass:focus {
   outline: none !important;
-  border-color: rgba(16, 185, 129, 0.5) !important;
-  box-shadow: inset 5px 5px 10px var(--neu-shadow-dark), inset -5px -5px 10px var(--neu-shadow-light), 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
-}
-
-/* Neomorphic Pill Badges & Toggle Buttons */
-.neu-pill {
-  background: #e6eef8 !important;
-  box-shadow: 3px 3px 7px var(--neu-shadow-dark), -3px -3px 7px var(--neu-shadow-light) !important;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.7) !important;
-  color: #4a5568;
-}
-
-.neu-pill-active {
-  background: linear-gradient(145deg, #10B981, #059669) !important;
-  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.25), inset -2px -2px 5px rgba(255, 255, 255, 0.3) !important;
-  color: white !important;
-  border-radius: 9999px;
+  border-color: #34D399 !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25) !important;
 }
 
 /* Hide scrollbar utility */
