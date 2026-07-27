@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #34D399;
-  --color-primary-light: #10B981;
-  --color-primary-dark: #059669;
+  --color-primary: #FFFFFF;
+  --color-primary-light: #F4F4F5;
+  --color-primary-dark: #18181B;
   
   --font-sans: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -17,7 +17,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: #14231a;
+  background: #000000;
   font-family: var(--font-sans);
   color: #ffffff;
   min-height: 100vh;
@@ -34,108 +34,107 @@ body {
 }
 
 /* ===================================================
-   GLASSMORPHIC FOREST LUXURY DESIGN SYSTEM UTILITIES
+   BLACK & WHITE MONOCHROME LUXURY DESIGN SYSTEM
    =================================================== */
 
-/* Rich Forest Gradient Background */
-.bg-forest-gradient {
-  background: linear-gradient(155deg, #446755 0%, #2a4638 50%, #172a1f 100%) !important;
+/* Pitch Black Gradient Backdrop */
+.bg-forest-gradient, .bg-mono-gradient {
+  background: linear-gradient(155deg, #1f1f23 0%, #0c0c0e 60%, #000000 100%) !important;
 }
 
-.bg-forest-dark {
-  background: #132219 !important;
+.bg-forest-dark, .bg-mono-dark {
+  background: #09090b !important;
 }
 
-/* Frosted Glass Floating Card Container */
+/* Glassmorphic Dark Charcoal Cards */
 .bg-glass-card {
-  background: rgba(30, 52, 40, 0.78) !important;
+  background: rgba(18, 18, 20, 0.88) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8) !important;
 }
 
 .bg-glass-card-light {
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
-/* Glass Capsules & Floating Pills */
+/* Monochrome Glass Capsules & Pills */
 .bg-glass-pill {
-  background: rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   color: #ffffff !important;
   border-radius: 9999px !important;
 }
 
 .bg-glass-pill-active {
-  background: rgba(52, 211, 153, 0.22) !important;
-  backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(52, 211, 153, 0.45) !important;
-  color: #34D399 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ffffff !important;
   border-radius: 9999px !important;
+  font-weight: 800 !important;
 }
 
-/* Primary Forest Dark Pill Button */
-.btn-forest-dark {
-  background: #112217 !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  color: #ffffff !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45) !important;
+/* High Contrast Pure White Action Button */
+.btn-forest-dark, .btn-mono-white {
+  background: #ffffff !important;
+  border: 1px solid #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.25) !important;
   border-radius: 9999px !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.btn-forest-dark:hover {
-  background: #1a3222 !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55) !important;
+.btn-forest-dark:hover, .btn-mono-white:hover {
+  background: #e4e4e7 !important;
+  border-color: #e4e4e7 !important;
+  box-shadow: 0 14px 30px rgba(255, 255, 255, 0.35) !important;
   transform: translateY(-1px) !important;
 }
 
-.btn-forest-dark:active {
+.btn-forest-dark:active, .btn-mono-white:active {
   transform: translateY(1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  background: #d4d4d8 !important;
 }
 
-/* Emerald Glow Button */
-.btn-emerald-glow {
-  background: linear-gradient(135deg, #34D399 0%, #059669 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+/* Secondary Dark Button */
+.btn-mono-dark {
+  background: #18181b !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   color: #ffffff !important;
-  box-shadow: 0 10px 25px rgba(52, 211, 153, 0.35) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5) !important;
   border-radius: 9999px !important;
   transition: all 0.2s ease !important;
 }
 
-.btn-emerald-glow:hover {
-  background: linear-gradient(135deg, #6EE7B7 0%, #047857 100%) !important;
-  box-shadow: 0 14px 30px rgba(52, 211, 153, 0.5) !important;
-  transform: translateY(-1px) !important;
+.btn-mono-dark:hover {
+  background: #27272a !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Glass Inputs */
+/* Monochrome Input Fields */
 .input-glass {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
   border-radius: 20px !important;
   transition: all 0.2s ease !important;
 }
 
 .input-glass::placeholder {
-  color: rgba(255, 255, 255, 0.45) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .input-glass:focus {
   outline: none !important;
-  border-color: #34D399 !important;
-  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Hide scrollbar utility */

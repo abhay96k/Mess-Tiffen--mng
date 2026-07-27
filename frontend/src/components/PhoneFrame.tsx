@@ -6,21 +6,21 @@ interface PhoneFrameProps {
 
 export function PhoneFrame({ children }: PhoneFrameProps) {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#122018] p-0 sm:p-4 md:p-6 select-none">
-      {/* Outer Glassmorphic Forest Phone Container */}
-      <div className="relative w-full h-screen sm:w-[412px] sm:h-[892px] sm:rounded-[52px] sm:border-[10px] sm:border-[#1e3427] bg-forest-gradient shadow-[0_25px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col transition-all duration-300">
+    <div className="flex items-center justify-center min-h-screen bg-black p-0 sm:p-4 md:p-6 select-none">
+      {/* Outer Black & White Phone Container */}
+      <div className="relative w-full h-screen sm:w-[412px] sm:h-[892px] sm:rounded-[52px] sm:border-[10px] sm:border-[#27272a] bg-mono-gradient shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col transition-all duration-300">
         
         {/* Dynamic Island / Camera Notch */}
-        <div className="hidden sm:flex absolute top-3 left-1/2 -translate-x-1/2 w-[110px] h-[30px] bg-[#0c1610] rounded-full z-50 items-center justify-between px-3 border border-white/10 shadow-lg">
-          <div className="w-3.5 h-3.5 bg-black rounded-full border border-white/20"></div>
-          <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+        <div className="hidden sm:flex absolute top-3 left-1/2 -translate-x-1/2 w-[110px] h-[30px] bg-black rounded-full z-50 items-center justify-between px-3 border border-white/20 shadow-lg">
+          <div className="w-3.5 h-3.5 bg-zinc-900 rounded-full border border-white/30"></div>
+          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
         </div>
 
         {/* Speaker Bar */}
-        <div className="hidden sm:block absolute top-1 left-1/2 -translate-x-1/2 w-[48px] h-[4px] bg-white/20 rounded-full z-50"></div>
+        <div className="hidden sm:block absolute top-1 left-1/2 -translate-x-1/2 w-[48px] h-[4px] bg-zinc-700 rounded-full z-50"></div>
 
         {/* Screen Content Wrapper */}
-        <div className="w-full h-full flex flex-col bg-forest-gradient overflow-hidden relative">
+        <div className="w-full h-full flex flex-col bg-mono-gradient overflow-hidden relative">
           
           {/* Top Status Bar Placeholder */}
           <div className="w-full h-11 bg-transparent shrink-0 flex items-center justify-between px-6 pt-3 select-none text-[13px] font-semibold text-white z-40 sm:flex hidden">
@@ -32,8 +32,8 @@ export function PhoneFrame({ children }: PhoneFrameProps) {
               <svg className="w-4 h-4 text-white fill-current" viewBox="0 0 24 24">
                 <path d="M12 21l-12-12c5-5 14-5 19 0l-7 12zm0-15c-3 0-6 1-8 3l8 8 8-8c-2-2-5-3-8-3z"/>
               </svg>
-              <div className="w-5.5 h-3 border border-white/60 rounded-sm p-0.5 flex items-center">
-                <div className="h-full w-4 bg-emerald-400 rounded-2xs"></div>
+              <div className="w-5.5 h-3 border border-white/70 rounded-sm p-0.5 flex items-center">
+                <div className="h-full w-4 bg-white rounded-2xs"></div>
               </div>
             </div>
           </div>
@@ -45,7 +45,7 @@ export function PhoneFrame({ children }: PhoneFrameProps) {
 
           {/* Home Indicator Bar */}
           <div className="hidden sm:block w-full h-6 bg-transparent shrink-0 relative z-40 select-none">
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-white/30 rounded-full"></div>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-white/40 rounded-full"></div>
           </div>
 
         </div>
