@@ -62,22 +62,61 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
     allMeals: 2800
   });
 
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setIsUploadingImage(true);
+
     const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64String = reader.result as string;
-      try {
-        const res = await authAPI.updateProfile({ profileImage: base64String });
-        if (res.success) {
-          setProfileImage(res.profileImage);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 400;
+        const MAX_HEIGHT = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
         }
-      } catch (error) {
-        console.error('Error uploading profile picture:', error);
-      }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+
+        authAPI.updateProfile({ profileImage: compressedBase64 })
+          .then((res) => {
+            if (res.success && res.profileImage) {
+              setProfileImage(res.profileImage);
+            }
+          })
+          .catch((error) => {
+            console.error('Error uploading profile picture:', error);
+            alert('Failed to upload profile image. Please try another image.');
+          })
+          .finally(() => {
+            setIsUploadingImage(false);
+          });
+      };
     };
+
     reader.readAsDataURL(file);
   };
 
@@ -877,34 +916,36 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {/* Profile & Feedback Dashboard Section */}
         {activeTab === 'profile' && (
           <div className="space-y-4">
-            {/* Profile Information Card */}
-            <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm space-y-5">
-              <div className="flex flex-col items-center justify-center text-center space-y-2 py-2 border-b border-neutral-50 pb-4">
+            {/* Executive Profile Information Card */}
+            <div className="bg-executive-card-sm rounded-[32px] p-6 border border-white/15 shadow-2xl space-y-5">
+              <div className="flex flex-col items-center justify-center text-center space-y-2.5 py-2 border-b border-white/10 pb-5">
                 {/* Uploadable Avatar */}
-                <div className="relative cursor-pointer">
-                  <div className="w-20 h-20 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center font-extrabold text-2xl text-primary shadow-md overflow-hidden relative">
-                    {profileImage ? (
+                <label className="relative cursor-pointer group block" title="Tap to upload profile picture">
+                  <div className="w-24 h-24 bg-white/10 border-2 border-emerald-400/40 rounded-full flex items-center justify-center font-extrabold text-2xl text-emerald-300 shadow-2xl overflow-hidden relative group-hover:border-emerald-400 transition-all">
+                    {isUploadingImage ? (
+                      <div className="w-8 h-8 border-3 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin"></div>
+                    ) : profileImage ? (
                       <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
                     ) : (
                       (userName || 'Student').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()
                     )}
                   </div>
-                  <label className="absolute bottom-0 right-0 w-7 h-7 bg-primary hover:bg-primary-dark text-white rounded-full flex items-center justify-center cursor-pointer border-2 border-white shadow-md transition-all active:scale-90 animate-pulse" title="Upload Photo">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-emerald-500 hover:bg-emerald-400 text-black rounded-full flex items-center justify-center cursor-pointer border-2 border-black shadow-lg transition-all active:scale-95 group-hover:scale-110">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
                 <div>
-                  <h4 className="font-extrabold text-neutral-800 text-base">{userName}</h4>
-                  <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                  <h4 className="font-extrabold text-white text-lg tracking-tight">{userName}</h4>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-3 py-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm mt-1 inline-block">
                     {accountStatus === 'active' ? '✔️ Active' : '❌ Inactive'} Student
                   </span>
                 </div>
