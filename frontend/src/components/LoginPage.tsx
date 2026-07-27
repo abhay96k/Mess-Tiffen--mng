@@ -310,11 +310,11 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               type="submit"
               disabled={loading}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-4 btn-emerald-glow text-white font-extrabold select-none mt-1 flex items-center justify-center gap-2 text-sm tracking-wide shadow-2xl"
+              className="w-full py-4 bg-white/10 hover:bg-emerald-600 border border-white/20 hover:border-emerald-500 text-white font-extrabold select-none mt-1 flex items-center justify-center gap-2 text-sm tracking-wide shadow-md hover:shadow-emerald-600/40 transition-all duration-300 rounded-full cursor-pointer group"
             >
               {loading && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>}
               <span>{loading ? 'Registering...' : 'Get started'}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
             </motion.button>
           ) : (
             <div className="flex flex-col gap-2.5 mt-1">
@@ -324,13 +324,13 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 disabled={loading}
                 onClick={() => setRole('student')}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400/40 text-white font-extrabold select-none flex items-center justify-center gap-2 text-sm tracking-wide shadow-xl shadow-emerald-900/40 hover:shadow-emerald-500/30 transition-all duration-300 rounded-full cursor-pointer"
+                className="w-full py-4 bg-white/10 hover:bg-emerald-600 border border-white/20 hover:border-emerald-500 text-white font-extrabold select-none flex items-center justify-center gap-2 text-sm tracking-wide shadow-md hover:shadow-emerald-600/40 transition-all duration-300 rounded-full cursor-pointer group"
               >
                 {loading && role === 'student' && (
                   <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                 )}
                 <span>Get started (Student)</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:text-white transition-colors" />
               </motion.button>
 
               {/* Login as Admin */}
