@@ -73,13 +73,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
     }
   };
 
-  const handleQuickCredentials = (userType: 'student' | 'admin') => {
-    setRole(userType);
-    setEmail(userType === 'student' ? 'student@mess.com' : 'admin@mess.com');
-    setPassword('password123');
-    setIsSignUp(false);
-    setErrorMsg(null);
-  };
+
 
   return (
     <div className="absolute inset-0 bg-executive-mesh flex flex-col justify-between overflow-y-auto no-scrollbar pb-6 text-white">
@@ -357,26 +351,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
           )}
         </form>
 
-        {/* Fast Demo Credentials */}
-        <div className="bg-white/10 backdrop-blur-md p-3 rounded-2xl text-[10px] space-y-2 border border-white/15 shadow-md">
-          <p className="font-bold text-white/70 text-center">💡 Tap below to auto-fill demo credentials:</p>
-          <div className="grid grid-cols-2 gap-2 font-bold">
-            <button
-              type="button"
-              onClick={() => handleQuickCredentials('student')}
-              className="py-2 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 rounded-xl text-emerald-300 text-center font-extrabold shadow-sm"
-            >
-              Demo Student
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickCredentials('admin')}
-              className="py-2 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 rounded-xl text-emerald-300 text-center font-extrabold shadow-sm"
-            >
-              Demo Admin
-            </button>
-          </div>
-        </div>
+
       </motion.div>
     </div>
   );
