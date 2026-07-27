@@ -284,10 +284,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-mono-gradient text-white relative overflow-hidden select-none">
+    <div className="w-full h-full flex flex-col bg-executive-mesh text-white relative overflow-hidden select-none">
       
-      {/* 1. Black & White Glassmorphic Header Bar */}
-      <div className="bg-white/10 backdrop-blur-2xl text-white pt-4 pb-5 px-5 rounded-b-[32px] border-b border-white/20 shrink-0 z-30 shadow-xl">
+      {/* 1. Executive Ultra Glassmorphic Header Bar */}
+      <div className="bg-white/10 backdrop-blur-2xl text-white pt-4 pb-5 px-5 rounded-b-[32px] border-b border-white/20 shrink-0 z-30 shadow-2xl">
         <div className="flex items-center justify-between">
           <button
             onClick={() => setActiveTab('profile')}
@@ -295,7 +295,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
             title="View Profile"
           >
             {/* Avatar badge */}
-            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center font-bold text-sm text-white shadow-md group-hover:scale-105 transition-transform overflow-hidden p-0.5 border border-white/40">
+            <div className="w-12 h-12 bg-white/15 backdrop-blur-md rounded-full flex items-center justify-center font-bold text-sm text-emerald-300 shadow-xl group-hover:scale-105 transition-transform overflow-hidden p-0.5 border border-white/30">
               {profileImage ? (
                 <img src={profileImage} alt={userName} className="w-full h-full object-cover rounded-full" />
               ) : (
@@ -303,7 +303,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
               )}
             </div>
             <div>
-              <p className="text-[10px] text-zinc-300 font-extrabold tracking-wider uppercase flex items-center gap-1">Good Day 👤</p>
+              <p className="text-[10px] text-emerald-400 font-extrabold tracking-wider uppercase flex items-center gap-1">Good Day 👤</p>
               <h3 className="text-base font-extrabold text-white leading-tight">{userName}</h3>
             </div>
           </button>
@@ -311,29 +311,29 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
             {/* Notification Bell */}
             <button 
               onClick={() => { setShowNotifications(!showNotifications); setHasNotification(false); }}
-              className="relative p-2.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 hover:bg-white/25 transition-all focus:outline-none shadow-md"
+              className="relative p-2.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 hover:bg-white/25 transition-all focus:outline-none shadow-lg"
             >
               <Bell className="w-4.5 h-4.5 text-white" />
               {hasNotification && (
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
               )}
             </button>
             {/* Logout button */}
             <button 
               onClick={onLogout}
-              className="p-2.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 hover:bg-white/30 transition-all focus:outline-none shadow-md"
+              className="p-2.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 hover:bg-rose-500/30 transition-all focus:outline-none shadow-lg"
               title="Logout"
             >
-              <LogOut className="w-4.5 h-4.5 text-white" />
+              <LogOut className="w-4.5 h-4.5 text-white hover:text-rose-300" />
             </button>
           </div>
         </div>
         
         {/* Room & Subscription Floating Pill Info */}
-        <div className="mt-3.5 flex items-center justify-between text-xs bg-white/10 backdrop-blur-md rounded-full px-4 py-2 border border-white/20">
-          <span className="font-bold text-white">📍 Room {roomNumber} (Student)</span>
-          <span className="flex items-center gap-1.5 text-[10px] bg-white text-black px-3 py-1 rounded-full font-extrabold uppercase tracking-wider shadow-md">
-            <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse"></span> {accountStatus} Plan
+        <div className="mt-3.5 flex items-center justify-between text-xs bg-white/10 backdrop-blur-md rounded-full px-4 py-2 border border-white/20 shadow-md">
+          <span className="font-bold text-white/90">📍 Room {roomNumber} (Student)</span>
+          <span className="flex items-center gap-1.5 text-[10px] bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 px-3 py-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm">
+            <span className="w-1.5 h-1.5 bg-emerald-300 rounded-full animate-pulse"></span> {accountStatus} Plan
           </span>
         </div>
       </div>
@@ -402,58 +402,63 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {/* Tab View Contents */}
         {activeTab === 'home' && (
           <>
-            {/* Active Tiffin Plan Card (Glassmorphic) */}
-            <div className="relative rounded-3xl p-5 overflow-hidden text-white shadow-md bg-gradient-to-br from-primary to-primary-dark select-none">
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+            {/* Active Tiffin Plan Metallic Card (Revolut / Apple Card Executive Style) */}
+            <div className="relative rounded-[32px] p-6 overflow-hidden text-white shadow-2xl bg-gradient-to-br from-[#1c3627] via-[#112319] to-[#09140e] border border-emerald-500/40 select-none">
+              <div className="absolute -top-12 -right-12 w-36 h-36 bg-emerald-400/15 rounded-full blur-2xl"></div>
               
               <div className="flex items-start justify-between relative z-10">
                 <div>
-                  <div className="flex items-center gap-1 bg-white/15 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase w-fit tracking-wider">
-                    <Sparkles className="w-2.5 h-2.5 text-yellow-300" /> Subscription Active
+                  <div className="flex items-center gap-1.5 bg-emerald-400/20 border border-emerald-400/30 px-3 py-1 rounded-full text-[9px] font-extrabold uppercase w-fit tracking-wider text-emerald-300 shadow-sm">
+                    <Sparkles className="w-3 h-3 text-emerald-300" /> Executive Subscription
                   </div>
-                  <h4 className="text-xl font-bold mt-2">{planName}</h4>
-                  <p className="text-xs text-white/80 mt-0.5">Packaged Tiffin Catering Plan</p>
+                  <h4 className="text-2xl font-extrabold mt-3 tracking-tight text-white">{planName}</h4>
+                  <p className="text-xs text-white/70 font-medium mt-0.5">Premium Daily Catering Pass</p>
                 </div>
-                <span className="text-3xl leading-none">🍱</span>
+                <span className="text-4xl leading-none filter drop-shadow-lg">🍱</span>
               </div>
 
-              <div className="mt-6 flex items-end justify-between relative z-10 border-t border-white/10 pt-4">
+              <div className="mt-6 flex items-end justify-between relative z-10 border-t border-white/15 pt-4">
                 <div>
-                  <p className="text-[9px] uppercase tracking-wider text-white/60 font-semibold">Invoice Status</p>
-                  <p className="text-xs font-bold mt-0.5">{billStatus === 'paid' ? 'Paid' : 'Unpaid Balance'}</p>
+                  <p className="text-[9px] uppercase tracking-wider text-white/50 font-extrabold">Invoice Status</p>
+                  <p className="text-xs font-extrabold mt-0.5 flex items-center gap-1">
+                    <span className={`w-2 h-2 rounded-full ${billStatus === 'paid' ? 'bg-emerald-400' : 'bg-rose-400 animate-pulse'}`}></span>
+                    <span>{billStatus === 'paid' ? 'Settled (Paid)' : 'Pending Balance'}</span>
+                  </p>
                 </div>
                 <button 
                   onClick={() => setActiveTab('billing')}
-                  className="bg-white hover:bg-neutral-100 text-primary px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-sm transition-all focus:outline-none"
+                  className="btn-emerald-glow px-4 py-2 text-xs font-extrabold shadow-lg focus:outline-none"
                 >
-                  Renew Plan
+                  Manage Plan
                 </button>
               </div>
             </div>
 
-            {/* Today's Food Preview */}
-            <div className="bg-white rounded-3xl p-4 shadow-sm border border-neutral-100 space-y-3">
-              <div className="flex items-center justify-between border-b border-neutral-50 pb-2">
-                <h4 className="font-bold text-neutral-800 text-sm">Today's Menu ({todayDayName})</h4>
+            {/* Today's Food Preview (Executive Glass Card) */}
+            <div className="bg-executive-card-sm rounded-[28px] p-5 shadow-xl border border-white/15 space-y-3.5">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                <h4 className="font-extrabold text-white text-sm tracking-tight flex items-center gap-2">
+                  <span>🍽️</span> Today's Menu ({todayDayName})
+                </h4>
                 <button 
                   onClick={() => setActiveTab('menu')}
-                  className="text-xs font-extrabold text-primary hover:underline"
+                  className="text-xs font-extrabold text-emerald-400 hover:text-emerald-300 transition-all"
                 >
-                  View Week
+                  Full Menu →
                 </button>
               </div>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between py-1 border-b border-neutral-50/50">
-                  <span className="font-bold text-neutral-600 w-20">Breakfast</span>
-                  <span className="text-neutral-550 flex-1 text-right">{todayMenu.breakfast}</span>
+              <div className="space-y-2.5 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-white/10">
+                  <span className="font-bold text-white/60 w-24">Breakfast</span>
+                  <span className="text-white font-extrabold flex-1 text-right">{todayMenu.breakfast}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-neutral-50/50">
-                  <span className="font-bold text-neutral-600 w-20">Lunch</span>
-                  <span className="text-neutral-550 flex-1 text-right">{todayMenu.lunch}</span>
+                <div className="flex justify-between py-1.5 border-b border-white/10">
+                  <span className="font-bold text-white/60 w-24">Lunch</span>
+                  <span className="text-white font-extrabold flex-1 text-right">{todayMenu.lunch}</span>
                 </div>
-                <div className="flex justify-between py-1">
-                  <span className="font-bold text-neutral-600 w-20">Dinner</span>
-                  <span className="text-neutral-550 flex-1 text-right">{todayMenu.dinner}</span>
+                <div className="flex justify-between py-1.5">
+                  <span className="font-bold text-white/60 w-24">Dinner</span>
+                  <span className="text-white font-extrabold flex-1 text-right">{todayMenu.dinner}</span>
                 </div>
               </div>
             </div>
