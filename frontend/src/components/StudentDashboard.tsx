@@ -351,16 +351,23 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
           </div>
           
           <div className="flex items-center gap-2 relative">
-            {/* Notification Bell */}
-            <button 
+            {/* Notification Bell with Ringing Animation */}
+            <motion.button 
+              whileTap={{ scale: 0.85 }}
               onClick={() => { setShowNotifications(!showNotifications); setHasNotification(false); setShowOptionsMenu(false); }}
               className="relative p-2.5 bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 rounded-full border border-slate-200/80 transition-all focus:outline-none shadow-2xs cursor-pointer"
+              title="Notifications"
             >
-              <Bell className="w-4.5 h-4.5" />
+              <motion.div
+                animate={showNotifications ? { rotate: [0, -28, 28, -18, 18, -8, 8, 0], scale: [1, 1.25, 1] } : { rotate: 0, scale: 1 }}
+                transition={{ duration: 0.55, ease: "easeInOut" }}
+              >
+                <Bell className="w-4.5 h-4.5 text-slate-700" />
+              </motion.div>
               {hasNotification && (
                 <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
               )}
-            </button>
+            </motion.button>
 
             {/* Three Dot Options Menu Button */}
             <button 
@@ -424,10 +431,11 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
       <AnimatePresence>
         {showNotifications && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-4 right-4 bg-white rounded-2xl shadow-xl border border-neutral-100 p-4 z-45"
+            initial={{ opacity: 0, scale: 0.92, y: -15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: -15 }}
+            transition={{ type: "spring", stiffness: 450, damping: 30 }}
+            className="absolute top-20 left-4 right-4 bg-white text-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 p-4 z-45"
           >
             <div className="flex items-center justify-between mb-3 border-b border-neutral-100 pb-2">
               <h4 className="font-bold text-neutral-800 text-xs">Notifications</h4>
