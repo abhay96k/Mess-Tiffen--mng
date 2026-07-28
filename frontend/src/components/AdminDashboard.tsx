@@ -391,24 +391,30 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
       {/* Real World Executive Header Bar */}
       <div className="bg-white text-slate-900 pt-4 pb-4 px-5 rounded-b-[28px] shrink-0 z-30 border-b border-slate-200/80 shadow-xs">
         <div className="flex items-center justify-between">
-          <button
-            onClick={() => setShowPhotoModal(true)}
-            className="flex items-center gap-3 text-left focus:outline-none hover:opacity-90 transition-all select-none group"
-            title="View & Update Profile Photo"
-          >
-            {/* Admin Avatar */}
-            <div className="w-11 h-11 bg-slate-100 rounded-full border-2 border-emerald-500/40 flex items-center justify-center font-black text-sm text-slate-700 shadow-xs group-hover:scale-105 transition-transform overflow-hidden p-0.5">
+          <div className="flex items-center gap-3 select-none">
+            {/* Admin Avatar Button - Opens ONLY Profile Photo Modal */}
+            <button
+              onClick={() => setShowPhotoModal(true)}
+              className="w-11 h-11 bg-slate-100 rounded-full border-2 border-emerald-500/40 flex items-center justify-center font-black text-sm text-slate-700 shadow-xs hover:scale-105 transition-transform overflow-hidden p-0.5 cursor-pointer focus:outline-none shrink-0"
+              title="View & Update Profile Photo"
+            >
               {profileImage ? (
                 <img src={profileImage} alt={userName} className="w-full h-full object-cover rounded-full" />
               ) : (
                 userName.split(' ').map(n => n[0]).join('').toUpperCase() || 'AD'
               )}
-            </div>
-            <div>
+            </button>
+
+            {/* Admin Name & Text - Navigates to Profile Tab */}
+            <button
+              onClick={() => setActiveTab('profile')}
+              className="flex flex-col text-left focus:outline-none hover:opacity-85 transition-opacity cursor-pointer"
+              title="View Profile Details"
+            >
               <p className="text-[10px] text-slate-400 font-extrabold tracking-wider uppercase">Portal Administrator</p>
               <h3 className="text-base font-black text-slate-900 leading-tight">{userName}</h3>
-            </div>
-          </button>
+            </button>
+          </div>
 
           <div className="relative">
             {/* Three Dot Options Menu Button */}
