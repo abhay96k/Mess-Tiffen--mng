@@ -3,7 +3,7 @@ import {
   Bell, LogOut, Calendar, 
   CreditCard, Send, Star, ChevronDown, ChevronUp, 
   ShieldAlert, Sparkles, Check, CheckCircle,
-  Home, Utensils, User, MapPin, MoreVertical
+  Utensils, User, MapPin, MoreVertical, LayoutGrid
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { attendanceAPI, menuAPI, feedbackAPI, studentAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
@@ -1277,132 +1277,79 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         )}
       </AnimatePresence>
 
-      {/* 3D Animated Floating Navigation Dock */}
-      <div className="mx-3 mb-3 nav-dock-3d p-1.5 flex justify-between items-center shrink-0 z-40 select-none">
+      {/* Real-World Reference Navigation Bar with Elevated Center Floating Button */}
+      <div className="bg-white border-t border-slate-200/80 pt-2 pb-5 px-3 flex justify-between items-center shrink-0 z-40 select-none shadow-[0_-8px_30px_rgba(0,0,0,0.06)] relative">
         
-        {/* Home Tab */}
+        {/* 1. Home Tab */}
         <motion.button
-          whileTap={{ scale: 0.88 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setActiveTab('home')}
-          className="relative flex flex-col items-center justify-center flex-1 py-2 px-1 transition-colors focus:outline-none gap-0.5 cursor-pointer z-10 select-none"
+          className={`flex flex-col items-center justify-center flex-1 py-1 focus:outline-none gap-1 cursor-pointer transition-colors ${
+            activeTab === 'home' ? 'text-emerald-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
+          }`}
         >
-          {activeTab === 'home' && (
-            <motion.div
-              layoutId="studentActiveTabPill"
-              transition={{ type: "spring", stiffness: 450, damping: 32 }}
-              className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl shadow-[0_8px_20px_rgba(5,150,105,0.38)] border border-emerald-400/40 z-0"
-            />
-          )}
-          <motion.div
-            animate={{ scale: activeTab === 'home' ? 1.05 : 1, y: activeTab === 'home' ? -1 : 0 }}
-            transition={{ type: "spring", stiffness: 500, damping: 25 }}
-            className={`relative z-10 flex flex-col items-center gap-0.5 ${
-              activeTab === 'home' ? 'text-white font-black' : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2.5} />
-            <span className="text-[9px] font-black tracking-wide">Home</span>
-          </motion.div>
+          <LayoutGrid className="w-5 h-5" strokeWidth={activeTab === 'home' ? 2.5 : 2} />
+          <span className="text-[10px] font-bold tracking-tight">Home</span>
         </motion.button>
 
-        {/* Menu Tab */}
+        {/* 2. Menu Tab */}
         <motion.button
-          whileTap={{ scale: 0.88 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setActiveTab('menu')}
-          className="relative flex flex-col items-center justify-center flex-1 py-2 px-1 transition-colors focus:outline-none gap-0.5 cursor-pointer z-10 select-none"
+          className={`flex flex-col items-center justify-center flex-1 py-1 focus:outline-none gap-1 cursor-pointer transition-colors ${
+            activeTab === 'menu' ? 'text-emerald-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
+          }`}
         >
-          {activeTab === 'menu' && (
-            <motion.div
-              layoutId="studentActiveTabPill"
-              transition={{ type: "spring", stiffness: 450, damping: 32 }}
-              className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl shadow-[0_8px_20px_rgba(5,150,105,0.38)] border border-emerald-400/40 z-0"
-            />
-          )}
-          <motion.div
-            animate={{ scale: activeTab === 'menu' ? 1.05 : 1, y: activeTab === 'menu' ? -1 : 0 }}
-            transition={{ type: "spring", stiffness: 500, damping: 25 }}
-            className={`relative z-10 flex flex-col items-center gap-0.5 ${
-              activeTab === 'menu' ? 'text-white font-black' : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <Utensils className="w-5 h-5" strokeWidth={2.5} />
-            <span className="text-[9px] font-black tracking-wide">Menu</span>
-          </motion.div>
+          <Utensils className="w-5 h-5" strokeWidth={activeTab === 'menu' ? 2.5 : 2} />
+          <span className="text-[10px] font-bold tracking-tight">Menu</span>
         </motion.button>
 
-        {/* Attendance Tab */}
-        <motion.button
-          whileTap={{ scale: 0.88 }}
-          onClick={() => setActiveTab('attendance')}
-          className="relative flex flex-col items-center justify-center flex-1 py-2 px-1 transition-colors focus:outline-none gap-0.5 cursor-pointer z-10 select-none"
-        >
-          {activeTab === 'attendance' && (
-            <motion.div
-              layoutId="studentActiveTabPill"
-              transition={{ type: "spring", stiffness: 450, damping: 32 }}
-              className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl shadow-[0_8px_20px_rgba(5,150,105,0.38)] border border-emerald-400/40 z-0"
-            />
-          )}
-          <motion.div
-            animate={{ scale: activeTab === 'attendance' ? 1.05 : 1, y: activeTab === 'attendance' ? -1 : 0 }}
-            transition={{ type: "spring", stiffness: 500, damping: 25 }}
-            className={`relative z-10 flex flex-col items-center gap-0.5 ${
-              activeTab === 'attendance' ? 'text-white font-black' : 'text-slate-500 hover:text-slate-800'
+        {/* 3. Center Elevated Floating Action Button (Attendance) */}
+        <div className="flex-1 flex justify-center -mt-7 z-20">
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            whileHover={{ scale: 1.06 }}
+            onClick={() => setActiveTab('attendance')}
+            className={`w-14 h-14 rounded-full flex items-center justify-center text-white shadow-[0_10px_25px_rgba(5,150,105,0.45)] border-[4px] border-white transition-all cursor-pointer ${
+              activeTab === 'attendance'
+                ? 'bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 ring-4 ring-emerald-500/20'
+                : 'bg-gradient-to-tr from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400'
             }`}
+            title="Attendance Pass"
           >
-            <Calendar className="w-5 h-5" strokeWidth={2.5} />
-            <span className="text-[9px] font-black tracking-wide">Attendance</span>
-          </motion.div>
-        </motion.button>
+            <Calendar className="w-6 h-6 text-white" strokeWidth={2.5} />
+          </motion.button>
+        </div>
 
-        {/* Payments Tab */}
+        {/* 4. Payments Tab */}
         <motion.button
-          whileTap={{ scale: 0.88 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setActiveTab('billing')}
-          className="relative flex flex-col items-center justify-center flex-1 py-2 px-1 transition-colors focus:outline-none gap-0.5 cursor-pointer z-10 select-none"
+          className={`flex flex-col items-center justify-center flex-1 py-1 focus:outline-none gap-1 cursor-pointer transition-colors relative ${
+            activeTab === 'billing' ? 'text-emerald-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
+          }`}
         >
-          {activeTab === 'billing' && (
-            <motion.div
-              layoutId="studentActiveTabPill"
-              transition={{ type: "spring", stiffness: 450, damping: 32 }}
-              className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl shadow-[0_8px_20px_rgba(5,150,105,0.38)] border border-emerald-400/40 z-0"
-            />
-          )}
-          <motion.div
-            animate={{ scale: activeTab === 'billing' ? 1.05 : 1, y: activeTab === 'billing' ? -1 : 0 }}
-            transition={{ type: "spring", stiffness: 500, damping: 25 }}
-            className={`relative z-10 flex flex-col items-center gap-0.5 ${
-              activeTab === 'billing' ? 'text-white font-black' : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <CreditCard className="w-5 h-5" strokeWidth={2.5} />
-            <span className="text-[9px] font-black tracking-wide">Payments</span>
-          </motion.div>
+          <div className="relative">
+            <CreditCard className="w-5 h-5" strokeWidth={activeTab === 'billing' ? 2.5 : 2} />
+            {billStatus !== 'paid' && (
+              <span className="absolute -top-1 -right-2 w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white">
+                !
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] font-bold tracking-tight">Payments</span>
         </motion.button>
 
-        {/* Profile Tab */}
+        {/* 5. Profile Tab */}
         <motion.button
-          whileTap={{ scale: 0.88 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setActiveTab('profile')}
-          className="relative flex flex-col items-center justify-center flex-1 py-2 px-1 transition-colors focus:outline-none gap-0.5 cursor-pointer z-10 select-none"
+          className={`flex flex-col items-center justify-center flex-1 py-1 focus:outline-none gap-1 cursor-pointer transition-colors ${
+            activeTab === 'profile' ? 'text-emerald-600 font-extrabold' : 'text-slate-400 hover:text-slate-600'
+          }`}
         >
-          {activeTab === 'profile' && (
-            <motion.div
-              layoutId="studentActiveTabPill"
-              transition={{ type: "spring", stiffness: 450, damping: 32 }}
-              className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl shadow-[0_8px_20px_rgba(5,150,105,0.38)] border border-emerald-400/40 z-0"
-            />
-          )}
-          <motion.div
-            animate={{ scale: activeTab === 'profile' ? 1.05 : 1, y: activeTab === 'profile' ? -1 : 0 }}
-            transition={{ type: "spring", stiffness: 500, damping: 25 }}
-            className={`relative z-10 flex flex-col items-center gap-0.5 ${
-              activeTab === 'profile' ? 'text-white font-black' : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <User className="w-5 h-5" strokeWidth={2.5} />
-            <span className="text-[9px] font-black tracking-wide">Profile</span>
-          </motion.div>
+          <User className="w-5 h-5" strokeWidth={activeTab === 'profile' ? 2.5 : 2} />
+          <span className="text-[10px] font-bold tracking-tight">Profile</span>
         </motion.button>
 
       </div>
