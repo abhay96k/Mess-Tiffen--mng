@@ -386,35 +386,36 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   return (
     <div className="w-full h-full flex flex-col bg-neutral-50 relative overflow-hidden select-none">
       
-      {/* Header Bar */}
-      <div className="bg-primary text-white pt-4 pb-6 px-5 rounded-b-[32px] shadow-lg shrink-0 z-30">
+      {/* Real World Executive Header Bar */}
+      <div className="bg-white text-slate-900 pt-4 pb-4 px-5 rounded-b-[28px] shrink-0 z-30 border-b border-slate-200/80 shadow-xs">
         <div className="flex items-center justify-between">
-            <button
-              onClick={() => setActiveTab('profile')}
-              className="flex items-center gap-3 text-left focus:outline-none hover:opacity-95 transition-all select-none group"
-              title="View Profile"
-            >
+          <button
+            onClick={() => setActiveTab('profile')}
+            className="flex items-center gap-3 text-left focus:outline-none hover:opacity-90 transition-all select-none group"
+            title="View Profile"
+          >
             {/* Admin Avatar */}
-            <div className="w-11 h-11 bg-white/20 rounded-full border border-white/30 flex items-center justify-center font-bold text-sm text-white shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
+            <div className="w-11 h-11 bg-slate-100 rounded-full border-2 border-emerald-500/40 flex items-center justify-center font-black text-sm text-slate-700 shadow-xs group-hover:scale-105 transition-transform overflow-hidden p-0.5">
               {profileImage ? (
-                <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+                <img src={profileImage} alt={userName} className="w-full h-full object-cover rounded-full" />
               ) : (
                 userName.split(' ').map(n => n[0]).join('').toUpperCase() || 'AD'
               )}
             </div>
             <div>
-              <p className="text-[10px] text-white/70 font-semibold tracking-wider uppercase flex items-center gap-1 font-extrabold">Portal Admin 👤</p>
-              <h3 className="text-base font-bold text-white leading-tight underline decoration-white/20 group-hover:decoration-white transition-all">{userName}</h3>
+              <p className="text-[10px] text-slate-400 font-extrabold tracking-wider uppercase">Portal Administrator</p>
+              <h3 className="text-base font-black text-slate-900 leading-tight">{userName}</h3>
             </div>
           </button>
+
           <div className="relative">
             {/* Three Dot Options Menu Button */}
             <button 
               onClick={() => setShowOptionsMenu(!showOptionsMenu)}
-              className="p-2 bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition-all focus:outline-none cursor-pointer"
+              className="p-2.5 bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 rounded-full border border-slate-200/80 transition-all focus:outline-none shadow-2xs cursor-pointer"
               title="Options"
             >
-              <MoreVertical className="w-4.5 h-4.5 text-white" />
+              <MoreVertical className="w-4.5 h-4.5" />
             </button>
 
             {/* Options Menu Dropdown */}
@@ -450,10 +451,10 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
         </div>
 
         {/* Dashboard Quick Subtitle Bar */}
-        <div className="mt-4 flex items-center justify-between text-xs bg-white/10 rounded-xl px-3 py-2 border border-white/15">
-          <span className="font-semibold text-white/90">💻 Mess Operations Center</span>
-          <span className="flex items-center gap-1 text-[10px] bg-amber-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider text-white">
-            Live Monitoring
+        <div className="mt-3.5 flex items-center justify-between text-xs bg-slate-50 rounded-2xl px-4 py-2 border border-slate-200/80 shadow-2xs">
+          <span className="font-extrabold text-slate-700">💻 Mess Operations Center</span>
+          <span className="flex items-center gap-1.5 text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-2xs">
+            <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-pulse"></span> Live Monitoring
           </span>
         </div>
       </div>
