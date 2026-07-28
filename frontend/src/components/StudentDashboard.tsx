@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Bell, LogOut, Calendar, 
   CreditCard, Send, Star, ChevronDown, ChevronUp, 
   ShieldAlert, Sparkles, Check, CheckCircle,
-  Utensils, User, MapPin, MoreVertical, LayoutGrid
+  Utensils, User, MapPin, MoreVertical, LayoutGrid, Camera, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { attendanceAPI, menuAPI, feedbackAPI, studentAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
@@ -29,6 +29,8 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   const [activeTab, setActiveTab] = useState<'home' | 'menu' | 'attendance' | 'billing' | 'profile' | 'nearby'>('home');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasNotification, setHasNotification] = useState(true);
   const [loading, setLoading] = useState(true);
 
@@ -331,9 +333,9 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
       <div className="bg-white text-slate-900 pt-4 pb-4 px-5 rounded-b-[28px] shrink-0 z-30 border-b border-slate-200/80 shadow-xs">
         <div className="flex items-center justify-between">
           <button
-            onClick={() => setActiveTab('profile')}
+            onClick={() => setShowPhotoModal(true)}
             className="flex items-center gap-3 text-left focus:outline-none hover:opacity-90 transition-all select-none group"
-            title="View Profile"
+            title="View & Update Profile Photo"
           >
             {/* Avatar badge */}
             <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center font-black text-sm text-slate-700 shadow-xs group-hover:scale-105 transition-transform overflow-hidden p-0.5 border-2 border-emerald-500/40">
@@ -1273,6 +1275,90 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                 </div>
               )}
             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Full-Screen Profile Photo Viewer & Camera Update Modal */}
+      <AnimatePresence>
+        {showPhotoModal && (
+          <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-between p-6 z-50 select-none">
+            
+            {/* Modal Top Header */}
+            <div className="w-full flex items-center justify-between text-white pt-2">
+              <div className="flex items-center gap-2">
+                <User className="w-5 h-5 text-emerald-400" />
+                <span className="font-extrabold text-sm tracking-wide">Profile Photo</span>
+              </div>
+              <button
+                onClick={() => setShowPhotoModal(false)}
+                className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all focus:outline-none cursor-pointer"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Photo View Display Box */}
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
+              className="flex flex-col items-center justify-center space-y-4 my-auto max-w-sm w-full"
+            >
+              <div className="relative group">
+                <div className="w-64 h-64 sm:w-72 sm:h-72 rounded-full overflow-hidden border-4 border-emerald-500/80 shadow-[0_0_50px_rgba(5,150,105,0.4)] bg-slate-900 flex items-center justify-center relative">
+                  {isUploadingImage ? (
+                    <div className="flex flex-col items-center gap-3 text-emerald-400">
+                      <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-400 rounded-full animate-spin"></div>
+                      <span className="text-xs font-bold">Uploading new photo...</span>
+                    </div>
+                  ) : profileImage ? (
+                    <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-6xl font-black text-emerald-400">
+                      {(userName || 'Student').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()}
+                    </span>
+                  )}
+                </div>
+
+                {/* Camera Button overlay on photo */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute bottom-2 right-2 p-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-full shadow-[0_8px_25px_rgba(16,185,129,0.5)] border-4 border-slate-950 transition-all cursor-pointer hover:scale-110 active:scale-95 flex items-center justify-center"
+                  title="Change Profile Photo"
+                >
+                  <Camera className="w-6 h-6 stroke-[2.5]" />
+                </button>
+              </div>
+
+              <div className="text-center text-white space-y-1">
+                <h3 className="text-xl font-black">{userName}</h3>
+                <p className="text-xs text-slate-400 font-semibold">Student Account • Room {roomNumber}</p>
+              </div>
+            </motion.div>
+
+            {/* Hidden File Input Trigger */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+
+            {/* Bottom Action bar */}
+            <div className="w-full max-w-xs space-y-2 pb-4">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
+              >
+                <Camera className="w-4.5 h-4.5" />
+                <span>Upload / Change Photo</span>
+              </button>
+            </div>
+
           </div>
         )}
       </AnimatePresence>
