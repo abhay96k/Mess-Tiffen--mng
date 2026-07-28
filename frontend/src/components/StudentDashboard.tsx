@@ -3,7 +3,7 @@ import {
   Bell, LogOut, Calendar, 
   CreditCard, Send, Star, ChevronDown, ChevronUp, 
   ShieldAlert, Sparkles, Check, CheckCircle,
-  Home, Utensils, User, MapPin
+  Home, Utensils, User, MapPin, MoreVertical
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { attendanceAPI, menuAPI, feedbackAPI, studentAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
@@ -28,6 +28,7 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   // Navigation & UI states
   const [activeTab, setActiveTab] = useState<'home' | 'menu' | 'attendance' | 'billing' | 'profile' | 'nearby'>('home');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
   const [loading, setLoading] = useState(true);
 
@@ -347,25 +348,64 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
               <h3 className="text-base font-black text-white leading-tight">{userName}</h3>
             </div>
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 relative">
             {/* Notification Bell */}
             <button 
-              onClick={() => { setShowNotifications(!showNotifications); setHasNotification(false); }}
-              className="relative p-2.5 bg-white/15 rounded-full border border-white/25 hover:bg-white/25 transition-all focus:outline-none shadow-xs"
+              onClick={() => { setShowNotifications(!showNotifications); setHasNotification(false); setShowOptionsMenu(false); }}
+              className="relative p-2.5 bg-white/15 rounded-full border border-white/25 hover:bg-white/25 transition-all focus:outline-none shadow-xs cursor-pointer"
             >
               <Bell className="w-4.5 h-4.5 text-white" />
               {hasNotification && (
                 <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-yellow-300 rounded-full animate-ping"></span>
               )}
             </button>
-            {/* Logout button */}
+
+            {/* Three Dot Options Menu Button */}
             <button 
-              onClick={onLogout}
-              className="p-2.5 bg-white/15 rounded-full border border-white/25 hover:bg-red-500/40 transition-all focus:outline-none shadow-xs"
-              title="Logout"
+              onClick={() => { setShowOptionsMenu(!showOptionsMenu); setShowNotifications(false); }}
+              className="p-2.5 bg-white/15 rounded-full border border-white/25 hover:bg-white/25 transition-all focus:outline-none shadow-xs cursor-pointer"
+              title="Options"
             >
-              <LogOut className="w-4.5 h-4.5 text-white hover:text-red-200" />
+              <MoreVertical className="w-4.5 h-4.5 text-white" />
             </button>
+
+            {/* Options Menu Dropdown */}
+            <AnimatePresence>
+              {showOptionsMenu && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  className="absolute right-0 top-12 w-48 bg-white text-slate-900 shadow-2xl rounded-2xl border border-slate-200 p-2 z-50 overflow-hidden space-y-1"
+                >
+                  <button
+                    onClick={() => { setActiveTab('profile'); setShowOptionsMenu(false); }}
+                    className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 font-bold text-xs flex items-center gap-2.5 transition-all text-left text-slate-800 cursor-pointer"
+                  >
+                    <User className="w-4 h-4 text-emerald-600" />
+                    <span>My Profile</span>
+                  </button>
+
+                  <button
+                    onClick={() => { setActiveTab('nearby'); setShowOptionsMenu(false); }}
+                    className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 font-bold text-xs flex items-center gap-2.5 transition-all text-left text-slate-800 cursor-pointer"
+                  >
+                    <MapPin className="w-4 h-4 text-emerald-600" />
+                    <span>Nearby Explorer</span>
+                  </button>
+
+                  <div className="border-t border-slate-100 my-1"></div>
+
+                  <button
+                    onClick={onLogout}
+                    className="w-full px-3 py-2.5 rounded-xl hover:bg-red-50 text-red-600 font-bold text-xs flex items-center gap-2.5 transition-all text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 text-red-600" />
+                    <span>Logout Account</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
         
@@ -1265,18 +1305,6 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
           <span className="text-[9px] font-black tracking-wide">Menu</span>
         </button>
 
-        {/* Nearby Map Tab */}
-        <button
-          onClick={() => setActiveTab('nearby')}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
-            activeTab === 'nearby' 
-              ? 'nav-tab-3d-active font-black scale-105' 
-              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
-          }`}
-        >
-          <MapPin className="w-5 h-5" strokeWidth={2.5} />
-          <span className="text-[9px] font-black tracking-wide">Nearby</span>
-        </button>
 
         {/* Attendance Tab */}
         <button

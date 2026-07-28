@@ -3,7 +3,7 @@ import {
   Users, CheckCircle2, Calendar, DollarSign, Megaphone,
   Plus, Trash, LogOut, Edit2, Save, 
   TrendingUp, Check, X, Star,
-  LayoutDashboard, Utensils, User
+  LayoutDashboard, Utensils, User, MoreVertical
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { studentAPI, menuAPI, feedbackAPI, attendanceAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
@@ -35,6 +35,7 @@ interface FeedbackRecord {
 export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'stats' | 'menu' | 'students' | 'attendance' | 'profile'>('stats');
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   
   // Dashboard indicators
   const [loading, setLoading] = useState(true);
@@ -406,13 +407,46 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
               <h3 className="text-base font-bold text-white leading-tight underline decoration-white/20 group-hover:decoration-white transition-all">{userName}</h3>
             </div>
           </button>
-          <button 
-            onClick={onLogout}
-            className="p-2 bg-white/10 rounded-full border border-white/20 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-300 transition-all focus:outline-none"
-            title="Logout"
-          >
-            <LogOut className="w-4 h-4 text-white" />
-          </button>
+          <div className="relative">
+            {/* Three Dot Options Menu Button */}
+            <button 
+              onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+              className="p-2 bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition-all focus:outline-none cursor-pointer"
+              title="Options"
+            >
+              <MoreVertical className="w-4.5 h-4.5 text-white" />
+            </button>
+
+            {/* Options Menu Dropdown */}
+            <AnimatePresence>
+              {showOptionsMenu && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  className="absolute right-0 top-12 w-48 bg-white text-slate-900 shadow-2xl rounded-2xl border border-slate-200 p-2 z-50 overflow-hidden space-y-1"
+                >
+                  <button
+                    onClick={() => { setActiveTab('profile'); setShowOptionsMenu(false); }}
+                    className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 font-bold text-xs flex items-center gap-2.5 transition-all text-left text-slate-800 cursor-pointer"
+                  >
+                    <User className="w-4 h-4 text-emerald-600" />
+                    <span>Admin Profile</span>
+                  </button>
+
+                  <div className="border-t border-slate-100 my-1"></div>
+
+                  <button
+                    onClick={onLogout}
+                    className="w-full px-3 py-2.5 rounded-xl hover:bg-red-50 text-red-600 font-bold text-xs flex items-center gap-2.5 transition-all text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 text-red-600" />
+                    <span>Logout Account</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Dashboard Quick Subtitle Bar */}
