@@ -553,21 +553,25 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
             {/* Nearby Mess Quick Explorer Card */}
             <div 
               onClick={() => setActiveTab('nearby')}
-              className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-3xl p-4 shadow-sm border border-slate-700/60 flex items-center justify-between cursor-pointer hover:scale-[1.01] transition-all"
+              className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 hover:border-emerald-500/40 hover:shadow-md transition-all select-none cursor-pointer group flex items-center justify-between gap-3"
             >
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 rounded-2xl">
-                  <MapPin className="w-5 h-5" />
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-12 h-12 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+                  <MapPin className="w-6 h-6 stroke-[2.2]" />
                 </div>
-                <div>
-                  <h5 className="font-black text-sm text-white flex items-center gap-1.5">
-                    <span>Nearby Mess Explorer</span>
-                    <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-2 py-0.5 rounded-full uppercase">Interactive Map</span>
-                  </h5>
-                  <p className="text-xs text-slate-300 font-medium">Explore 4+ mess facilities & daily thalis near you</p>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h5 className="font-extrabold text-sm text-slate-900 tracking-tight">Nearby Mess Explorer</h5>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full shrink-0">
+                      Interactive Map
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5 truncate">Explore 4+ mess facilities & daily thalis near you</p>
                 </div>
               </div>
-              <span className="text-xs font-black text-emerald-400 hover:underline">Open Map →</span>
+              <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 group-hover:bg-emerald-600 group-hover:text-white px-3.5 py-2 rounded-full border border-emerald-200/80 transition-all shrink-0 flex items-center gap-1 shadow-2xs">
+                Open Map →
+              </span>
             </div>
           </>
         )}
