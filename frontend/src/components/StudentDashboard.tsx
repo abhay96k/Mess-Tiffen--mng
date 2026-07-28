@@ -6,7 +6,7 @@ import {
   Utensils, User, MapPin, MoreVertical, LayoutGrid, Camera, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { attendanceAPI, menuAPI, feedbackAPI, studentAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
+import { attendanceAPI, menuAPI, feedbackAPI, studentAPI, authAPI, settingsAPI } from '../services/api';
 import { NearbyMessMap } from './NearbyMessMap';
 
 interface StudentDashboardProps {
@@ -50,7 +50,6 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   const [billAmount, setBillAmount] = useState(2400);
   const [billStatus, setBillStatus] = useState('pending');
   const [planName, setPlanName] = useState('2-Meal Standard');
-  const [announcements, setAnnouncements] = useState<string[]>([]);
   const [userEmail, setUserEmail] = useState('');
   const [roomNumber, setRoomNumber] = useState('304');
   const [accountStatus, setAccountStatus] = useState('active');
@@ -147,14 +146,12 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         profileRes,
         attendanceRes,
         menuRes,
-        notesRes,
         historyRes,
         pricingRes
       ] = await Promise.allSettled([
         authAPI.getMe(),
         attendanceAPI.getToday(),
         menuAPI.getMenu(),
-        announcementAPI.getAnnouncements(),
         attendanceAPI.getHistory(),
         settingsAPI.getPricing()
       ]);
@@ -187,10 +184,6 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
 
       if (menuRes.status === 'fulfilled' && menuRes.value?.success) {
         setWeeklyMenu(menuRes.value.data);
-      }
-
-      if (notesRes.status === 'fulfilled' && notesRes.value?.success && notesRes.value.data.length > 0) {
-        setAnnouncements(notesRes.value.data);
       }
 
       if (historyRes.status === 'fulfilled' && historyRes.value?.success) {
@@ -475,18 +468,6 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
 
        {/* 3. Main Scrollable Content */}
       <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 space-y-4">
-
-        {/* Announcements Notice Alert bar */}
-        {announcements.length > 0 && (
-          <div className="bg-yellow-50 border border-yellow-250 rounded-2xl p-3 flex gap-2 items-center text-[11px] font-semibold text-yellow-800 shadow-3xs shrink-0 select-none">
-            <span className="text-sm shrink-0">📢</span>
-            <div className="overflow-hidden relative w-full h-4">
-              <div className="absolute w-full animate-pulse whitespace-nowrap overflow-hidden text-ellipsis">
-                {announcements[0]}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Tab View Contents */}
         {activeTab === 'home' && (
