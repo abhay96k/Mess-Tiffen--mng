@@ -75,7 +75,28 @@ body {
   transform: translateY(-1px);
 }
 
-/* Legacy Backwards Compatible Class Overrides for Clean High-Contrast */
+/* 3D Floating Dock Bar System */
+.nav-dock-3d {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 
+    0 20px 40px -10px rgba(15, 23, 42, 0.22),
+    0 8px 16px -6px rgba(15, 23, 42, 0.12),
+    inset 0 1.5px 0 rgba(255, 255, 255, 1) !important;
+  border-radius: 28px !important;
+}
+
+.nav-tab-3d-active {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  border-radius: 18px !important;
+}
+
+/* Legacy Backwards Compatible Class Overrides */
 .bg-executive-mesh, .bg-mono-gradient, .bg-forest-gradient {
   background: #f8fafc !important;
 }

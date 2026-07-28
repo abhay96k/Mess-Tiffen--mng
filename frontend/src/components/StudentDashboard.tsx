@@ -1236,14 +1236,16 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         )}
       </AnimatePresence>
 
-      {/* Real World Bottom Tab Navigation Bar */}
-      <div className="bg-white/95 backdrop-blur-md border-t border-slate-200/80 pt-2 pb-5 px-3 flex justify-between shrink-0 z-40 select-none shadow-lg">
+      {/* 3D Elevated Floating Pill Capsule Navigation Dock */}
+      <div className="mx-3 mb-3 nav-dock-3d p-1.5 flex justify-between items-center shrink-0 z-40 select-none">
         
         {/* Home Tab */}
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
-            activeTab === 'home' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'home' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
           <Home className="w-5 h-5" fill={activeTab === 'home' ? 'currentColor' : 'none'} strokeWidth={2.5} />
@@ -1253,8 +1255,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {/* Menu Tab */}
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
-            activeTab === 'menu' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'menu' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
           <Utensils className="w-5 h-5" strokeWidth={2.5} />
@@ -1264,8 +1268,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {/* Nearby Map Tab */}
         <button
           onClick={() => setActiveTab('nearby')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
-            activeTab === 'nearby' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'nearby' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
           <MapPin className="w-5 h-5" strokeWidth={2.5} />
@@ -1275,8 +1281,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {/* Attendance Tab */}
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
-            activeTab === 'attendance' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'attendance' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
           <Calendar className="w-5 h-5" strokeWidth={2.5} />
@@ -1286,8 +1294,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {/* Payments Tab */}
         <button
           onClick={() => setActiveTab('billing')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
-            activeTab === 'billing' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'billing' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
           <CreditCard className="w-5 h-5" strokeWidth={2.5} />
@@ -1297,8 +1307,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {/* Profile Tab */}
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all focus:outline-none gap-0.5 cursor-pointer ${
-            activeTab === 'profile' ? 'text-emerald-700 font-black' : 'text-slate-400 hover:text-slate-700'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'profile' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
           <User className="w-5 h-5" strokeWidth={2.5} />

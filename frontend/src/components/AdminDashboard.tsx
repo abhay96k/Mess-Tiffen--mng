@@ -1245,62 +1245,72 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
 
       </div>
 
-      {/* Admin Tab Bottom Navigation Bar */}
-      <div className="bg-white rounded-t-[32px] border-t border-neutral-150/70 pt-3 pb-6 px-4 flex justify-between shrink-0 z-30 select-none shadow-[0_-8px_20px_rgba(0,0,0,0.03)]">
+      {/* 3D Elevated Floating Pill Capsule Navigation Dock */}
+      <div className="mx-3 mb-3 nav-dock-3d p-1.5 flex justify-between items-center shrink-0 z-40 select-none">
         
         {/* Stats Tab */}
         <button
           onClick={() => setActiveTab('stats')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'stats' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'stats' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
-          <LayoutDashboard className="w-5 h-5" fill={activeTab === 'stats' ? 'currentColor' : 'none'} strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Overview</span>
+          <LayoutDashboard className="w-5 h-5" fill={activeTab === 'stats' ? 'currentColor' : 'none'} strokeWidth={2.5} />
+          <span className="text-[9px] font-black tracking-wide">Overview</span>
         </button>
 
         {/* Menu Tab */}
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'menu' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'menu' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
-          <Utensils className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Menu</span>
+          <Utensils className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[9px] font-black tracking-wide">Menu</span>
         </button>
 
         {/* Students Tab */}
         <button
           onClick={() => setActiveTab('students')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'students' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'students' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
-          <Users className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Students</span>
+          <Users className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[9px] font-black tracking-wide">Students</span>
         </button>
 
         {/* Attendance Tab */}
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'attendance' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'attendance' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
-          <Calendar className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Attendance</span>
+          <Calendar className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[9px] font-black tracking-wide">Attendance</span>
         </button>
 
         {/* Profile Tab */}
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center justify-center flex-1 transition-all focus:outline-none gap-1 ${
-            activeTab === 'profile' ? 'text-primary font-medium' : 'text-neutral-400 hover:text-neutral-600'
+          className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 transition-all duration-200 focus:outline-none gap-0.5 cursor-pointer ${
+            activeTab === 'profile' 
+              ? 'nav-tab-3d-active font-black scale-105' 
+              : 'text-slate-500 hover:text-slate-800 hover:-translate-y-0.5'
           }`}
         >
-          <User className="w-5 h-5" strokeWidth={2} />
-          <span className="text-[11px] tracking-wide">Profile</span>
+          <User className="w-5 h-5" strokeWidth={2.5} />
+          <span className="text-[9px] font-black tracking-wide">Profile</span>
         </button>
 
       </div>
