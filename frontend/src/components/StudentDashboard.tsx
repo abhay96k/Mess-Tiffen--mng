@@ -93,19 +93,19 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
 
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 400;
-        const MAX_HEIGHT = 400;
+        const MAX_WIDTH = 1080;
+        const MAX_HEIGHT = 1080;
         let width = img.width;
         let height = img.height;
 
         if (width > height) {
           if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
+            height = Math.round((height * MAX_WIDTH) / width);
             width = MAX_WIDTH;
           }
         } else {
           if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
+            width = Math.round((width * MAX_HEIGHT) / height);
             height = MAX_HEIGHT;
           }
         }
@@ -113,9 +113,13 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
+        if (ctx) {
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, width, height);
+        }
 
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.92);
 
         authAPI.updateProfile({ profileImage: compressedBase64 })
           .then((res) => {
