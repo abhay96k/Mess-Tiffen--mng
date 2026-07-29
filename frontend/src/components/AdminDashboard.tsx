@@ -1103,20 +1103,20 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
         {activeTab === 'profile' && (
           <div className="space-y-4">
             {/* Executive Admin Profile Card */}
-            <div className="bg-executive-card-sm rounded-[32px] p-6 border border-white/15 shadow-2xl space-y-5">
-              <div className="flex flex-col items-center justify-center text-center space-y-2.5 py-2 border-b border-white/10 pb-5">
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5">
+              <div className="flex flex-col items-center justify-center text-center space-y-3 py-2 border-b border-slate-100 pb-5">
                 {/* Uploadable Admin Avatar */}
                 <label className="relative cursor-pointer group block" title="Tap to upload profile picture">
-                  <div className="w-24 h-24 bg-white/10 border-2 border-emerald-400/40 rounded-full flex items-center justify-center font-extrabold text-2xl text-emerald-300 shadow-2xl overflow-hidden relative group-hover:border-emerald-400 transition-all">
+                  <div className="w-24 h-24 bg-emerald-50 border-2 border-emerald-500/30 rounded-full flex items-center justify-center font-black text-2xl text-emerald-700 shadow-md overflow-hidden relative group-hover:border-emerald-500 transition-all">
                     {isUploadingImage ? (
-                      <div className="w-8 h-8 border-3 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin"></div>
+                      <div className="w-8 h-8 border-3 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
                     ) : profileImage ? (
                       <img src={profileImage} alt={adminName} className="w-full h-full object-cover" />
                     ) : (
                       (adminName || 'Admin').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()
                     )}
                   </div>
-                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-emerald-500 hover:bg-emerald-400 text-black rounded-full flex items-center justify-center cursor-pointer border-2 border-black shadow-lg transition-all active:scale-95 group-hover:scale-110">
+                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full flex items-center justify-center cursor-pointer border-2 border-white shadow-md transition-all active:scale-95 group-hover:scale-110">
                     <Camera className="w-4 h-4" />
                   </div>
                   <input
@@ -1127,37 +1127,37 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                   />
                 </label>
                 <div>
-                  <h4 className="font-extrabold text-white text-lg tracking-tight">{adminName || userName}</h4>
-                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-3 py-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm mt-1 inline-block">
+                  <h4 className="font-extrabold text-slate-900 text-xl tracking-tight">{adminName || userName}</h4>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-black uppercase tracking-wider shadow-2xs mt-1 inline-block">
                     👑 System Administrator
                   </span>
                 </div>
 
                 <button
                   onClick={() => setShowEditProfileModal(true)}
-                  className="mt-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-full text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-full text-xs shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
                 >
-                  <Edit2 className="w-3.5 h-3.5" />
+                  <Edit2 className="w-4 h-4" />
                   <span>Edit Profile Details</span>
                 </button>
               </div>
 
-              <div className="space-y-3 text-xs text-white/90">
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">Email Address</span>
-                  <span className="font-bold">{adminEmail || `${(adminName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
+              <div className="space-y-3.5 text-xs text-slate-800 font-semibold">
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Email Address</span>
+                  <span className="font-black text-slate-900">{adminEmail || `${(adminName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">Mobile Number</span>
-                  <span className="font-bold">{adminPhone || 'Not Added'}</span>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Mobile Number</span>
+                  <span className="font-black text-slate-900">{adminPhone || 'Not Added'}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">Security Access</span>
-                  <span className="font-bold text-emerald-300">Full Operator Permission</span>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Security Access</span>
+                  <span className="font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Full Operator Permission</span>
                 </div>
                 <div className="flex justify-between items-center py-1">
-                  <span className="font-semibold text-white/60">Operational Scope</span>
-                  <span className="font-bold text-emerald-300">Menu, Broadcaster, Billing, Student Audit</span>
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Operational Scope</span>
+                  <span className="font-black text-slate-900">Menu, Broadcaster, Billing, Student Audit</span>
                 </div>
               </div>
             </div>

@@ -1035,20 +1035,20 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         {activeTab === 'profile' && (
           <div className="space-y-4">
             {/* Executive Profile Information Card */}
-            <div className="bg-executive-card-sm rounded-[32px] p-6 border border-white/15 shadow-2xl space-y-5">
-              <div className="flex flex-col items-center justify-center text-center space-y-2.5 py-2 border-b border-white/10 pb-5">
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5">
+              <div className="flex flex-col items-center justify-center text-center space-y-3 py-2 border-b border-slate-100 pb-5">
                 {/* Uploadable Avatar */}
                 <label className="relative cursor-pointer group block" title="Tap to upload profile picture">
-                  <div className="w-24 h-24 bg-white/10 border-2 border-emerald-400/40 rounded-full flex items-center justify-center font-extrabold text-2xl text-emerald-300 shadow-2xl overflow-hidden relative group-hover:border-emerald-400 transition-all">
+                  <div className="w-24 h-24 bg-emerald-50 border-2 border-emerald-500/30 rounded-full flex items-center justify-center font-black text-2xl text-emerald-700 shadow-md overflow-hidden relative group-hover:border-emerald-500 transition-all">
                     {isUploadingImage ? (
-                      <div className="w-8 h-8 border-3 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin"></div>
+                      <div className="w-8 h-8 border-3 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
                     ) : profileImage ? (
-                      <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+                      <img src={profileImage} alt={studentName} className="w-full h-full object-cover" />
                     ) : (
-                      (userName || 'Student').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()
+                      (studentName || 'Student').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()
                     )}
                   </div>
-                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-emerald-500 hover:bg-emerald-400 text-black rounded-full flex items-center justify-center cursor-pointer border-2 border-black shadow-lg transition-all active:scale-95 group-hover:scale-110">
+                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full flex items-center justify-center cursor-pointer border-2 border-white shadow-md transition-all active:scale-95 group-hover:scale-110">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1062,50 +1062,51 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                   />
                 </label>
                 <div>
-                  <h4 className="font-extrabold text-white text-lg tracking-tight">{studentName || userName}</h4>
-                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-3 py-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm mt-1 inline-block">
-                    {accountStatus === 'active' ? '✔️ Active' : '❌ Inactive'} Student
-                  </span>
+                  <h4 className="font-extrabold text-slate-900 text-xl tracking-tight">{studentName || userName}</h4>
                 </div>
 
                 <button
                   onClick={() => setShowEditProfileModal(true)}
-                  className="mt-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-full text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-full text-xs shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
                 >
-                  <Edit2 className="w-3.5 h-3.5" />
+                  <Edit2 className="w-4 h-4" />
                   <span>Edit Profile Details</span>
                 </button>
               </div>
 
-              <div className="space-y-3 text-xs text-white/90">
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">Email Address</span>
-                  <span className="font-bold">{userEmail || `${(studentName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
+              <div className="space-y-3.5 text-xs text-slate-800 font-semibold">
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Email Address</span>
+                  <span className="font-black text-slate-900">{userEmail || `${(studentName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">Mobile Number</span>
-                  <span className="font-bold">{phoneNumber || 'Not Added'}</span>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Mobile Number</span>
+                  <span className="font-black text-slate-900">{phoneNumber || 'Not Added'}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">College / Institute</span>
-                  <span className="font-bold">{collegeName || 'Not Added'}</span>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">College / Institute</span>
+                  <span className="font-black text-slate-900">{collegeName || 'Not Added'}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">Room / PG Name</span>
-                  <span className="font-bold">{pgName ? `${pgName} (Room ${roomNumber})` : `Room ${roomNumber}`}</span>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Room / PG Name</span>
+                  <span className="font-black text-slate-900">{pgName ? `${pgName} (Room ${roomNumber})` : `Room ${roomNumber}`}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">Dietary Preference</span>
-                  <span className="font-bold text-emerald-300">🥗 {dietaryPref}</span>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Dietary Preference</span>
+                  <span className="font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">🥗 {dietaryPref}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-white/10">
-                  <span className="font-semibold text-white/60">Subscription Plan</span>
-                  <span className="font-bold">{planName}</span>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Subscription Plan</span>
+                  <span className="font-black text-slate-900">{planName}</span>
                 </div>
                 <div className="flex justify-between items-center py-1">
-                  <span className="font-semibold text-white/60">Billing Status</span>
-                  <span className={`font-bold ${billStatus === 'paid' ? 'text-emerald-300' : 'text-amber-300'}`}>
-                    {billStatus === 'paid' ? 'Paid & Active' : 'Payment Due'}
+                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Billing Status</span>
+                  <span className={`font-black px-2.5 py-0.5 rounded-full border text-[11px] ${
+                    billStatus === 'paid' 
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}>
+                    {billStatus === 'paid' ? '✔️ Paid & Active' : '⌛ Payment Due'}
                   </span>
                 </div>
               </div>
