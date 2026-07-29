@@ -74,19 +74,19 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="absolute inset-0 bg-slate-50 flex flex-col justify-between overflow-y-auto no-scrollbar pb-4 text-slate-900">
+    <div className="absolute inset-0 bg-slate-50 flex flex-col items-center justify-start overflow-y-auto no-scrollbar p-4 text-slate-900">
       
       {/* Top Header Section */}
-      <div className="flex-1 flex flex-col items-center justify-center pt-3 pb-1 px-6 text-center select-none shrink-0 relative">
+      <div className="w-full flex flex-col items-center pt-5 pb-3 px-4 text-center select-none shrink-0 relative">
         
         {/* Real World Brand Badge */}
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-extrabold px-3.5 py-1 rounded-full mb-2 flex items-center gap-1.5 shadow-xs">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-extrabold px-3.5 py-1 rounded-full mb-2.5 flex items-center gap-1.5 shadow-xs">
           <Utensils className="w-3.5 h-3.5 text-emerald-600" />
           <span>Smart Meal Management</span>
         </div>
 
         {/* Hero App Logo Icon */}
-        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-2xl flex items-center justify-center mb-1.5 border border-slate-200 p-2 shadow-sm">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-2xl flex items-center justify-center mb-2 border border-slate-200 p-2 shadow-sm">
           <img src={tiffinLogo} alt="Mess Tiffin Logo" className="w-full h-full object-contain" />
         </div>
 
@@ -96,12 +96,12 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
         </h1>
       </div>
 
-      {/* Real World Auth Card Container - Shifted further upward */}
+      {/* Real World Auth Card Container - Pulled right under header */}
       <motion.div
-        initial={{ y: 50, opacity: 0 }}
+        initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="w-full bg-white rounded-t-[36px] px-6 pt-5 pb-6 flex flex-col gap-3.5 shrink-0 shadow-xl border-t border-slate-200 -mt-6"
+        className="w-full bg-white rounded-[32px] px-6 pt-5 pb-6 flex flex-col gap-3.5 shrink-0 shadow-xl border border-slate-200 mt-2 mb-4"
       >
         {/* Header inside card */}
         <div className="text-center">
