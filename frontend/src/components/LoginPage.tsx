@@ -74,37 +74,37 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="absolute inset-0 bg-slate-50 flex flex-col justify-between overflow-y-auto no-scrollbar pb-6 text-slate-900">
+    <div className="absolute inset-0 bg-slate-50 flex flex-col justify-between overflow-y-auto no-scrollbar pb-4 text-slate-900">
       
       {/* Top Header Section */}
-      <div className="flex-1 flex flex-col items-center justify-center py-8 px-6 text-center select-none shrink-0 relative">
+      <div className="flex-1 flex flex-col items-center justify-center pt-5 pb-2 px-6 text-center select-none shrink-0 relative">
         
         {/* Real World Brand Badge */}
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-extrabold px-3.5 py-1 rounded-full mb-4 flex items-center gap-1.5 shadow-xs">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-extrabold px-3.5 py-1 rounded-full mb-3 flex items-center gap-1.5 shadow-xs">
           <Utensils className="w-3.5 h-3.5 text-emerald-600" />
           <span>Smart Meal Management</span>
         </div>
 
         {/* Hero App Logo Icon */}
-        <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-3 border border-slate-200 p-3 shadow-md">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-3xl flex items-center justify-center mb-2 border border-slate-200 p-2.5 shadow-md">
           <img src={tiffinLogo} alt="Mess Tiffin Logo" className="w-full h-full object-contain" />
         </div>
 
         {/* App Title */}
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
           Mess Tiffin Portal
         </h1>
-        <p className="text-xs text-slate-500 font-medium mt-1">
+        <p className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">
           Daily Mess Catering & Attendance System
         </p>
       </div>
 
-      {/* Real World Auth Card Container */}
+      {/* Real World Auth Card Container - Shifted upward */}
       <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="w-full bg-white rounded-t-[36px] px-6 pt-6 pb-6 flex flex-col gap-4 shrink-0 shadow-xl border-t border-slate-200"
+        className="w-full bg-white rounded-t-[36px] px-6 pt-5 pb-6 flex flex-col gap-3.5 shrink-0 shadow-xl border-t border-slate-200 -mt-3"
       >
         {/* Header inside card */}
         <div className="text-center">
