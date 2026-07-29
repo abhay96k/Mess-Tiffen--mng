@@ -6,12 +6,20 @@
   --color-primary-dark: #047857;
   
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);        /* strong ease-out for UI */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);    /* strong ease-in-out for on-screen movement */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);     /* iOS-like drawer curve */
 }
 
 :root {
   color-scheme: light;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);        /* strong ease-out for UI */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);    /* strong ease-in-out for on-screen movement */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);     /* iOS-like drawer curve */
 }
 
 body {
@@ -131,4 +139,17 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Custom Cubic-Bezier Easing Utilities */
+.ease-custom-out {
+  transition-timing-function: var(--ease-out) !important;
+}
+
+.ease-custom-in-out {
+  transition-timing-function: var(--ease-in-out) !important;
+}
+
+.ease-drawer-curve {
+  transition-timing-function: var(--ease-drawer) !important;
 }
