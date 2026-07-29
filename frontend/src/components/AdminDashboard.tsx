@@ -3,7 +3,7 @@ import {
   Users, CheckCircle2, Calendar, DollarSign, Megaphone,
   Plus, Trash, LogOut, Edit2, Save, 
   TrendingUp, Check, X, Star,
-  Utensils, User, MoreVertical, LayoutGrid, Camera
+  Utensils, User, MoreVertical, LayoutGrid, Camera, Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { studentAPI, menuAPI, feedbackAPI, attendanceAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
@@ -46,9 +46,15 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   const [revenue, setRevenue] = useState(86400);
 
   // Profile modal states
+  const [adminName, setAdminName] = useState(userName);
   const [adminEmail, setAdminEmail] = useState('');
+  const [adminPhone, setAdminPhone] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editProfileLoading, setEditProfileLoading] = useState(false);
+  const [editSuccessMsg, setEditSuccessMsg] = useState('');
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -104,6 +110,30 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
     };
 
     reader.readAsDataURL(file);
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEditProfileLoading(true);
+    setEditSuccessMsg('');
+    try {
+      const res = await authAPI.updateProfile({
+        name: adminName,
+        email: adminEmail,
+        phone: adminPhone
+      });
+      if (res.success) {
+        setEditSuccessMsg('Admin profile details updated!');
+        setTimeout(() => {
+          setEditSuccessMsg('');
+          setShowEditProfileModal(false);
+        }, 1200);
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setEditProfileLoading(false);
+    }
   };
 
   // Student directory states
@@ -441,6 +471,14 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                   >
                     <User className="w-4 h-4 text-emerald-600" />
                     <span>Admin Profile</span>
+                  </button>
+
+                  <button
+                    onClick={() => { setShowEditProfileModal(true); setShowOptionsMenu(false); }}
+                    className="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 font-bold text-xs flex items-center gap-2.5 transition-all text-left text-slate-800 cursor-pointer"
+                  >
+                    <Edit2 className="w-4 h-4 text-emerald-600" />
+                    <span>Edit Profile Details</span>
                   </button>
 
                   <div className="border-t border-slate-100 my-1"></div>
@@ -1064,25 +1102,22 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
         {/* Profile & Reviews Section */}
         {activeTab === 'profile' && (
           <div className="space-y-4">
-            {/* Admin Profile Card */}
-            <div className="bg-white rounded-3xl p-5 border border-neutral-100 shadow-sm space-y-5">
-              <div className="flex flex-col items-center justify-center text-center space-y-2 py-2 border-b border-neutral-50 pb-4">
+            {/* Executive Admin Profile Card */}
+            <div className="bg-executive-card-sm rounded-[32px] p-6 border border-white/15 shadow-2xl space-y-5">
+              <div className="flex flex-col items-center justify-center text-center space-y-2.5 py-2 border-b border-white/10 pb-5">
                 {/* Uploadable Admin Avatar */}
                 <label className="relative cursor-pointer group block" title="Tap to upload profile picture">
-                  <div className="w-24 h-24 bg-primary/10 border-2 border-primary/20 rounded-full flex items-center justify-center font-extrabold text-2xl text-primary shadow-md overflow-hidden relative group-hover:border-primary transition-all">
+                  <div className="w-24 h-24 bg-white/10 border-2 border-emerald-400/40 rounded-full flex items-center justify-center font-extrabold text-2xl text-emerald-300 shadow-2xl overflow-hidden relative group-hover:border-emerald-400 transition-all">
                     {isUploadingImage ? (
-                      <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                      <div className="w-8 h-8 border-3 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin"></div>
                     ) : profileImage ? (
-                      <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+                      <img src={profileImage} alt={adminName} className="w-full h-full object-cover" />
                     ) : (
-                      userName.split(' ').map(n => n[0]).join('').toUpperCase() || 'AD'
+                      (adminName || 'Admin').split(' ').map(n => n ? n[0] : '').join('').toUpperCase()
                     )}
                   </div>
-                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-primary hover:bg-primary-dark text-white rounded-full flex items-center justify-center cursor-pointer border-2 border-white shadow-md transition-all active:scale-95 group-hover:scale-110">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-emerald-500 hover:bg-emerald-400 text-black rounded-full flex items-center justify-center cursor-pointer border-2 border-black shadow-lg transition-all active:scale-95 group-hover:scale-110">
+                    <Camera className="w-4 h-4" />
                   </div>
                   <input
                     type="file"
@@ -1092,31 +1127,37 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                   />
                 </label>
                 <div>
-                  <h4 className="font-extrabold text-neutral-800 text-base">{userName}</h4>
-                  <span className="text-[10px] bg-amber-500 text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                    System Administrator
+                  <h4 className="font-extrabold text-white text-lg tracking-tight">{adminName || userName}</h4>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-3 py-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm mt-1 inline-block">
+                    👑 System Administrator
                   </span>
                 </div>
+
+                <button
+                  onClick={() => setShowEditProfileModal(true)}
+                  className="mt-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-full text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  <span>Edit Profile Details</span>
+                </button>
               </div>
 
-              <div className="space-y-3.5 text-xs">
-                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
-                  <span className="font-bold text-neutral-450">Admin Email</span>
-                  <span className="font-bold text-neutral-700">{adminEmail || `${userName.toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
+              <div className="space-y-3 text-xs text-white/90">
+                <div className="flex justify-between items-center py-1 border-b border-white/10">
+                  <span className="font-semibold text-white/60">Email Address</span>
+                  <span className="font-bold">{adminEmail || `${(adminName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
                 </div>
-                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
-                  <span className="font-bold text-neutral-450">Security Access</span>
-                  <span className="font-bold text-neutral-700">Full Operator Permission</span>
+                <div className="flex justify-between items-center py-1 border-b border-white/10">
+                  <span className="font-semibold text-white/60">Mobile Number</span>
+                  <span className="font-bold">{adminPhone || 'Not Added'}</span>
                 </div>
-                <div className="flex justify-between items-center py-0.5 border-b border-neutral-100/50 pb-2">
-                  <span className="font-bold text-neutral-450">Operational Scope</span>
-                  <span className="font-bold text-neutral-700">Menu CRUD, Broadcaster, Student Audit</span>
+                <div className="flex justify-between items-center py-1 border-b border-white/10">
+                  <span className="font-semibold text-white/60">Security Access</span>
+                  <span className="font-bold text-emerald-300">Full Operator Permission</span>
                 </div>
-                <div className="flex justify-between items-center py-0.5 pb-0">
-                  <span className="font-bold text-neutral-450">Connection Status</span>
-                  <span className="font-bold text-emerald-600 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span> Live (Secured)
-                  </span>
+                <div className="flex justify-between items-center py-1">
+                  <span className="font-semibold text-white/60">Operational Scope</span>
+                  <span className="font-bold text-emerald-300">Menu, Broadcaster, Billing, Student Audit</span>
                 </div>
               </div>
             </div>
@@ -1287,6 +1328,118 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
         )}
 
       </div>
+
+      {/* Edit Admin Profile Details Modal */}
+      <AnimatePresence>
+        {showEditProfileModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 z-50 select-none">
+            <motion.div
+              initial={{ y: 250, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 250, opacity: 0, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              className="bg-white rounded-t-[32px] sm:rounded-3xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar relative shadow-2xl border border-slate-200 text-slate-900"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Edit2 className="w-5 h-5 text-emerald-600" />
+                  <h3 className="font-extrabold text-slate-900 text-base">Edit Administrator Profile</h3>
+                </div>
+                <button 
+                  onClick={() => setShowEditProfileModal(false)}
+                  className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full transition-all focus:outline-none cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {editSuccessMsg && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2 text-emerald-700 text-xs font-bold animate-pulse">
+                  <CheckCircle2 className="w-4 h-4" /> {editSuccessMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleSaveProfile} className="space-y-4 text-xs font-semibold">
+                
+                {/* Name */}
+                <div>
+                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">Full Admin Name</label>
+                  <div className="relative">
+                    <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <input
+                      type="text"
+                      required
+                      value={adminName}
+                      onChange={(e) => setAdminName(e.target.value)}
+                      placeholder="E.g. Admin Manager"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">Email Address</label>
+                  <div className="relative">
+                    <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <input
+                      type="email"
+                      required
+                      value={adminEmail}
+                      onChange={(e) => setAdminEmail(e.target.value)}
+                      placeholder="admin@mess.com"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Mobile Phone Number */}
+                <div>
+                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">Mobile / Contact Number</label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <input
+                      type="tel"
+                      value={adminPhone}
+                      onChange={(e) => setAdminPhone(e.target.value)}
+                      placeholder="E.g. +91 98765 43210"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-3 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditProfileModal(false)}
+                    className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editProfileLoading}
+                    className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer disabled:opacity-50"
+                  >
+                    {editProfileLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>Save Admin Profile</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Real-World Reference Navigation Bar with Elevated Center Floating Button */}
       <div className="bg-white border-t border-slate-200/80 pt-2 pb-5 px-3 flex justify-between items-center shrink-0 z-40 select-none shadow-[0_-8px_30px_rgba(0,0,0,0.06)] relative">

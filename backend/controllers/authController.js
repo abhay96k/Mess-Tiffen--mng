@@ -82,6 +82,10 @@ export const loginUser = async (req, res) => {
         billAmount: user.billAmount,
         billStatus: user.billStatus,
         profileImage: user.profileImage || '',
+        collegeName: user.collegeName || '',
+        pgName: user.pgName || '',
+        phone: user.phone || '',
+        dietaryPreference: user.dietaryPreference || 'Veg',
         notifications: user.notifications || [],
         token: generateToken(user._id)
       });
@@ -112,6 +116,10 @@ export const getMe = async (req, res) => {
         billAmount: user.billAmount,
         billStatus: user.billStatus,
         profileImage: user.profileImage || '',
+        collegeName: user.collegeName || '',
+        pgName: user.pgName || '',
+        phone: user.phone || '',
+        dietaryPreference: user.dietaryPreference || 'Veg',
         notifications: user.notifications || []
       });
     } else {
@@ -122,7 +130,7 @@ export const getMe = async (req, res) => {
   }
 };
 
-// @desc    Update user profile (name, image)
+// @desc    Update user profile (name, email, room, collegeName, pgName, phone, dietaryPreference, image)
 // @route   PUT /api/auth/profile
 // @access  Private
 export const updateProfile = async (req, res) => {
@@ -131,6 +139,13 @@ export const updateProfile = async (req, res) => {
 
     if (user) {
       user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.room = req.body.room !== undefined ? req.body.room : user.room;
+      user.collegeName = req.body.collegeName !== undefined ? req.body.collegeName : user.collegeName;
+      user.pgName = req.body.pgName !== undefined ? req.body.pgName : user.pgName;
+      user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
+      user.dietaryPreference = req.body.dietaryPreference || user.dietaryPreference;
+      
       if (req.body.profileImage !== undefined) {
         user.profileImage = req.body.profileImage;
       }
@@ -149,6 +164,10 @@ export const updateProfile = async (req, res) => {
         billAmount: updatedUser.billAmount,
         billStatus: updatedUser.billStatus,
         profileImage: updatedUser.profileImage || '',
+        collegeName: updatedUser.collegeName || '',
+        pgName: updatedUser.pgName || '',
+        phone: updatedUser.phone || '',
+        dietaryPreference: updatedUser.dietaryPreference || 'Veg',
         notifications: updatedUser.notifications || []
       });
     } else {

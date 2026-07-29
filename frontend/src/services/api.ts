@@ -51,7 +51,16 @@ export const authAPI = {
     const response = await api.get('/api/auth/me');
     return response.data;
   },
-  updateProfile: async (profileData: { name?: string; profileImage?: string }) => {
+  updateProfile: async (profileData: { 
+    name?: string; 
+    email?: string; 
+    room?: string; 
+    collegeName?: string; 
+    pgName?: string; 
+    phone?: string; 
+    dietaryPreference?: string; 
+    profileImage?: string;
+  }) => {
     const response = await api.put('/api/auth/profile', profileData);
     return response.data;
   },

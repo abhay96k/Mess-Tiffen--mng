@@ -48,6 +48,22 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  collegeName: {
+    type: String,
+    default: ''
+  },
+  pgName: {
+    type: String,
+    default: ''
+  },
+  phone: {
+    type: String,
+    default: ''
+  },
+  dietaryPreference: {
+    type: String,
+    default: 'Veg'
+  },
   notifications: {
     type: Array,
     default: []
