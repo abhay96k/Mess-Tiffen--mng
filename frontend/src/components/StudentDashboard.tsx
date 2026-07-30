@@ -54,6 +54,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   const [editProfileLoading, setEditProfileLoading] = useState(false);
   const [editSuccessMsg, setEditSuccessMsg] = useState('');
 
+  // Holiday states
+  const [isHolidayToday, setIsHolidayToday] = useState(false);
+  const [holidayReasonToday, setHolidayReasonToday] = useState('');
+
   // Core Data States
   const [meals, setMeals] = useState<MealState>({
     breakfast: true,
@@ -230,6 +234,13 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
           dinner: attendance.dinner,
           dinnerPendingSkip: attendance.dinnerPendingSkip || false
         });
+        if (attendanceRes.value.isHoliday) {
+          setIsHolidayToday(true);
+          setHolidayReasonToday(attendanceRes.value.holidayReason);
+        } else {
+          setIsHolidayToday(false);
+          setHolidayReasonToday('');
+        }
       }
 
       if (menuRes.status === 'fulfilled' && menuRes.value?.success) {
@@ -646,163 +657,176 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
               </div>
               
-              <div className="grid grid-cols-3 gap-2">
-                {/* Breakfast */}
-                <button
-                  disabled={!meals.breakfast || meals.breakfastPendingSkip || isMealSkipCutoffExceeded('breakfast')}
-                  onClick={() => setConfirmMealSkip('breakfast')}
-                  className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
-                    !meals.breakfast
-                      ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
-                      : meals.breakfastPendingSkip
-                        ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
-                        : isMealSkipCutoffExceeded('breakfast')
-                          ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
-                          : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
-                  }`}
-                  title={
-                    !meals.breakfast
-                      ? 'Skip Request Approved'
-                      : meals.breakfastPendingSkip
-                        ? 'Skip Request Pending Approval'
-                        : isMealSkipCutoffExceeded('breakfast')
-                          ? 'Cut-off time (7:00 AM) has passed'
-                          : 'Click to Apply for Absent'
-                  }
-                >
-                  {/* Top-Right Indicator Mark */}
-                  <div className="absolute top-1.5 right-1.5">
-                    {!meals.breakfast ? (
-                      <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
-                    ) : meals.breakfastPendingSkip ? (
-                      <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
-                    ) : (
-                      <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
-                    )}
+              {isHolidayToday ? (
+                <div className="py-8 px-4 flex flex-col items-center justify-center text-center gap-3 select-none">
+                  <span className="text-4xl animate-bounce">🎉</span>
+                  <h5 className="font-black text-emerald-800 text-sm">Today is a Mess Holiday!</h5>
+                  <p className="text-xs text-slate-550 font-semibold leading-relaxed max-w-xs">
+                    Reason: <span className="font-extrabold text-slate-800">"{holidayReasonToday}"</span><br />
+                    All meals are cancelled. Enjoy your day!
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-3 gap-2">
+                    {/* Breakfast */}
+                    <button
+                      disabled={!meals.breakfast || meals.breakfastPendingSkip || isMealSkipCutoffExceeded('breakfast')}
+                      onClick={() => setConfirmMealSkip('breakfast')}
+                      className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
+                        !meals.breakfast
+                          ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
+                          : meals.breakfastPendingSkip
+                            ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
+                            : isMealSkipCutoffExceeded('breakfast')
+                              ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
+                              : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
+                      }`}
+                      title={
+                        !meals.breakfast
+                          ? 'Skip Request Approved'
+                          : meals.breakfastPendingSkip
+                            ? 'Skip Request Pending Approval'
+                            : isMealSkipCutoffExceeded('breakfast')
+                              ? 'Cut-off time (7:00 AM) has passed'
+                              : 'Click to Apply for Absent'
+                      }
+                    >
+                      {/* Top-Right Indicator Mark */}
+                      <div className="absolute top-1.5 right-1.5">
+                        {!meals.breakfast ? (
+                          <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
+                        ) : meals.breakfastPendingSkip ? (
+                          <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
+                        ) : (
+                          <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
+                        )}
+                      </div>
+
+                      <span className="text-xl">🍳</span>
+                      <span className="text-xs mt-1 text-[11px] font-bold">Breakfast</span>
+                      <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">8:00 AM - 10:00 AM</span>
+                      {isMealSkipCutoffExceeded('breakfast') ? (
+                        <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (7:00 AM)</span>
+                      ) : (
+                        <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 7:00 AM</span>
+                      )}
+                      {!meals.breakfast ? (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
+                      ) : meals.breakfastPendingSkip ? (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
+                      ) : (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
+                      )}
+                    </button>
+
+                    {/* Lunch */}
+                    <button
+                      disabled={!meals.lunch || meals.lunchPendingSkip || isMealSkipCutoffExceeded('lunch')}
+                      onClick={() => setConfirmMealSkip('lunch')}
+                      className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
+                        !meals.lunch
+                          ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
+                          : meals.lunchPendingSkip
+                            ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
+                            : isMealSkipCutoffExceeded('lunch')
+                              ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
+                              : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
+                      }`}
+                      title={
+                        !meals.lunch
+                          ? 'Skip Request Approved'
+                          : meals.lunchPendingSkip
+                            ? 'Skip Request Pending Approval'
+                            : isMealSkipCutoffExceeded('lunch')
+                              ? 'Cut-off time (11:00 AM) has passed'
+                              : 'Click to Apply for Absent'
+                      }
+                    >
+                      {/* Top-Right Indicator Mark */}
+                      <div className="absolute top-1.5 right-1.5">
+                        {!meals.lunch ? (
+                          <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
+                        ) : meals.lunchPendingSkip ? (
+                          <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
+                        ) : (
+                          <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
+                        )}
+                      </div>
+
+                      <span className="text-xl">🍲</span>
+                      <span className="text-xs mt-1 text-[11px] font-bold">Lunch</span>
+                      <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">1:00 PM - 3:00 PM</span>
+                      {isMealSkipCutoffExceeded('lunch') ? (
+                        <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (11:00 AM)</span>
+                      ) : (
+                        <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 11:00 AM</span>
+                      )}
+                      {!meals.lunch ? (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
+                      ) : meals.lunchPendingSkip ? (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
+                      ) : (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
+                      )}
+                    </button>
+
+                    {/* Dinner */}
+                    <button
+                      disabled={!meals.dinner || meals.dinnerPendingSkip || isMealSkipCutoffExceeded('dinner')}
+                      onClick={() => setConfirmMealSkip('dinner')}
+                      className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
+                        !meals.dinner
+                          ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
+                          : meals.dinnerPendingSkip
+                            ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
+                            : isMealSkipCutoffExceeded('dinner')
+                              ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
+                              : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
+                      }`}
+                      title={
+                        !meals.dinner
+                          ? 'Skip Request Approved'
+                          : meals.dinnerPendingSkip
+                            ? 'Skip Request Pending Approval'
+                            : isMealSkipCutoffExceeded('dinner')
+                              ? 'Cut-off time (6:00 PM) has passed'
+                              : 'Click to Apply for Absent'
+                      }
+                    >
+                      {/* Top-Right Indicator Mark */}
+                      <div className="absolute top-1.5 right-1.5">
+                        {!meals.dinner ? (
+                          <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
+                        ) : meals.dinnerPendingSkip ? (
+                          <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
+                        ) : (
+                          <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
+                        )}
+                      </div>
+
+                      <span className="text-xl">🍽️</span>
+                      <span className="text-xs mt-1 text-[11px] font-bold">Dinner</span>
+                      <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">8:00 PM - 10:00 PM</span>
+                      {isMealSkipCutoffExceeded('dinner') ? (
+                        <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (6:00 PM)</span>
+                      ) : (
+                        <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 6:00 PM</span>
+                      )}
+                      {!meals.dinner ? (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
+                      ) : meals.dinnerPendingSkip ? (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
+                      ) : (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
+                      )}
+                    </button>
                   </div>
-
-                  <span className="text-xl">🍳</span>
-                  <span className="text-xs mt-1 text-[11px] font-bold">Breakfast</span>
-                  <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">8:00 AM - 10:00 AM</span>
-                  {isMealSkipCutoffExceeded('breakfast') ? (
-                    <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (7:00 AM)</span>
-                  ) : (
-                    <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 7:00 AM</span>
-                  )}
-                  {!meals.breakfast ? (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
-                  ) : meals.breakfastPendingSkip ? (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
-                  ) : (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
-                  )}
-                </button>
-
-                {/* Lunch */}
-                <button
-                  disabled={!meals.lunch || meals.lunchPendingSkip || isMealSkipCutoffExceeded('lunch')}
-                  onClick={() => setConfirmMealSkip('lunch')}
-                  className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
-                    !meals.lunch
-                      ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
-                      : meals.lunchPendingSkip
-                        ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
-                        : isMealSkipCutoffExceeded('lunch')
-                          ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
-                          : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
-                  }`}
-                  title={
-                    !meals.lunch
-                      ? 'Skip Request Approved'
-                      : meals.lunchPendingSkip
-                        ? 'Skip Request Pending Approval'
-                        : isMealSkipCutoffExceeded('lunch')
-                          ? 'Cut-off time (11:00 AM) has passed'
-                          : 'Click to Apply for Absent'
-                  }
-                >
-                  {/* Top-Right Indicator Mark */}
-                  <div className="absolute top-1.5 right-1.5">
-                    {!meals.lunch ? (
-                      <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
-                    ) : meals.lunchPendingSkip ? (
-                      <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
-                    ) : (
-                      <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
-                    )}
-                  </div>
-
-                  <span className="text-xl">🍲</span>
-                  <span className="text-xs mt-1 text-[11px] font-bold">Lunch</span>
-                  <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">1:00 PM - 3:00 PM</span>
-                  {isMealSkipCutoffExceeded('lunch') ? (
-                    <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (11:00 AM)</span>
-                  ) : (
-                    <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 11:00 AM</span>
-                  )}
-                  {!meals.lunch ? (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
-                  ) : meals.lunchPendingSkip ? (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
-                  ) : (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
-                  )}
-                </button>
-
-                {/* Dinner */}
-                <button
-                  disabled={!meals.dinner || meals.dinnerPendingSkip || isMealSkipCutoffExceeded('dinner')}
-                  onClick={() => setConfirmMealSkip('dinner')}
-                  className={`relative flex flex-col items-center justify-between p-3 rounded-2xl border transition-all ${
-                    !meals.dinner
-                      ? 'bg-red-50/50 border-red-100 text-red-500 font-semibold cursor-not-allowed'
-                      : meals.dinnerPendingSkip
-                        ? 'bg-amber-50/50 border-amber-200 text-amber-600 font-semibold cursor-not-allowed'
-                        : isMealSkipCutoffExceeded('dinner')
-                          ? 'bg-neutral-50/70 border-neutral-200 text-neutral-550 font-semibold cursor-not-allowed'
-                          : 'bg-emerald-50/45 border-emerald-200 text-emerald-800 font-bold hover:scale-[1.02] cursor-pointer'
-                  }`}
-                  title={
-                    !meals.dinner
-                      ? 'Skip Request Approved'
-                      : meals.dinnerPendingSkip
-                        ? 'Skip Request Pending Approval'
-                        : isMealSkipCutoffExceeded('dinner')
-                          ? 'Cut-off time (6:00 PM) has passed'
-                          : 'Click to Apply for Absent'
-                  }
-                >
-                  {/* Top-Right Indicator Mark */}
-                  <div className="absolute top-1.5 right-1.5">
-                    {!meals.dinner ? (
-                      <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✗</span>
-                    ) : meals.dinnerPendingSkip ? (
-                      <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-extrabold shadow-sm animate-pulse">⏳</span>
-                    ) : (
-                      <span className="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">✓</span>
-                    )}
-                  </div>
-
-                  <span className="text-xl">🍽️</span>
-                  <span className="text-xs mt-1 text-[11px] font-bold">Dinner</span>
-                  <span className="text-[8px] text-neutral-500 font-semibold mt-0.5">8:00 PM - 10:00 PM</span>
-                  {isMealSkipCutoffExceeded('dinner') ? (
-                    <span className="text-[8px] text-red-500 font-bold mb-1">🔴 Skip Closed (6:00 PM)</span>
-                  ) : (
-                    <span className="text-[8px] text-emerald-600 font-bold mb-1">🟢 Skip Closes: 6:00 PM</span>
-                  )}
-                  {!meals.dinner ? (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">❌ Absent</span>
-                  ) : meals.dinnerPendingSkip ? (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold animate-pulse">⏳ Pending</span>
-                  ) : (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">✔️ Present</span>
-                  )}
-                </button>
-              </div>
-              <p className="text-[9px] text-neutral-400 text-center font-medium italic mt-1">
-                *Attendance changes save instantly to the live database.
-              </p>
+                  <p className="text-[9px] text-neutral-400 text-center font-medium italic mt-1">
+                    *Attendance changes save instantly to the live database.
+                  </p>
+                </>
+              )}
             </div>
 
             {/* Attendance History Section */}

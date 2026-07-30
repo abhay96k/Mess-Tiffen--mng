@@ -1,5 +1,6 @@
 import { Attendance } from '../models/Attendance.js';
 import { User } from '../models/User.js';
+import { Holiday } from '../models/Holiday.js';
 
 // Helper to get formatted local date (YYYY-MM-DD)
 const getTodayDateString = () => {
@@ -18,6 +19,23 @@ export const getTodayAttendance = async (req, res) => {
   const userId = req.user._id;
 
   try {
+    const holiday = await Holiday.findOne({ date });
+    if (holiday) {
+      return res.json({ 
+        success: true, 
+        isHoliday: true, 
+        holidayReason: holiday.reason,
+        data: {
+          breakfast: false,
+          breakfastPendingSkip: false,
+          lunch: false,
+          lunchPendingSkip: false,
+          dinner: false,
+          dinnerPendingSkip: false
+        }
+      });
+    }
+
     let record = await Attendance.findOne({ userId, date });
 
     if (!record) {
@@ -80,8 +98,25 @@ export const getAttendanceSummary = async (req, res) => {
   const date = getTodayDateString();
 
   try {
+    const holiday = await Holiday.findOne({ date });
+
     // Fetch all active students
     const students = await User.find({ role: 'student', status: 'active' });
+
+    if (holiday) {
+      const summary = students.map(s => ({
+        userId: s._id,
+        name: s.name,
+        room: s.room || 'N/A',
+        breakfast: 'Absent',
+        breakfastPendingSkip: false,
+        lunch: 'Absent',
+        lunchPendingSkip: false,
+        dinner: 'Absent',
+        dinnerPendingSkip: false
+      }));
+      return res.json({ success: true, isHoliday: true, holidayReason: holiday.reason, count: summary.length, data: summary });
+    }
     
     // Fetch today's records
     const attendanceRecords = await Attendance.find({ date });

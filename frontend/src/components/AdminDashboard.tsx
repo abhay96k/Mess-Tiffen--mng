@@ -7,7 +7,7 @@ import {
   Mail, ShieldAlert, Briefcase
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { studentAPI, menuAPI, feedbackAPI, attendanceAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
+import { studentAPI, menuAPI, feedbackAPI, attendanceAPI, authAPI, announcementAPI, settingsAPI, holidayAPI } from '../services/api';
 
 interface AdminDashboardProps {
   userName: string;
@@ -52,6 +52,15 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   const [adminPhone, setAdminPhone] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  // Holiday states
+  const [isHolidayToday, setIsHolidayToday] = useState(false);
+  const [holidayReasonToday, setHolidayReasonToday] = useState('');
+  const [holidayDate, setHolidayDate] = useState('');
+  const [holidayReason, setHolidayReason] = useState('');
+  const [holidaySuccessMsg, setHolidaySuccessMsg] = useState('');
+  const [holidayErrorMsg, setHolidayErrorMsg] = useState('');
+  const [holidayLoading, setHolidayLoading] = useState(false);
 
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [editProfileLoading, setEditProfileLoading] = useState(false);
@@ -256,6 +265,13 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
 
       if (attendanceRes.status === 'fulfilled' && attendanceRes.value?.success) {
         setAttendanceLogs(attendanceRes.value.data);
+        if (attendanceRes.value.isHoliday) {
+          setIsHolidayToday(true);
+          setHolidayReasonToday(attendanceRes.value.holidayReason);
+        } else {
+          setIsHolidayToday(false);
+          setHolidayReasonToday('');
+        }
       }
 
       if (profileRes.status === 'fulfilled' && profileRes.value?.success) {
@@ -375,6 +391,30 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
       }
     } catch (error) {
       console.error('Error publishing alert message:', error);
+    }
+  };
+
+  const handleDeclareHoliday = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setHolidayLoading(true);
+    setHolidaySuccessMsg('');
+    setHolidayErrorMsg('');
+
+    try {
+      const res = await holidayAPI.declareHoliday({ date: holidayDate, reason: holidayReason });
+      if (res.success) {
+        setHolidaySuccessMsg(`Holiday declared successfully for ${holidayDate}!`);
+        setHolidayDate('');
+        setHolidayReason('');
+        fetchAdminData();
+        setTimeout(() => setHolidaySuccessMsg(''), 3000);
+      }
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Failed to declare holiday';
+      setHolidayErrorMsg(msg);
+      setTimeout(() => setHolidayErrorMsg(''), 3000);
+    } finally {
+      setHolidayLoading(false);
     }
   };
 
@@ -1051,6 +1091,14 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
               <span className="text-[10px] text-neutral-400 font-semibold uppercase">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
             </div>
             
+            {isHolidayToday && (
+              <div className="p-5 bg-amber-50 border border-amber-200 rounded-3xl text-amber-850 text-xs font-bold flex flex-col items-center justify-center text-center gap-2 shadow-xs select-none">
+                <span className="text-2xl animate-bounce">🎉</span>
+                <p className="text-sm font-black text-amber-900">Today is a Declared Mess Holiday!</p>
+                <p className="text-xs text-amber-700 font-semibold leading-relaxed">Reason: "{holidayReasonToday}"<br />Attendance manual updates are disabled for today.</p>
+              </div>
+            )}
+
             <div className="bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden text-xs">
               <div className="grid grid-cols-4 bg-neutral-50 px-4 py-3 font-bold text-neutral-500 border-b border-neutral-150">
                 <span>Student</span>
@@ -1067,6 +1115,7 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                     </div>
                     <div className="text-center">
                       <button
+                        disabled={isHolidayToday}
                         onClick={() => {
                           setAdminConfirmSkip({ 
                             userId: log.userId, 
@@ -1076,20 +1125,23 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                             isPendingSkip: !!log.breakfastPendingSkip
                           });
                         }}
-                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none ${
-                          log.breakfastPendingSkip
-                            ? 'bg-amber-500 text-white border border-amber-600 animate-pulse'
-                            : log.breakfast === 'Present' 
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                              : 'bg-red-50 text-red-700 border border-red-200'
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all focus:outline-none ${
+                          isHolidayToday
+                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-60'
+                            : log.breakfastPendingSkip
+                              ? 'bg-amber-500 text-white border border-amber-600 animate-pulse hover:scale-105 active:scale-95 cursor-pointer'
+                              : log.breakfast === 'Present' 
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:scale-105 active:scale-95 cursor-pointer' 
+                                : 'bg-red-50 text-red-700 border border-red-200 hover:scale-105 active:scale-95 cursor-pointer'
                         }`}
-                        title={log.breakfastPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle breakfast attendance'}
+                        title={isHolidayToday ? 'Mess Holiday declared' : log.breakfastPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle breakfast attendance'}
                       >
-                        {log.breakfastPendingSkip ? '⚠️ Request' : log.breakfast === 'Present' ? '✔️ Present' : '❌ Absent'}
+                        {isHolidayToday ? '❌ Closed' : log.breakfastPendingSkip ? '⚠️ Request' : log.breakfast === 'Present' ? '✔️ Present' : '❌ Absent'}
                       </button>
                     </div>
                     <div className="text-center">
                       <button
+                        disabled={isHolidayToday}
                         onClick={() => {
                           setAdminConfirmSkip({ 
                             userId: log.userId, 
@@ -1099,20 +1151,23 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                             isPendingSkip: !!log.lunchPendingSkip
                           });
                         }}
-                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none ${
-                          log.lunchPendingSkip
-                            ? 'bg-amber-500 text-white border border-amber-600 animate-pulse'
-                            : log.lunch === 'Present' 
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                              : 'bg-red-50 text-red-700 border border-red-200'
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all focus:outline-none ${
+                          isHolidayToday
+                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-60'
+                            : log.lunchPendingSkip
+                              ? 'bg-amber-500 text-white border border-amber-600 animate-pulse hover:scale-105 active:scale-95 cursor-pointer'
+                              : log.lunch === 'Present' 
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:scale-105 active:scale-95 cursor-pointer' 
+                                : 'bg-red-50 text-red-700 border border-red-200 hover:scale-105 active:scale-95 cursor-pointer'
                         }`}
-                        title={log.lunchPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle lunch attendance'}
+                        title={isHolidayToday ? 'Mess Holiday declared' : log.lunchPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle lunch attendance'}
                       >
-                        {log.lunchPendingSkip ? '⚠️ Request' : log.lunch === 'Present' ? '✔️ Present' : '❌ Absent'}
+                        {isHolidayToday ? '❌ Closed' : log.lunchPendingSkip ? '⚠️ Request' : log.lunch === 'Present' ? '✔️ Present' : '❌ Absent'}
                       </button>
                     </div>
                     <div className="text-center">
                       <button
+                        disabled={isHolidayToday}
                         onClick={() => {
                           setAdminConfirmSkip({ 
                             userId: log.userId, 
@@ -1122,16 +1177,18 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                             isPendingSkip: !!log.dinnerPendingSkip
                           });
                         }}
-                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none ${
-                          log.dinnerPendingSkip
-                            ? 'bg-amber-500 text-white border border-amber-600 animate-pulse'
-                            : log.dinner === 'Present' 
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                              : 'bg-red-50 text-red-700 border border-red-200'
+                        className={`px-2.5 py-1 rounded-full text-[9px] font-bold transition-all focus:outline-none ${
+                          isHolidayToday
+                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed opacity-60'
+                            : log.dinnerPendingSkip
+                              ? 'bg-amber-500 text-white border border-amber-600 animate-pulse hover:scale-105 active:scale-95 cursor-pointer'
+                              : log.dinner === 'Present' 
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:scale-105 active:scale-95 cursor-pointer' 
+                                : 'bg-red-50 text-red-700 border border-red-200 hover:scale-105 active:scale-95 cursor-pointer'
                         }`}
-                        title={log.dinnerPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle dinner attendance'}
+                        title={isHolidayToday ? 'Mess Holiday declared' : log.dinnerPendingSkip ? 'Click to Confirm Skip Request' : 'Click to toggle dinner attendance'}
                       >
-                        {log.dinnerPendingSkip ? '⚠️ Request' : log.dinner === 'Present' ? '✔️ Present' : '❌ Absent'}
+                        {isHolidayToday ? '❌ Closed' : log.dinnerPendingSkip ? '⚠️ Request' : log.dinner === 'Present' ? '✔️ Present' : '❌ Absent'}
                       </button>
                     </div>
                   </div>
@@ -1352,6 +1409,63 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Declare Mess Holiday Card */}
+            <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                <span className="text-lg">🎉</span>
+                <h3 className="text-base font-bold text-slate-800">Declare Mess Holiday</h3>
+              </div>
+
+              {holidaySuccessMsg && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-700 text-xs font-bold flex items-center gap-2 animate-pulse">
+                  <span>✓</span> {holidaySuccessMsg}
+                </div>
+              )}
+              {holidayErrorMsg && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-xs font-bold flex items-center gap-2">
+                  <span>⚠️</span> {holidayErrorMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleDeclareHoliday} className="space-y-3.5 text-xs font-semibold">
+                <div>
+                  <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase tracking-wider">Holiday Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={holidayDate}
+                    onChange={(e) => setHolidayDate(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase tracking-wider">Reason for Holiday</label>
+                  <input
+                    type="text"
+                    required
+                    value={holidayReason}
+                    onChange={(e) => setHolidayReason(e.target.value)}
+                    placeholder="E.g. Diwali Festival / Maintenance Day"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={holidayLoading}
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {holidayLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                      <span>Declaring...</span>
+                    </>
+                  ) : (
+                    <span>Declare Holiday</span>
+                  )}
+                </button>
+              </form>
             </div>
 
             {/* Student Reviews List Card */}

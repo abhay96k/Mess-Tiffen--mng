@@ -164,4 +164,15 @@ export const settingsAPI = {
   }
 };
 
+export const holidayAPI = {
+  getHolidays: async () => {
+    const response = await api.get('/api/holidays');
+    return response.data;
+  },
+  declareHoliday: async (holidayData: { date: string; reason: string }) => {
+    const response = await api.post('/api/holidays', holidayData);
+    return response.data;
+  }
+};
+
 export default api;

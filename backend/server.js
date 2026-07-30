@@ -12,6 +12,7 @@ import attendanceRoutes from './routes/attendance.js';
 import feedbackRoutes from './routes/feedback.js';
 import announcementRoutes from './routes/announcements.js';
 import settingsRoutes from './routes/settings.js';
+import holidayRoutes from './routes/holiday.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/holidays', holidayRoutes);
 
 // Base Route
 app.get('/', (req, res) => {
