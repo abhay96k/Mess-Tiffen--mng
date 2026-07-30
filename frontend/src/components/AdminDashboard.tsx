@@ -420,10 +420,10 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   const attendanceRate = studentsCount > 0 ? Math.round((totalAttendedToday / studentsCount) * 100) : 0;
 
   return (
-    <div className="w-full h-full flex flex-col bg-neutral-50 relative overflow-hidden select-none">
+    <div className="w-full h-full flex flex-col bg-slate-50 relative overflow-hidden select-none bg-executive-mesh">
       
       {/* Real World Executive Header Bar */}
-      <div className="bg-white text-slate-900 pt-4 pb-4 px-5 rounded-b-[28px] shrink-0 z-30 border-b border-slate-200/80 shadow-xs">
+      <div className="glass-premium text-slate-900 pt-4 pb-4 px-5 rounded-b-[28px] shrink-0 z-30 border-b border-slate-200/80 shadow-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 select-none">
             {/* Admin Avatar Button - Opens ONLY Profile Photo Modal */}
@@ -516,90 +516,128 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
         {activeTab === 'stats' && (
           <div className="space-y-4">
             {/* KPI Cards */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white border border-neutral-100 p-4 rounded-2xl shadow-3xs flex flex-col justify-between">
-                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mb-2">
-                  <Users className="w-4 h-4 text-primary" />
+            <div className="grid grid-cols-2 gap-3.5">
+              <motion.div 
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                className="glow-card-indigo p-4 rounded-2xl flex flex-col justify-between h-32 transition-all duration-300"
+              >
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-2">
+                  <Users className="w-5 h-5 text-indigo-600" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-neutral-405 font-semibold uppercase">Total Students</p>
-                  <p className="text-2xl font-extrabold text-neutral-800">{studentsCount}</p>
+                  <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Total Students</p>
+                  <div className="flex items-baseline gap-1.5">
+                    <p className="text-2xl font-black text-slate-800 tracking-tight">{studentsCount}</p>
+                    <span className="text-[9px] text-indigo-600 font-bold">Registered</span>
+                  </div>
                 </div>
-              </div>
-              <div className="bg-white border border-neutral-100 p-4 rounded-2xl shadow-3xs flex flex-col justify-between">
-                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mb-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-[10px] text-neutral-405 font-semibold uppercase">Active Plans</p>
-                  <p className="text-2xl font-extrabold text-neutral-800">{activePlans}</p>
-                </div>
-              </div>
-              <div className="bg-white border border-neutral-100 p-4 rounded-2xl shadow-3xs flex flex-col justify-between">
-                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mb-2">
-                  <DollarSign className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-[10px] text-neutral-405 font-semibold uppercase">Revenue</p>
-                  <p className="text-xl font-extrabold text-neutral-800">₹{revenue.toLocaleString()}</p>
-                </div>
-              </div>
-              <div className="bg-white border border-neutral-100 p-4 rounded-2xl shadow-3xs flex flex-col justify-between">
-                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center mb-2">
-                  <TrendingUp className="w-4 h-4 text-primary" />
+              </motion.div>
+
+              <motion.div 
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                className="glow-card-emerald p-4 rounded-2xl flex flex-col justify-between h-32 transition-all duration-300"
+              >
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-neutral-405 font-semibold uppercase">Active Rate</p>
-                  <p className="text-2xl font-extrabold text-neutral-800">{attendanceRate}%</p>
+                  <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Active Plans</p>
+                  <div className="flex items-baseline gap-1.5">
+                    <p className="text-2xl font-black text-slate-800 tracking-tight">{activePlans}</p>
+                    <span className="text-[9px] text-emerald-600 font-bold">Live Now</span>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
+
+              <motion.div 
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                className="glow-card-amber p-4 rounded-2xl flex flex-col justify-between h-32 transition-all duration-300"
+              >
+                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center mb-2">
+                  <DollarSign className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Revenue</p>
+                  <div className="flex items-baseline gap-1.5">
+                    <p className="text-xl font-black text-slate-800 tracking-tight">₹{revenue.toLocaleString()}</p>
+                    <span className="text-[9px] text-amber-600 font-bold">Current</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                whileHover={{ y: -4, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                className="glow-card-purple p-4 rounded-2xl flex flex-col justify-between h-32 transition-all duration-300"
+              >
+                <div className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center mb-2">
+                  <TrendingUp className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Active Rate</p>
+                  <div className="flex items-baseline gap-1.5">
+                    <p className="text-2xl font-black text-slate-800 tracking-tight">{attendanceRate}%</p>
+                    <span className="text-[9px] text-purple-600 font-bold">Today</span>
+                  </div>
+                </div>
+              </motion.div>
             </div>
 
             {/* Quick Actions Shortcuts */}
-            <div className="bg-white rounded-3xl p-4 border border-neutral-100 shadow-sm space-y-2">
-              <h4 className="font-bold text-neutral-800 text-xs pb-1 border-b border-neutral-50">Quick Actions Shortcut</h4>
-              <div className="grid grid-cols-3 gap-1.5 text-xs">
-                <button 
+            {/* Quick Actions Shortcuts */}
+            <div className="glass-premium rounded-3xl p-4 border border-slate-200/80 shadow-xs space-y-3">
+              <h4 className="font-extrabold text-slate-800 text-xs pb-1.5 border-b border-slate-100">Quick Actions Shortcut</h4>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveTab('menu')}
-                  className="py-2.5 bg-neutral-105 rounded-xl font-bold hover:bg-neutral-200 text-neutral-700 text-center text-[10px] whitespace-nowrap"
+                  className="py-3 bg-slate-50 border border-slate-200 hover:border-emerald-350 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 rounded-xl font-bold text-center text-[10px] whitespace-nowrap transition-all shadow-3xs cursor-pointer flex flex-col items-center gap-1"
                 >
-                  🍱 Edit Menu
-                </button>
-                <button 
+                  <span className="text-base">🍱</span>
+                  <span>Edit Menu</span>
+                </motion.button>
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveTab('students')}
-                  className="py-2.5 bg-neutral-105 rounded-xl font-bold hover:bg-neutral-200 text-neutral-700 text-center text-[10px] whitespace-nowrap"
+                  className="py-3 bg-slate-50 border border-slate-200 hover:border-emerald-350 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 rounded-xl font-bold text-center text-[10px] whitespace-nowrap transition-all shadow-3xs cursor-pointer flex flex-col items-center gap-1"
                 >
-                  👥 Add Student
-                </button>
-                <button 
+                  <span className="text-base">👥</span>
+                  <span>Add Student</span>
+                </motion.button>
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setShowAnnouncementModal(true)}
-                  className="py-2.5 bg-neutral-105 rounded-xl font-bold hover:bg-neutral-200 text-neutral-700 text-center text-[10px] whitespace-nowrap"
+                  className="py-3 bg-slate-50 border border-slate-200 hover:border-emerald-350 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 rounded-xl font-bold text-center text-[10px] whitespace-nowrap transition-all shadow-3xs cursor-pointer flex flex-col items-center gap-1"
                 >
-                  📣 Announcement
-                </button>
+                  <span className="text-base">📣</span>
+                  <span>Broadcast</span>
+                </motion.button>
               </div>
             </div>
 
             {/* Today's Meal Counts summary */}
-            <div className="bg-white rounded-3xl p-4 border border-neutral-100 shadow-sm space-y-3">
-              <h4 className="font-bold text-neutral-800 text-xs pb-1 border-b border-neutral-50">Today's Headcount Summary</h4>
-              <div className="space-y-2 text-xs">
+            <div className="glass-premium rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+              <h4 className="font-extrabold text-slate-800 text-xs pb-1.5 border-b border-slate-100">Today's Headcount Summary</h4>
+              <div className="space-y-3.5 text-xs font-semibold">
                 <div className="flex justify-between items-center">
-                  <span className="text-neutral-500 font-semibold">🍳 Breakfast (Served)</span>
-                  <span className="font-bold text-neutral-800">
-                    {attendanceLogs.filter(l => l.breakfast === 'Present').length} Students present
+                  <span className="text-slate-550 font-bold flex items-center gap-1.5">🍳 Breakfast (Served)</span>
+                  <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                    {attendanceLogs.filter(l => l.breakfast === 'Present').length} Present
                   </span>
                 </div>
-                <div className="flex justify-between items-center py-1.5 border-y border-neutral-50">
-                  <span className="text-neutral-500 font-semibold">🍲 Lunch (Expected)</span>
-                  <span className="font-bold text-neutral-800">
-                    {attendanceLogs.filter(l => l.lunch === 'Present').length} Students present
+                <div className="flex justify-between items-center py-2.5 border-y border-slate-100">
+                  <span className="text-slate-550 font-bold flex items-center gap-1.5">🍲 Lunch (Expected)</span>
+                  <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                    {attendanceLogs.filter(l => l.lunch === 'Present').length} Present
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-neutral-500 font-semibold">🍽️ Dinner (Expected)</span>
-                  <span className="font-bold text-neutral-800">
-                    {attendanceLogs.filter(l => l.dinner === 'Present').length} Students present
+                  <span className="text-slate-550 font-bold flex items-center gap-1.5">🍽️ Dinner (Expected)</span>
+                  <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                    {attendanceLogs.filter(l => l.dinner === 'Present').length} Present
                   </span>
                 </div>
               </div>

@@ -49,6 +49,46 @@ body {
   border-radius: 24px;
 }
 
+.glass-premium {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04) !important;
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Glow Cards */
+.glow-card-indigo {
+  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.08), 0 8px 10px -6px rgba(99, 102, 241, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  border: 1.5px solid rgba(99, 102, 241, 0.15) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(99, 102, 241, 0.02) 100%) !important;
+}
+
+.glow-card-emerald {
+  box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.08), 0 8px 10px -6px rgba(16, 185, 129, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.15) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(16, 185, 129, 0.02) 100%) !important;
+}
+
+.glow-card-amber {
+  box-shadow: 0 20px 25px -5px rgba(245, 158, 11, 0.08), 0 8px 10px -6px rgba(245, 158, 11, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.15) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 158, 11, 0.02) 100%) !important;
+}
+
+.glow-card-purple {
+  box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.08), 0 8px 10px -6px rgba(168, 85, 247, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  border: 1.5px solid rgba(168, 85, 247, 0.15) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(168, 85, 247, 0.02) 100%) !important;
+}
+
 .app-input {
   background: #f8fafc;
   border: 1px solid #cbd5e1;
@@ -69,51 +109,59 @@ body {
 }
 
 .btn-primary-app {
-  background: #059669;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   color: #ffffff;
   font-weight: 700;
   border-radius: 9999px;
   box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .btn-primary-app:hover {
-  background: #047857;
-  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.4);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+  transform: translateY(-1.5px);
 }
 
 /* 3D Floating Dock Bar System */
 .nav-dock-3d {
-  background: rgba(255, 255, 255, 0.92) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(25px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
   box-shadow: 
-    0 20px 40px -10px rgba(15, 23, 42, 0.22),
-    0 8px 16px -6px rgba(15, 23, 42, 0.12),
+    0 24px 48px -12px rgba(15, 23, 42, 0.18),
+    0 8px 16px -6px rgba(15, 23, 42, 0.08),
     inset 0 1.5px 0 rgba(255, 255, 255, 1) !important;
   border-radius: 28px !important;
 }
 
 .nav-tab-3d-active {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
   border-radius: 18px !important;
 }
 
 /* Legacy Backwards Compatible Class Overrides */
-.bg-executive-mesh, .bg-mono-gradient, .bg-forest-gradient {
+.bg-executive-mesh {
+  background: radial-gradient(at 0% 0%, rgba(244, 245, 247, 0.9) 0, transparent 50%), 
+              radial-gradient(at 50% 0%, rgba(224, 242, 254, 0.3) 0, transparent 50%),
+              radial-gradient(at 100% 0%, rgba(243, 232, 255, 0.35) 0, transparent 50%),
+              #f8fafc !important;
+}
+
+.bg-mono-gradient, .bg-forest-gradient {
   background: #f8fafc !important;
 }
 
 .bg-executive-card, .bg-executive-card-sm, .bg-glass-card {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
-  backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(241, 245, 249, 0.8) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03) !important;
 }
 
 .input-glass {

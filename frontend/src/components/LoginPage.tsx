@@ -74,7 +74,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="absolute inset-0 bg-slate-50 flex flex-col items-center justify-center overflow-y-auto no-scrollbar p-4 text-slate-900">
+    <div className="absolute inset-0 bg-slate-50 flex flex-col items-center justify-center overflow-y-auto no-scrollbar p-4 text-slate-900 bg-executive-mesh">
       
       {/* Wrapper to center Header and Card in the middle of the page */}
       <div className="w-full max-w-md my-auto flex flex-col items-center gap-3">
@@ -104,7 +104,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="w-full bg-white rounded-[32px] px-6 pt-5 pb-6 flex flex-col gap-3.5 shrink-0 shadow-xl border border-slate-200"
+          className="w-full glass-premium rounded-[32px] px-6 pt-5 pb-6 flex flex-col gap-3.5 shrink-0 shadow-xl border border-slate-200"
         >
         {/* Header inside card */}
         <div className="text-center">

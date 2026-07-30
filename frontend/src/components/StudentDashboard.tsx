@@ -370,10 +370,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-slate-50 text-slate-900 relative overflow-hidden select-none">
+    <div className="w-full h-full flex flex-col bg-slate-50 text-slate-900 relative overflow-hidden select-none bg-executive-mesh">
       
       {/* 1. Real World Executive Header Bar */}
-      <div className="bg-white text-slate-900 pt-4 pb-4 px-5 rounded-b-[28px] shrink-0 z-30 border-b border-slate-200/80 shadow-xs">
+      <div className="glass-premium text-slate-900 pt-4 pb-4 px-5 rounded-b-[28px] shrink-0 z-30 border-b border-slate-200/80 shadow-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 select-none">
             {/* Avatar badge button - Opens ONLY Profile Photo Modal */}
@@ -537,9 +537,14 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
 
         {/* Tab View Contents */}
         {activeTab === 'home' && (
-          <>
+              <>
             {/* Active Tiffin Subscription Card (Real-World App Style) */}
-            <div className="relative rounded-3xl p-6 overflow-hidden text-white shadow-md bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 border border-emerald-500/30 select-none">
+            <motion.div 
+              whileHover={{ y: -4, scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="relative rounded-3xl p-6 overflow-hidden text-white shadow-[0_15px_35px_-5px_rgba(5,150,105,0.4)] bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-800 border border-white/10 select-none transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-300/20 via-transparent to-transparent"></div>
               <div className="flex items-start justify-between relative z-10">
                 <div>
                   <div className="flex items-center gap-1.5 bg-white/20 border border-white/30 px-3 py-1 rounded-full text-[10px] font-black uppercase w-fit tracking-wider text-white shadow-xs">
@@ -548,29 +553,30 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                   <h4 className="text-2xl font-black mt-3 tracking-tight text-white">{planName}</h4>
                   <p className="text-xs text-white/80 font-medium mt-0.5">Daily Packaged Catering</p>
                 </div>
-                <span className="text-4xl leading-none">🍱</span>
+                <span className="text-4xl leading-none drop-shadow-md">🍱</span>
               </div>
 
-              <div className="mt-6 flex items-end justify-between relative z-10 border-t border-white/20 pt-4">
+              <div className="mt-6 flex items-end justify-between relative z-10 border-t border-white/25 pt-4">
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-white/70 font-extrabold">Bill Status</p>
                   <p className="text-xs font-black mt-0.5 flex items-center gap-1.5">
-                    <span className={`w-2 h-2 rounded-full ${billStatus === 'paid' ? 'bg-emerald-300' : 'bg-amber-300'}`}></span>
+                    <span className={`w-2.5 h-2.5 rounded-full animate-pulse ${billStatus === 'paid' ? 'bg-emerald-300 shadow-[0_0_8px_#34d399]' : 'bg-amber-300 shadow-[0_0_8px_#fcd34d]'}`}></span>
                     <span>{billStatus === 'paid' ? 'Paid & Active' : 'Payment Due'}</span>
                   </p>
                 </div>
-                <button 
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveTab('billing')}
-                  className="bg-white hover:bg-slate-100 text-emerald-800 px-4 py-2 rounded-full text-xs font-black shadow-sm transition-all focus:outline-none cursor-pointer"
+                  className="bg-white hover:bg-slate-100 text-emerald-800 px-4.5 py-2 rounded-full text-xs font-black shadow-md transition-all focus:outline-none cursor-pointer"
                 >
                   Manage Plan
-                </button>
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Today's Food Preview (Real-World App Card) */}
-            <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-3.5">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div className="glass-premium rounded-3xl p-5 shadow-xs border border-slate-200/80 space-y-3.5">
+              <div className="flex items-center justify-between border-b border-slate-150 pb-2.5">
                 <h4 className="font-black text-slate-900 text-sm tracking-tight flex items-center gap-2">
                   <span>🍽️</span> Today's Menu ({todayDayName})
                 </h4>
@@ -581,26 +587,28 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                   Full Week →
                 </button>
               </div>
-              <div className="space-y-2.5 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-slate-100/60">
-                  <span className="font-bold text-slate-500 w-24">Breakfast</span>
-                  <span className="text-slate-900 font-extrabold flex-1 text-right">{todayMenu.breakfast}</span>
+              <div className="space-y-2.5 text-xs font-semibold">
+                <div className="flex justify-between py-2 border-b border-slate-100">
+                  <span className="text-slate-500 w-24">Breakfast</span>
+                  <span className="text-slate-800 font-extrabold flex-1 text-right">{todayMenu.breakfast}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100/60">
-                  <span className="font-bold text-slate-500 w-24">Lunch</span>
-                  <span className="text-slate-900 font-extrabold flex-1 text-right">{todayMenu.lunch}</span>
+                <div className="flex justify-between py-2 border-b border-slate-100">
+                  <span className="text-slate-500 w-24">Lunch</span>
+                  <span className="text-slate-800 font-extrabold flex-1 text-right">{todayMenu.lunch}</span>
                 </div>
-                <div className="flex justify-between py-1.5">
-                  <span className="font-bold text-slate-500 w-24">Dinner</span>
-                  <span className="text-slate-900 font-extrabold flex-1 text-right">{todayMenu.dinner}</span>
+                <div className="flex justify-between py-2">
+                  <span className="text-slate-500 w-24">Dinner</span>
+                  <span className="text-slate-800 font-extrabold flex-1 text-right">{todayMenu.dinner}</span>
                 </div>
               </div>
             </div>
 
             {/* Nearby Mess Quick Explorer Card */}
-            <div 
+            <motion.div 
+              whileHover={{ y: -4, scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               onClick={() => setActiveTab('nearby')}
-              className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 hover:border-emerald-500/40 hover:shadow-md transition-all select-none cursor-pointer group flex items-center justify-between gap-3"
+              className="glass-premium rounded-3xl p-5 shadow-xs border border-slate-200/80 hover:border-emerald-400 hover:shadow-sm transition-all select-none cursor-pointer group flex items-center justify-between gap-3"
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <div className="w-12 h-12 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
@@ -609,17 +617,17 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h5 className="font-extrabold text-sm text-slate-900 tracking-tight">Nearby Mess Explorer</h5>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
                       Interactive Map
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5 truncate">Explore 4+ mess facilities & daily thalis near you</p>
+                  <p className="text-xs text-slate-550 font-medium mt-0.5 truncate">Explore 4+ mess facilities & daily thalis near you</p>
                 </div>
               </div>
-              <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 group-hover:bg-emerald-600 group-hover:text-white px-3.5 py-2 rounded-full border border-emerald-200/80 transition-all shrink-0 flex items-center gap-1 shadow-2xs">
+              <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 group-hover:bg-emerald-600 group-hover:text-white px-3.5 py-2 rounded-full border border-emerald-200 transition-all shrink-0 flex items-center gap-1 shadow-2xs">
                 Open Map →
               </span>
-            </div>
+            </motion.div>
           </>
         )}
 
@@ -632,10 +640,10 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
             <h3 className="text-base font-bold text-neutral-800 px-1">Meal Attendance Tracker</h3>
 
             {/* Meal Attendance Checklist */}
-            <div className="bg-white rounded-3xl p-4 shadow-sm border border-neutral-100 space-y-3">
-              <div className="flex items-center justify-between border-b border-neutral-50 pb-2">
-                <h4 className="font-bold text-neutral-800 text-sm">Today's Attendance Checklist</h4>
-                <span className="text-[10px] text-neutral-400 font-semibold uppercase">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+            <div className="glass-premium rounded-3xl p-5 shadow-xs border border-slate-200/80 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <h4 className="font-extrabold text-slate-800 text-sm">Today's Attendance Checklist</h4>
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
               </div>
               
               <div className="grid grid-cols-3 gap-2">
