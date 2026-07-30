@@ -3,7 +3,8 @@ import {
   Users, CheckCircle2, Calendar, DollarSign, Megaphone,
   Plus, Trash, LogOut, Edit2, Save, 
   TrendingUp, Check, X, Star,
-  Utensils, User, MoreVertical, LayoutGrid, Camera, Phone
+  Utensils, User, MoreVertical, LayoutGrid, Camera, Phone,
+  Mail, ShieldAlert, Briefcase
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { studentAPI, menuAPI, feedbackAPI, attendanceAPI, authAPI, announcementAPI, settingsAPI } from '../services/api';
@@ -1184,22 +1185,42 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
                 </button>
               </div>
 
-              <div className="space-y-3.5 text-xs text-slate-800 font-semibold">
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Email Address</span>
-                  <span className="font-black text-slate-900">{adminEmail || `${(adminName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
+              <div className="space-y-4 text-xs text-slate-800 font-semibold">
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Email Address</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">{adminEmail || `${(adminName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Mobile Number</span>
-                  <span className="font-black text-slate-900">{adminPhone || 'Not Added'}</span>
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Mobile Number</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">{adminPhone || 'Not Added'}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Security Access</span>
-                  <span className="font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Full Operator Permission</span>
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <ShieldAlert className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Security Access</p>
+                    <span className="font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-250 text-xs inline-block mt-0.5">Full Operator Permission</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Operational Scope</span>
-                  <span className="font-black text-slate-900">Menu, Broadcaster, Billing, Student Audit</span>
+                <div className="flex items-center gap-3.5 py-1">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <Briefcase className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Operational Scope</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">Menu, Broadcaster, Billing, Student Audit</p>
+                  </div>
                 </div>
               </div>
             </div>

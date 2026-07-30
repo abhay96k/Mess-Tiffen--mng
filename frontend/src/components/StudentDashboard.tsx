@@ -4,7 +4,7 @@ import {
   CreditCard, Send, Star, ChevronDown, ChevronUp, 
   ShieldAlert, Sparkles, Check, CheckCircle,
   Utensils, User, MapPin, MoreVertical, LayoutGrid, Camera, X,
-  Edit2, Phone, GraduationCap, Building, Home
+  Edit2, Phone, GraduationCap, Building, Home, Mail
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { attendanceAPI, menuAPI, feedbackAPI, studentAPI, authAPI, settingsAPI } from '../services/api';
@@ -1086,40 +1086,75 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
                 </button>
               </div>
 
-              <div className="space-y-3.5 text-xs text-slate-800 font-semibold">
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Email Address</span>
-                  <span className="font-black text-slate-900">{userEmail || `${(studentName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</span>
+              <div className="space-y-4 text-xs text-slate-800 font-semibold font-sans">
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Email Address</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">{userEmail || `${(studentName || userName).toLowerCase().replace(/\s+/g, '')}@mess.com`}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Mobile Number</span>
-                  <span className="font-black text-slate-900">{phoneNumber || 'Not Added'}</span>
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Mobile Number</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">{phoneNumber || 'Not Added'}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">College / Institute</span>
-                  <span className="font-black text-slate-900">{collegeName || 'Not Added'}</span>
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">College / Institute</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">{collegeName || 'Not Added'}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Room / PG Name</span>
-                  <span className="font-black text-slate-900">{pgName ? `${pgName} (Room ${roomNumber})` : `Room ${roomNumber}`}</span>
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <Building className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Room / PG Name</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">{pgName ? `${pgName} (Room ${roomNumber})` : `Room ${roomNumber}`}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Dietary Preference</span>
-                  <span className="font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">🥗 {dietaryPref}</span>
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <Utensils className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Dietary Preference</p>
+                    <span className="font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-250 text-xs inline-block mt-0.5">🥗 {dietaryPref}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Subscription Plan</span>
-                  <span className="font-black text-slate-900">{planName}</span>
+                <div className="flex items-center gap-3.5 py-1 border-b border-slate-100/60 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Subscription Plan</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">{planName}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-1">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Billing Status</span>
-                  <span className={`font-black px-2.5 py-0.5 rounded-full border text-[11px] ${
-                    billStatus === 'paid' 
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                      : 'bg-amber-50 text-amber-700 border-amber-200'
-                  }`}>
-                    {billStatus === 'paid' ? '✔️ Paid & Active' : '⌛ Payment Due'}
-                  </span>
+                <div className="flex items-center gap-3.5 py-1">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Billing Status</p>
+                    <span className={`font-extrabold px-2.5 py-0.5 rounded-full border text-[11px] inline-block mt-0.5 ${
+                      billStatus === 'paid' 
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-250' 
+                        : 'bg-amber-50 text-amber-700 border-amber-250'
+                    }`}>
+                      {billStatus === 'paid' ? 'Paid & Active' : 'Payment Due'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
