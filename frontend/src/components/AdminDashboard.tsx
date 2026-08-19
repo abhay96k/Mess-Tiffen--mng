@@ -293,7 +293,7 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
   };
 
   useEffect(() => {
-    fetchAdminData(true);
+    fetchAdminData(false);
 
     const timer = setInterval(() => {
       fetchAdminData(false);
