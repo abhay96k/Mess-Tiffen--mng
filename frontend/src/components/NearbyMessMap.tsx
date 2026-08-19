@@ -167,16 +167,19 @@ export function NearbyMessMap() {
     return true;
   });
 
+  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyCAv_D8H41N4hJUvCJRhFqztkm-0c0hcgk';
+
   const getMapEmbedUrl = (lat: number, lng: number, mode: 'standard' | 'satellite' | '3d') => {
+    if (googleApiKey) {
+      const mapType = mode === 'satellite' ? 'satellite' : 'roadmap';
+      return `https://www.google.com/maps/embed/v1/place?key=${googleApiKey}&q=${lat},${lng}&zoom=16&maptype=${mapType}`;
+    }
     if (mode === 'satellite') {
-      // Esri World Imagery Satellite Tiles Embed
       return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=hot&marker=${lat}%2C${lng}`;
     }
     if (mode === '3d') {
-      // 3D Topographic View Embed
       return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=cyclemap&marker=${lat}%2C${lng}`;
     }
-    // Standard Vector Mapnik Embed
     return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=mapnik&marker=${lat}%2C${lng}`;
   };
 
