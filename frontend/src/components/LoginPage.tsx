@@ -265,7 +265,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             )}
 
             {/* Main Action Button matching reference image gradient pill button */}
-            <div className="pt-4">
+            <div className="pt-4 space-y-3">
               <button
                 type="submit"
                 disabled={loading}
@@ -277,20 +277,20 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                   <span>{isSignUp ? 'SIGN UP' : 'SIGN IN'}</span>
                 )}
               </button>
+
+              {/* Text placed directly below the SIGN IN / SIGN UP button box */}
+              <div className="flex items-center justify-end text-xs font-semibold text-slate-500 pt-1">
+                <span>{isSignUp ? 'Already have account?' : "Don't have account?"}</span>
+                <button
+                  type="button"
+                  onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(null); }}
+                  className="ml-1.5 font-extrabold text-slate-900 hover:text-emerald-600 hover:underline cursor-pointer"
+                >
+                  {isSignUp ? 'Sign In' : 'Sign up'}
+                </button>
+              </div>
             </div>
           </form>
-
-          {/* Bottom Switcher matching reference image right aligned text */}
-          <div className="pt-6 flex items-center justify-end text-xs font-semibold text-slate-500">
-            <span>{isSignUp ? 'Already have account?' : "Don't have account?"}</span>
-            <button
-              type="button"
-              onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(null); }}
-              className="ml-1.5 font-extrabold text-slate-900 hover:text-emerald-600 hover:underline cursor-pointer"
-            >
-              {isSignUp ? 'Sign In' : 'Sign up'}
-            </button>
-          </div>
 
         </motion.div>
       </div>
