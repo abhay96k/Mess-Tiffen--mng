@@ -167,7 +167,7 @@ export function NearbyMessMap() {
     return true;
   });
 
-  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyCAv_D8H41N4hJUvCJRhFqztkm-0c0hcgk';
+  const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
   const getMapEmbedUrl = (lat: number, lng: number, mode: 'standard' | 'satellite' | '3d') => {
     if (googleApiKey) {
