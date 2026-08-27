@@ -14,13 +14,18 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Safety fallback timer to prevent infinite loading screen (e.g. backend cold start or network delay)
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 6000);
+
     // Check if token exists in localStorage to restore session
     const restoreSession = async () => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
           const res = await authAPI.getMe();
-          if (res.success) {
+          if (res && res.success) {
             setUser({
               id: res._id,
               name: res.name,
@@ -41,10 +46,12 @@ export default function App() {
         // No token, show splash then login
         setScreen('splash');
       }
+      clearTimeout(timer);
       setLoading(false);
     };
 
     restoreSession();
+    return () => clearTimeout(timer);
   }, []);
 
   const handleSplashComplete = () => {
@@ -71,8 +78,15 @@ export default function App() {
   if (loading) {
     return (
       <PhoneFrame>
-        <div className="absolute inset-0 bg-primary flex items-center justify-center text-white">
-          <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+        <div className="absolute inset-0 bg-primary flex flex-col items-center justify-center text-white px-6 text-center">
+          <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mb-4"></div>
+          <p className="text-sm font-medium opacity-90">Connecting to server...</p>
+          <button 
+            onClick={() => { localStorage.removeItem('token'); setLoading(false); setScreen('login'); }}
+            className="mt-6 text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-colors underline"
+          >
+            Skip to Login
+          </button>
         </div>
       </PhoneFrame>
     );
