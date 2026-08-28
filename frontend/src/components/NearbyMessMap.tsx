@@ -170,11 +170,12 @@ export function NearbyMessMap() {
   const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
+  const getMapboxStaticUrl = (lat: number, lng: number, mode: 'standard' | 'satellite' | '3d') => {
+    const style = mode === 'satellite' ? 'satellite-streets-v12' : mode === '3d' ? 'outdoors-v12' : 'streets-v12';
+    return `https://api.mapbox.com/styles/v1/mapbox/${style}/static/pin-l-restaurant+059669(${lng},${lat})/${lng},${lat},15,0/800x400@2x?access_token=${mapboxToken}`;
+  };
+
   const getMapEmbedUrl = (lat: number, lng: number, mode: 'standard' | 'satellite' | '3d') => {
-    if (mapboxToken) {
-      const style = mode === 'satellite' ? 'satellite-v9' : mode === '3d' ? 'outdoors-v12' : 'streets-v12';
-      return `https://api.mapbox.com/styles/v1/mapbox/${style}/html?access_token=${mapboxToken}#16/${lat}/${lng}`;
-    }
     if (googleApiKey) {
       const mapType = mode === 'satellite' ? 'satellite' : 'roadmap';
       return `https://www.google.com/maps/embed/v1/place?key=${googleApiKey}&q=${lat},${lng}&zoom=16&maptype=${mapType}`;
@@ -187,6 +188,7 @@ export function NearbyMessMap() {
     }
     return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=mapnik&marker=${lat}%2C${lng}`;
   };
+
 
 
   return (
@@ -333,17 +335,26 @@ export function NearbyMessMap() {
           )}
         </AnimatePresence>
 
-        {/* OpenStreetMap iframe View */}
+        {/* Map View Display */}
         <div className="w-full h-64 relative bg-slate-100">
-          <iframe
-            title="Nearby Mess Map"
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            scrolling="no"
-            src={getMapEmbedUrl(selectedMess.lat, selectedMess.lng, mapStyle)}
-            className="w-full h-full filter saturate-110"
-          ></iframe>
+          {mapboxToken ? (
+            <img
+              src={getMapboxStaticUrl(selectedMess.lat, selectedMess.lng, mapStyle)}
+              alt={selectedMess.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <iframe
+              title="Nearby Mess Map"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              scrolling="no"
+              src={getMapEmbedUrl(selectedMess.lat, selectedMess.lng, mapStyle)}
+              className="w-full h-full filter saturate-110"
+            ></iframe>
+          )}
+
 
           {/* Interactive Floating Badge on Map */}
           <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200 shadow-lg flex items-center justify-between text-xs">
