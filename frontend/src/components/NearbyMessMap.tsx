@@ -167,9 +167,14 @@ export function NearbyMessMap() {
     return true;
   });
 
+  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
   const getMapEmbedUrl = (lat: number, lng: number, mode: 'standard' | 'satellite' | '3d') => {
+    if (mapboxToken) {
+      const style = mode === 'satellite' ? 'satellite-v9' : mode === '3d' ? 'outdoors-v12' : 'streets-v12';
+      return `https://api.mapbox.com/styles/v1/mapbox/${style}/html?access_token=${mapboxToken}#16/${lat}/${lng}`;
+    }
     if (googleApiKey) {
       const mapType = mode === 'satellite' ? 'satellite' : 'roadmap';
       return `https://www.google.com/maps/embed/v1/place?key=${googleApiKey}&q=${lat},${lng}&zoom=16&maptype=${mapType}`;
@@ -182,6 +187,7 @@ export function NearbyMessMap() {
     }
     return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=mapnik&marker=${lat}%2C${lng}`;
   };
+
 
   return (
     <div className="space-y-4 text-slate-900">
