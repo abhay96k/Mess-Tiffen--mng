@@ -124,10 +124,15 @@ export function NearbyMessMap() {
     return () => clearInterval(interval);
   }, [isLiveTracking]);
 
+  // Auto-fetch user live GPS location on component mount
+  useEffect(() => {
+    handleGetLiveLocation(true);
+  }, []);
+
   // Request user's live GPS location
-  const handleGetLiveLocation = () => {
+  const handleGetLiveLocation = (silent: boolean = false) => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
+      if (!silent) alert('Geolocation is not supported by your browser');
       return;
     }
 
@@ -151,7 +156,7 @@ export function NearbyMessMap() {
       (error) => {
         console.error('Error fetching geolocation:', error);
         setIsLocating(false);
-        alert('Could not fetch your GPS location. Showing default campus map.');
+        if (!silent) alert('Could not fetch your GPS location. Showing default campus map.');
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -170,9 +175,31 @@ export function NearbyMessMap() {
   const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
-  const getMapboxStaticUrl = (lat: number, lng: number, mode: 'standard' | 'satellite' | '3d') => {
+  // Generate Mapbox Static Map with live user GPS pin + mess pin + live rider pin
+  const getMapboxStaticUrl = (mess: MessLocation, mode: 'standard' | 'satellite' | '3d') => {
     const style = mode === 'satellite' ? 'satellite-streets-v12' : mode === '3d' ? 'outdoors-v12' : 'streets-v12';
-    return `https://api.mapbox.com/styles/v1/mapbox/${style}/static/pin-l-restaurant+059669(${lng},${lat})/${lng},${lat},15,0/800x400@2x?access_token=${mapboxToken}`;
+    
+    const pins: string[] = [`pin-l-restaurant+059669(${mess.lng},${mess.lat})`];
+
+    // Target location (User GPS or default campus offset)
+    const targetLat = userCoords ? userCoords.lat : mess.lat + 0.005;
+    const targetLng = userCoords ? userCoords.lng : mess.lng + 0.005;
+
+    if (userCoords) {
+      pins.push(`pin-s-pitch+2563eb(${userCoords.lng},${userCoords.lat})`);
+    }
+
+    if (isLiveTracking) {
+      const riderLat = mess.lat + (targetLat - mess.lat) * (riderProgress / 100);
+      const riderLng = mess.lng + (targetLng - mess.lng) * (riderProgress / 100);
+      pins.push(`pin-s-fast-food+ef4444(${riderLng.toFixed(5)},${riderLat.toFixed(5)})`);
+    }
+
+    if (pins.length > 1) {
+      return `https://api.mapbox.com/styles/v1/mapbox/${style}/static/${pins.join(',')}/auto/800x400@2x?padding=60&access_token=${mapboxToken}`;
+    }
+
+    return `https://api.mapbox.com/styles/v1/mapbox/${style}/static/${pins[0]}/${mess.lng},${mess.lat},15,0/800x400@2x?access_token=${mapboxToken}`;
   };
 
   const getMapEmbedUrl = (lat: number, lng: number, mode: 'standard' | 'satellite' | '3d') => {
@@ -188,6 +215,7 @@ export function NearbyMessMap() {
     }
     return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.012}%2C${lat - 0.012}%2C${lng + 0.012}%2C${lat + 0.012}&layer=mapnik&marker=${lat}%2C${lng}`;
   };
+
 
 
 
@@ -209,7 +237,7 @@ export function NearbyMessMap() {
           
           {/* Live GPS Button */}
           <button
-            onClick={handleGetLiveLocation}
+            onClick={() => handleGetLiveLocation(false)}
             disabled={isLocating}
             className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-xs cursor-pointer transition-all active:scale-95"
           >
@@ -339,7 +367,7 @@ export function NearbyMessMap() {
         <div className="w-full h-64 relative bg-slate-100">
           {mapboxToken ? (
             <img
-              src={getMapboxStaticUrl(selectedMess.lat, selectedMess.lng, mapStyle)}
+              src={getMapboxStaticUrl(selectedMess, mapStyle)}
               alt={selectedMess.name}
               className="w-full h-full object-cover"
             />
