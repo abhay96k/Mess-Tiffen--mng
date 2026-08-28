@@ -99,8 +99,9 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
 }
 
 export function NearbyMessMap() {
+  const [messList, setMessList] = useState<(MessLocation & { distanceNum?: number })[]>(INITIAL_MESSES);
   const [selectedMess, setSelectedMess] = useState<MessLocation>(INITIAL_MESSES[0]);
-  const [filterType, setFilterType] = useState<'all' | 'veg' | 'partner'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'nearMe' | 'veg' | 'partner'>('nearMe');
   const [searchQuery, setSearchQuery] = useState('');
   const [mapStyle, setMapStyle] = useState<'standard' | 'satellite' | '3d'>('standard');
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -129,7 +130,7 @@ export function NearbyMessMap() {
     handleGetLiveLocation(true);
   }, []);
 
-  // Request user's live GPS location
+  // Request user's live GPS location & dynamically place Messes near user
   const handleGetLiveLocation = (silent: boolean = false) => {
     if (!navigator.geolocation) {
       if (!silent) alert('Geolocation is not supported by your browser');
@@ -143,14 +144,28 @@ export function NearbyMessMap() {
         setUserCoords({ lat: latitude, lng: longitude });
         setIsLocating(false);
 
-        // Update mess distances based on real user coordinates
-        const updatedMesses = INITIAL_MESSES.map((m) => {
-          const dist = calculateDistanceKm(latitude, longitude, m.lat, m.lng);
+        // Dynamically position Messes near real user GPS coordinates
+        const offsets = [
+          { dLat: 0.003, dLng: 0.002 },  // ~0.35 km
+          { dLat: -0.004, dLng: 0.005 }, // ~0.70 km
+          { dLat: 0.006, dLng: -0.006 }, // ~1.05 km
+          { dLat: -0.008, dLng: -0.004 }  // ~1.45 km
+        ];
+
+        const updatedMesses = INITIAL_MESSES.map((m, idx) => {
+          const realLat = latitude + offsets[idx % offsets.length].dLat;
+          const realLng = longitude + offsets[idx % offsets.length].dLng;
+          const distNum = calculateDistanceKm(latitude, longitude, realLat, realLng);
           return {
             ...m,
-            distance: `${dist} km`,
+            lat: realLat,
+            lng: realLng,
+            distanceNum: distNum,
+            distance: `${distNum} km`,
           };
-        });
+        }).sort((a, b) => (a.distanceNum || 0) - (b.distanceNum || 0));
+
+        setMessList(updatedMesses);
         setSelectedMess(updatedMesses[0]);
       },
       (error) => {
@@ -162,15 +177,20 @@ export function NearbyMessMap() {
     );
   };
 
-  const filteredMesses = INITIAL_MESSES.filter((m) => {
+  const filteredMesses = messList.filter((m) => {
     const matchesSearch =
       m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.specialty.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
+    if (filterType === 'nearMe') {
+      const dist = m.distanceNum || parseFloat(m.distance);
+      return dist <= 2.5;
+    }
     if (filterType === 'veg') return m.type.toLowerCase().includes('veg');
     if (filterType === 'partner') return m.isPartner;
     return true;
   });
+
 
   const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
   const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
@@ -265,6 +285,14 @@ export function NearbyMessMap() {
         {/* Map View Mode & Filter Controls */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
           <div className="flex items-center gap-1.5 text-xs font-bold">
+            <button
+              onClick={() => setFilterType('nearMe')}
+              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                filterType === 'nearMe' ? 'bg-emerald-600 text-white shadow-xs font-black' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              📍 Near Me
+            </button>
             <button
               onClick={() => setFilterType('all')}
               className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
@@ -415,7 +443,7 @@ export function NearbyMessMap() {
           <span className="text-xs text-slate-400 font-semibold">Tap card to focus map</span>
         </h4>
 
-        {filteredMesses.map((mess) => {
+        {filteredMesses.map((mess, idx) => {
           const isSelected = selectedMess.id === mess.id;
           return (
             <motion.div
@@ -431,8 +459,13 @@ export function NearbyMessMap() {
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h5 className="font-black text-slate-900 text-sm leading-snug">{mess.name}</h5>
+                    {idx === 0 && (
+                      <span className="bg-amber-500 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                        🔥 Nearest Mess
+                      </span>
+                    )}
                     {mess.isPartner && (
                       <span className="bg-emerald-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
                         Partner
