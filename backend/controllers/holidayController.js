@@ -75,7 +75,7 @@ export const declareHoliday = async (req, res) => {
 // @access  Private
 export const getHolidays = async (req, res) => {
   try {
-    const list = await Holiday.find({}).sort({ date: -1 });
+    const list = await Holiday.find({});
     res.json({ success: true, count: list.length, data: list });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

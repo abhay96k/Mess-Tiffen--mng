@@ -5,7 +5,7 @@ import { User } from '../models/User.js';
 // @access  Private/Admin
 export const getStudents = async (req, res) => {
   try {
-    const students = await User.find({ role: 'student' }).select('-password').sort({ createdAt: -1 });
+    const students = await User.find({ role: 'student' });
     res.json({ success: true, count: students.length, data: students });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

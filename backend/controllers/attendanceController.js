@@ -72,7 +72,7 @@ export const toggleMealAttendance = async (req, res) => {
 
     if (!record) {
       // Create default before toggling
-      record = new Attendance({
+      record = await Attendance.create({
         userId,
         date,
         breakfast: true,
@@ -162,7 +162,7 @@ export const updateStudentAttendance = async (req, res) => {
     let record = await Attendance.findOne({ userId, date });
 
     if (!record) {
-      record = new Attendance({
+      record = await Attendance.create({
         userId,
         date,
         breakfast: true,
@@ -229,7 +229,7 @@ export const applySkipMealAttendance = async (req, res) => {
 
     if (!record) {
       // Create defaults
-      record = new Attendance({
+      record = await Attendance.create({
         userId,
         date,
         breakfast: true,
@@ -255,9 +255,10 @@ export const getStudentAttendanceHistory = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const history = await Attendance.find({ userId }).sort({ date: -1 }).limit(30);
-    res.json({ success: true, data: history });
+    const history = await Attendance.find({ userId });
+    res.json({ success: true, data: history.slice(0, 30) });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+

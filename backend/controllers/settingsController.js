@@ -41,7 +41,7 @@ export const updatePricing = async (req, res) => {
   try {
     let pricing = await Settings.findOne({ key: 'pricing' });
     if (!pricing) {
-      pricing = new Settings({ key: 'pricing' });
+      pricing = await Settings.create({ key: 'pricing' });
     }
 
     if (breakfastOnly !== undefined) pricing.breakfastOnly = Number(breakfastOnly);

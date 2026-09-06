@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { connectDB } from './config/db.js';
+import { testConnection } from './config/supabase.js';
 import { User } from './models/User.js';
 
 // Route imports
@@ -43,21 +43,21 @@ app.use('/api/holidays', holidayRoutes);
 
 // Base Route
 app.get('/', (req, res) => {
-  res.send('Mess Tiffin Management System API is running...');
+  res.send('Mess Tiffin Management System API is running on Supabase...');
 });
 
 // Port and start server
 const PORT = process.env.PORT || 5000;
 
-// Database Connection & Seed Admin/Student
+// Supabase Connection & Seed Admin/Student
 const startServer = async () => {
-  await connectDB();
+  await testConnection();
 
   try {
     // Seed default credentials if database is empty
     const userCount = await User.countDocuments();
     if (userCount === 0) {
-      console.log('Seeding default admin and student credentials...');
+      console.log('Seeding default admin and student credentials in Supabase...');
       
       // Default Admin
       await User.create({
@@ -83,15 +83,9 @@ const startServer = async () => {
       console.log('Default credentials seeded successfully.');
       console.log('Admin Email: admin@mess.com | Pass: password123');
       console.log('Student Email: student@mess.com | Pass: password123');
-    } else {
-      // Auto-update existing seeded student from Alex Johnson to Abhay Chavan
-      await User.updateMany(
-        { email: 'student@mess.com', name: 'Alex Johnson' },
-        { name: 'Abhay Chavan' }
-      );
     }
   } catch (err) {
-    console.error('Error seeding default users:', err.message);
+    console.warn('Note on startup user check/seeding:', err.message);
   }
 
   app.listen(PORT, () => {
@@ -100,3 +94,4 @@ const startServer = async () => {
 };
 
 startServer();
+

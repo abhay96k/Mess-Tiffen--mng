@@ -29,7 +29,7 @@ export const submitFeedback = async (req, res) => {
 // @access  Private/Admin
 export const getFeedbacks = async (req, res) => {
   try {
-    const feedbacks = await Feedback.find({}).sort({ createdAt: -1 });
+    const feedbacks = await Feedback.find({});
     
     // Format response dates for UI
     const formatted = feedbacks.map(f => {

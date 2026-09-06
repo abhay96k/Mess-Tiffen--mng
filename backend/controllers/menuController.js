@@ -50,7 +50,7 @@ export const updateMenu = async (req, res) => {
     let menuItem = await Menu.findOne({ day: dayName });
     
     if (!menuItem) {
-      menuItem = new Menu({ day: dayName });
+      menuItem = await Menu.create({ day: dayName });
     }
 
     menuItem.breakfast = breakfast !== undefined ? breakfast : menuItem.breakfast;

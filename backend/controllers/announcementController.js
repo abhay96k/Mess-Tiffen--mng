@@ -5,7 +5,7 @@ import { Announcement } from '../models/Announcement.js';
 // @access  Public
 export const getAnnouncements = async (req, res) => {
   try {
-    const list = await Announcement.find({}).sort({ createdAt: -1 }).limit(5);
+    const list = await Announcement.find({});
     
     // Default banner if none published
     const textList = list.length > 0 

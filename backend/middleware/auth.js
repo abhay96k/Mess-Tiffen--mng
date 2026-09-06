@@ -14,7 +14,7 @@ export const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'mess_tiffin_jwt_secret_key_2026');
 
       // Get user from token and attach to request
-      req.user = await User.findById(decoded.id).select('-password');
+      req.user = await User.findById(decoded.id);
       if (!req.user) {
         return res.status(401).json({ success: false, message: 'Not authorized, user not found' });
       }
