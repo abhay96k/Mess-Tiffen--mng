@@ -209,10 +209,10 @@ export const applySkipMealAttendance = async (req, res) => {
   }
 
   // Time cutoff validation (Breakfast: 7 AM, Lunch: 11 AM, Dinner: 6 PM Kolkata Time)
-  const d = new Date();
-  const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false };
-  const timeString = d.toLocaleTimeString('en-US', options);
-  const [hour, minute] = timeString.split(':').map(Number);
+  const now = new Date();
+  const kolkataTimeStr = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+  const kolkataDate = new Date(kolkataTimeStr);
+  const hour = kolkataDate.getHours();
 
   if (meal === 'breakfast' && hour >= 7) {
     return res.status(400).json({ success: false, message: 'Cut-off time exceeded! Skip requests for breakfast must be submitted before 7:00 AM.' });

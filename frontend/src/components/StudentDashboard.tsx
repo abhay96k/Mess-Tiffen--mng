@@ -262,15 +262,30 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
     }
   };
 
+  const isInitialMount = useRef(true);
+
   useEffect(() => {
-    fetchData();
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      fetchData(true);
+    } else {
+      fetchData(false);
+    }
 
-    // Auto-poll every 8 seconds to sync attendance overrides from Admin portal
+    // Safety fallback: dismiss loading screen after max 1.2s regardless of network delay
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 1200);
+
+    // Auto-poll every 25 seconds to sync attendance overrides from Admin portal
     const timer = setInterval(() => {
-      fetchData();
-    }, 8000);
+      fetchData(false);
+    }, 25000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(safetyTimer);
+      clearInterval(timer);
+    };
   }, [activeTab]);
 
   const isMealSkipCutoffExceeded = (meal: 'breakfast' | 'lunch' | 'dinner'): boolean => {

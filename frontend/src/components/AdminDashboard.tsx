@@ -251,8 +251,13 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
         const activeCount = data.filter((s: any) => s.status === 'active').length;
         setActivePlans(activeCount);
 
-        const paidCount = data.filter((s: any) => s.billStatus === 'paid').length;
-        setRevenue(paidCount * 2400);
+        const totalRev = data.reduce((sum: number, s: any) => {
+          if (s.billStatus === 'paid') {
+            return sum + (s.billAmount > 0 ? s.billAmount : 2400);
+          }
+          return sum;
+        }, 0);
+        setRevenue(totalRev);
       }
 
       if (menuRes.status === 'fulfilled' && menuRes.value?.success) {
@@ -282,7 +287,10 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
 
       if (pricingRes.status === 'fulfilled' && pricingRes.value?.success) {
         setPricingSettings(pricingRes.value.data);
-        setPricingForm(pricingRes.value.data);
+        // Only set pricing form on initial load to avoid wiping input while admin is typing
+        if (isInitial) {
+          setPricingForm(pricingRes.value.data);
+        }
       }
 
     } catch (error) {
@@ -292,14 +300,30 @@ export function AdminDashboard({ userName, onLogout }: AdminDashboardProps) {
     }
   };
 
+  const isInitialMount = useRef(true);
+
   useEffect(() => {
-    fetchAdminData(false);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      fetchAdminData(true);
+    } else {
+      // Silent fetch on tab switch - never trigger full screen loader
+      fetchAdminData(false);
+    }
+
+    // Safety fallback: dismiss full screen loader after max 1.2s regardless of network delay
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 1200);
 
     const timer = setInterval(() => {
       fetchAdminData(false);
-    }, 8000);
+    }, 25000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(safetyTimer);
+      clearInterval(timer);
+    };
   }, [activeTab]); // Refetch when tabs switch to pull fresh records
 
   const handleEditStudent = (student: StudentRecord) => {

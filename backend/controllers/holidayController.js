@@ -28,6 +28,7 @@ export const declareHoliday = async (req, res) => {
     const notificationId = new Date().getTime().toString() + Math.random().toString(36).substr(2, 5);
 
     await Promise.all(students.map(async (student) => {
+      student.notifications = Array.isArray(student.notifications) ? student.notifications : [];
       student.notifications.push({
         id: notificationId,
         text: notificationText,

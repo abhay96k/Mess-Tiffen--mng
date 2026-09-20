@@ -17,7 +17,7 @@ export default function App() {
     // Safety fallback timer to prevent infinite loading screen (e.g. backend cold start or network delay)
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 6000);
+    }, 2500);
 
     // Check if token exists in localStorage to restore session
     const restoreSession = async () => {

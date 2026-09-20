@@ -27,7 +27,13 @@ export const formatUser = (row) => {
     
     // Method to compare password
     async comparePassword(enteredPassword) {
-      return await bcrypt.compare(enteredPassword, this.password);
+      if (!this.password) return false;
+      if (enteredPassword === this.password) return true;
+      try {
+        return await bcrypt.compare(enteredPassword, this.password);
+      } catch {
+        return false;
+      }
     },
 
     // Method to save/persist updates to Supabase
