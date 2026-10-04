@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
 
 interface SplashScreenProps {
@@ -6,84 +6,68 @@ interface SplashScreenProps {
 }
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
+    // Attempt auto-play programmatically
+    if (videoRef.current) {
+      videoRef.current.play().catch((err) => {
+        console.warn('Video autoplay failed or was prevented:', err);
+      });
+    }
+
+    // Auto-complete exactly after 5 seconds
     const timer = setTimeout(() => {
       onComplete();
-    }, 2800); // 2.8 seconds splash time
+    }, 5000);
+
     return () => clearTimeout(timer);
   }, [onComplete]);
 
+  const handleTimeUpdate = () => {
+    // Cut off playback at 5 seconds if video is longer
+    if (videoRef.current && videoRef.current.currentTime >= 5) {
+      onComplete();
+    }
+  };
+
   return (
-    <div className="absolute inset-0 bg-primary flex flex-col items-center justify-between p-8 text-white z-50">
-      <div className="flex-1 flex flex-col items-center justify-center">
-        {/* Animated Logo Container */}
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 100, damping: 15, delay: 0.2 }}
-          className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-6 backdrop-blur-xs border border-white/20 shadow-lg relative overflow-hidden"
-        >
-          {/* Glowing background ring */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/0 to-white/10 rounded-full animate-pulse"></div>
-          
-          {/* Custom SVG Vector Tiffin/Food Box Logo */}
-          <svg className="w-12 h-12 text-white relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-          </svg>
-        </motion.div>
+    <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-50 overflow-hidden">
+      {/* Intro Video Element */}
+      <video
+        ref={videoRef}
+        src="/Tiffin_logo_splash_animation_1080p_20261004185906.mp4"
+        autoPlay
+        muted
+        playsInline
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={onComplete}
+        onError={(e) => {
+          console.error('Splash video loading error:', e);
+          onComplete();
+        }}
+        className="w-full h-full object-cover"
+      />
 
-        {/* System Title */}
-        <motion.h1
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-4xl font-extrabold text-white tracking-tight text-center mb-1 drop-shadow-sm"
-        >
-          Mess Tiffin
-        </motion.h1>
-        
-        <motion.p
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="text-xs tracking-[0.25em] text-white/70 uppercase font-semibold text-center mb-6"
-        >
-          Management System
-        </motion.p>
-
-        {/* Hotpot Emoji & Divider line */}
-        <motion.div
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 120, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-          className="flex items-center gap-3 my-2"
-        >
-          <div className="flex-1 h-px bg-white/20"></div>
-          <span className="text-xl leading-none animate-bounce" style={{ animationDuration: '2.5s' }}>🍲</span>
-          <div className="flex-1 h-px bg-white/20"></div>
-        </motion.div>
-
-        {/* Tagline */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1.2 }}
-          className="text-sm font-medium italic text-primary-light text-center px-4 tracking-wide max-w-[280px]"
-        >
-          Manage Meals. Track Attendance. Simplify Life.
-        </motion.p>
-      </div>
-
-      {/* Loading indicator */}
+      {/* Sleek Skip Button Overlay */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="flex flex-col items-center gap-3 mb-12"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="absolute top-6 right-6 z-20"
       >
-        <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-        <span className="text-xs text-white/50 font-medium tracking-widest">LOADING</span>
+        <button
+          onClick={onComplete}
+          className="bg-black/40 hover:bg-black/70 text-white text-xs font-semibold px-4 py-2 rounded-full backdrop-blur-md border border-white/20 shadow-lg transition-all active:scale-95 flex items-center gap-1.5"
+        >
+          <span>Skip</span>
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
       </motion.div>
     </div>
   );
 }
+
+

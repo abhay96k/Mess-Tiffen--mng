@@ -82,10 +82,10 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-0 sm:p-4 font-sans text-slate-900 select-none">
+    <div className="min-h-screen w-full bg-[#F6F2EB] flex items-center justify-center p-0 sm:p-4 font-sans text-[#2C332E] select-none">
       
       {/* Frame Container matching reference layout */}
-      <div className="w-full max-w-sm sm:max-w-md h-screen sm:h-[760px] bg-gradient-to-b from-emerald-600 via-emerald-800 to-slate-950 sm:rounded-[40px] shadow-2xl flex flex-col justify-between overflow-hidden relative border border-emerald-500/20">
+      <div className="w-full max-w-sm sm:max-w-md h-screen sm:h-[760px] bg-gradient-to-b from-[#35523A] via-[#2A442E] to-[#1E3322] sm:rounded-[40px] shadow-2xl flex flex-col justify-between overflow-hidden relative border border-[#35523A]/30">
         
         {/* Top Header Area matching reference image */}
         <div className="pt-8 px-6 pb-6 text-white flex flex-col justify-between shrink-0 relative z-10">
@@ -96,7 +96,10 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               <div className="w-7 h-7 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center p-1 border border-white/20">
                 <img src={tiffinLogo} alt="MessTiffin" className="w-full h-full object-contain filter brightness-0 invert" />
               </div>
-              <span className="font-bold tracking-tight text-white">MessTiffin</span>
+              <span className="font-extrabold tracking-tight text-white text-sm">
+                <span className="text-[#A3D9A5]">MESS </span>
+                <span className="text-[#EA6A14]">TIFFIN</span>
+              </span>
             </div>
             
             {/* Role Pill Switcher */}
@@ -105,7 +108,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 type="button"
                 onClick={() => handleQuickFill('student')}
                 className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full transition-all ${
-                  role === 'student' ? 'bg-emerald-400 text-slate-950 shadow-xs' : 'text-white/70 hover:text-white'
+                  role === 'student' ? 'bg-[#EA6A14] text-white shadow-xs' : 'text-white/70 hover:text-white'
                 }`}
               >
                 Student
@@ -114,7 +117,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 type="button"
                 onClick={() => handleQuickFill('admin')}
                 className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full transition-all ${
-                  role === 'admin' ? 'bg-emerald-400 text-slate-950 shadow-xs' : 'text-white/70 hover:text-white'
+                  role === 'admin' ? 'bg-[#EA6A14] text-white shadow-xs' : 'text-white/70 hover:text-white'
                 }`}
               >
                 Admin
@@ -131,18 +134,18 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
           >
             <h1 className="text-3xl font-black tracking-tight leading-tight">
               {isSignUp ? (
-                <>Create Your<br />Account</>
+                <>Create Your<br /><span className="text-[#EA6A14]">Account</span></>
               ) : (
-                <>Hello<br />Sign in!</>
+                <>Hello<br /><span className="text-[#EA6A14]">Sign in!</span></>
               )}
             </h1>
           </motion.div>
         </div>
 
-        {/* Bottom White Curved Card Sheet matching reference image */}
+        {/* Bottom Curved Card Sheet */}
         <motion.div
           layout
-          className="w-full bg-white rounded-t-[36px] px-6 pt-7 pb-8 flex flex-col justify-between grow shadow-2xl border-t border-white/40 overflow-y-auto no-scrollbar relative z-20"
+          className="w-full bg-[#FAF6F0] rounded-t-[36px] px-6 pt-7 pb-8 flex flex-col justify-between grow shadow-2xl border-t border-white/60 overflow-y-auto no-scrollbar relative z-20"
         >
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -164,50 +167,50 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             {/* Name Field (Sign Up) */}
             {isSignUp && (
               <div className="space-y-1">
-                <label className="text-xs font-bold text-emerald-800">Full Name</label>
-                <div className="relative border-b border-slate-300 focus-within:border-emerald-600 pb-1 transition-all flex items-center justify-between">
+                <label className="text-xs font-bold text-[#35523A]">Full Name</label>
+                <div className="relative border-b border-[#DCD5C9] focus-within:border-[#35523A] pb-1 transition-all flex items-center justify-between">
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Rahul Sharma"
-                    className="w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 py-1"
+                    className="w-full bg-transparent text-sm font-semibold text-[#2C332E] outline-none placeholder:text-[#929E95] py-1"
                   />
-                  {name.trim() && <Check className="w-4 h-4 text-emerald-600 shrink-0" />}
+                  {name.trim() && <Check className="w-4 h-4 text-[#35523A] shrink-0" />}
                 </div>
               </div>
             )}
 
             {/* Email / Username Field */}
             <div className="space-y-1">
-              <label className="text-xs font-bold text-emerald-800">
+              <label className="text-xs font-bold text-[#35523A]">
                 {isSignUp ? 'Phone or Email' : 'Email or Username'}
               </label>
-              <div className="relative border-b border-slate-300 focus-within:border-emerald-600 pb-1 transition-all flex items-center justify-between">
+              <div className="relative border-b border-[#DCD5C9] focus-within:border-[#35523A] pb-1 transition-all flex items-center justify-between">
                 <input
                   type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={role === 'student' ? 'student@mess.com' : 'admin@mess.com'}
-                  className="w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 py-1"
+                  className="w-full bg-transparent text-sm font-semibold text-[#2C332E] outline-none placeholder:text-[#929E95] py-1"
                 />
-                {email.trim() && <Check className="w-4 h-4 text-emerald-600 shrink-0" />}
+                {email.trim() && <Check className="w-4 h-4 text-[#35523A] shrink-0" />}
               </div>
             </div>
 
             {/* Password Field */}
             <div className="space-y-1">
-              <label className="text-xs font-bold text-emerald-800">Password</label>
-              <div className="relative border-b border-slate-300 focus-within:border-emerald-600 pb-1 transition-all flex items-center justify-between">
+              <label className="text-xs font-bold text-[#35523A]">Password</label>
+              <div className="relative border-b border-[#DCD5C9] focus-within:border-[#35523A] pb-1 transition-all flex items-center justify-between">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 py-1 pr-2"
+                  className="w-full bg-transparent text-sm font-semibold text-[#2C332E] outline-none placeholder:text-[#929E95] py-1 pr-2"
                 />
                 <button
                   type="button"
@@ -223,25 +226,25 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             {isSignUp && role === 'student' && (
               <div className="grid grid-cols-2 gap-4 pt-1">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-emerald-800">Room No.</label>
-                  <div className="border-b border-slate-300 focus-within:border-emerald-600 pb-1 transition-all">
+                  <label className="text-xs font-bold text-[#35523A]">Room No.</label>
+                  <div className="border-b border-[#DCD5C9] focus-within:border-[#35523A] pb-1 transition-all">
                     <input
                       type="text"
                       required
                       value={room}
                       onChange={(e) => setRoom(e.target.value)}
                       placeholder="e.g. 304"
-                      className="w-full bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 py-1"
+                      className="w-full bg-transparent text-sm font-semibold text-[#2C332E] outline-none placeholder:text-[#929E95] py-1"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-emerald-800">Meal Plan</label>
+                  <label className="text-xs font-bold text-[#35523A]">Meal Plan</label>
                   <select
                     value={plan}
                     onChange={(e) => setPlan(e.target.value)}
-                    className="w-full bg-transparent border-b border-slate-300 focus:border-emerald-600 text-xs font-bold text-slate-900 outline-none py-1.5 cursor-pointer"
+                    className="w-full bg-transparent border-b border-[#DCD5C9] focus:border-[#35523A] text-xs font-bold text-[#2C332E] outline-none py-1.5 cursor-pointer"
                   >
                     <option value="1-Meal Basic">1-Meal Basic</option>
                     <option value="2-Meal Standard">2-Meal Standard</option>
@@ -257,19 +260,19 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 <a
                   href="#forgot"
                   onClick={(e) => { e.preventDefault(); alert('Please contact your Mess Manager to reset your password.'); }}
-                  className="text-xs text-slate-600 font-bold hover:text-emerald-700 hover:underline"
+                  className="text-xs text-[#68756C] font-bold hover:text-[#EA6A14] hover:underline"
                 >
                   Forgot password?
                 </a>
               </div>
             )}
 
-            {/* Main Action Button matching reference image gradient pill button */}
+            {/* Main Action Button matching reference image brand gradient */}
             <div className="pt-4 space-y-3">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-emerald-600 via-emerald-800 to-slate-950 hover:from-emerald-700 hover:to-slate-900 text-white font-extrabold text-sm uppercase tracking-wider shadow-xl transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70"
+                className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#35523A] via-[#2A442E] to-[#EA6A14] hover:from-[#2A442E] hover:to-[#C45404] text-white font-extrabold text-sm uppercase tracking-wider shadow-xl transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -279,12 +282,12 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               </button>
 
               {/* Text placed directly below the SIGN IN / SIGN UP button box */}
-              <div className="flex items-center justify-end text-xs font-semibold text-slate-500 pt-1">
+              <div className="flex items-center justify-end text-xs font-semibold text-[#68756C] pt-1">
                 <span>{isSignUp ? 'Already have account?' : "Don't have account?"}</span>
                 <button
                   type="button"
                   onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(null); }}
-                  className="ml-1.5 font-extrabold text-slate-900 hover:text-emerald-600 hover:underline cursor-pointer"
+                  className="ml-1.5 font-extrabold text-[#35523A] hover:text-[#EA6A14] hover:underline cursor-pointer"
                 >
                   {isSignUp ? 'Sign In' : 'Sign up'}
                 </button>
