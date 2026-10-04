@@ -1,5 +1,6 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion } from 'motion/react';
+import tiffinLogo from '../assets/tiffin_logo_3d.png';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -7,32 +8,34 @@ interface SplashScreenProps {
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      // Force muted properties directly on DOM element for iOS Safari autoplay compliance
-      video.defaultMuted = true;
+      // Force DOM properties for strict iOS Safari compliance
       video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
       video.setAttribute('playsinline', 'true');
       video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('x5-playsinline', 'true');
 
-      // Programmatic autoplay request
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('iOS Autoplay prevented by browser/Low Power mode:', err);
-          // If iOS blocks initial autoplay, play on first user interaction
-          const handleFirstTouch = () => {
-            video.play().catch(() => onComplete());
-          };
-          window.addEventListener('touchstart', handleFirstTouch, { once: true });
-          window.addEventListener('click', handleFirstTouch, { once: true });
-        });
-      }
+      const attemptPlay = async () => {
+        try {
+          await video.play();
+          setIsPlaying(true);
+        } catch (err) {
+          console.warn('iOS Autoplay restricted by browser:', err);
+          setIsBlocked(true);
+        }
+      };
+
+      attemptPlay();
     }
 
-    // Auto-complete strictly after 5 seconds
+    // Safety completion timer strictly capping splash at 5 seconds
     const timer = setTimeout(() => {
       onComplete();
     }, 5000);
@@ -41,25 +44,31 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   }, [onComplete]);
 
   const handleTimeUpdate = () => {
-    // Cut off playback at 5 seconds
     if (videoRef.current && videoRef.current.currentTime >= 5) {
       onComplete();
     }
   };
 
-  const handleContainerClick = () => {
-    if (videoRef.current && videoRef.current.paused) {
-      videoRef.current.play().catch(() => onComplete());
+  const handleStartPlay = () => {
+    if (videoRef.current) {
+      videoRef.current.play().then(() => {
+        setIsPlaying(true);
+        setIsBlocked(false);
+      }).catch(() => {
+        onComplete();
+      });
+    } else {
+      onComplete();
     }
   };
 
   return (
     <div 
-      onClick={handleContainerClick}
-      onTouchStart={handleContainerClick}
-      className="absolute inset-0 bg-[#F6F2EB] flex flex-col items-center justify-center z-50 overflow-hidden select-none cursor-pointer"
+      onClick={handleStartPlay}
+      onTouchStart={handleStartPlay}
+      className="absolute inset-0 bg-[#F6F2EB] flex flex-col items-center justify-between p-8 text-[#2C332E] z-50 overflow-hidden select-none cursor-pointer"
     >
-      {/* Intro Video Element with pointer-events-none to eliminate iOS native controls */}
+      {/* Video Container - Hidden until actively playing to prevent native iOS play button overlay */}
       <video
         ref={videoRef}
         src="/Tiffin_logo_splash_animation_1080p_20261004185906.mp4"
@@ -68,21 +77,78 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         playsInline
         preload="auto"
         controls={false}
+        onPlay={() => {
+          setIsPlaying(true);
+          setIsBlocked(false);
+        }}
         onTimeUpdate={handleTimeUpdate}
         onEnded={onComplete}
         onError={(e) => {
-          console.error('Splash video loading error:', e);
+          console.error('Splash video error:', e);
           onComplete();
         }}
-        className="w-full h-full object-cover pointer-events-none"
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 pointer-events-none ${
+          isPlaying ? 'opacity-100' : 'opacity-0'
+        }`}
       />
+
+      {/* Fallback Brand Splash poster when video is loading or blocked by iOS Safari policy */}
+      {!isPlaying && (
+        <div className="absolute inset-0 bg-[#F6F2EB] flex flex-col items-center justify-between p-8 z-10">
+          <div className="flex-1 flex flex-col items-center justify-center">
+            {/* 3D Tiffin Logo */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+              className="w-32 h-32 mb-6 relative flex items-center justify-center"
+            >
+              <img src={tiffinLogo} alt="Mess Tiffin" className="w-full h-full object-contain drop-shadow-xl" />
+            </motion.div>
+
+            {/* Title matching logo graphic */}
+            <motion.h1
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-4xl font-black tracking-tight text-center mb-1 flex items-center gap-2"
+            >
+              <span className="text-[#35523A]">MESS</span>
+              <span className="text-[#EA6A14]">TIFFIN</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="text-xs tracking-[0.25em] text-[#68756C] uppercase font-bold text-center mb-6"
+            >
+              — MANAGEMENT SYSTEM —
+            </motion.p>
+          </div>
+
+          {/* Interactive Tap Prompt if iOS Safari required touch */}
+          {isBlocked && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8 bg-[#35523A] text-white text-xs font-bold px-6 py-3 rounded-full shadow-lg flex items-center gap-2 animate-bounce"
+            >
+              <span>Tap Anywhere to Open</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </motion.div>
+          )}
+        </div>
+      )}
 
       {/* Sleek Skip Button Overlay */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="absolute top-6 right-6 z-20"
+        transition={{ delay: 0.2 }}
+        className="absolute top-6 right-6 z-30"
       >
         <button
           type="button"
@@ -101,6 +167,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
     </div>
   );
 }
+
 
 
 
