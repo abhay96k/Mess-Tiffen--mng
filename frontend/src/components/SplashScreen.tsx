@@ -137,24 +137,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         </motion.div>
       </div>
 
-      {/* Sleek Skip Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="absolute top-6 right-6 z-30"
-      >
-        <button
-          type="button"
-          onClick={onComplete}
-          className="bg-black/30 hover:bg-black/60 text-white text-xs font-semibold px-4 py-2 rounded-full backdrop-blur-md border border-white/20 shadow-md transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
-        >
-          <span>Skip</span>
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-m0 0l-7 7m7-7H3" />
-          </svg>
-        </button>
-      </motion.div>
+
     </div>
   );
 }
