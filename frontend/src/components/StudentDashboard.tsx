@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { 
   Bell, LogOut, Calendar, 
   CreditCard, Send, Star, ChevronDown, ChevronUp, 
-  ShieldAlert, Sparkles, Check, CheckCircle,
+  ShieldAlert, Sparkles, Check, CheckCircle, CheckCircle2, XCircle, Clock, CheckCheck, Inbox,
   Utensils, User, MapPin, MoreVertical, LayoutGrid, Camera, X,
   Edit2, Phone, GraduationCap, Building, Home, Mail
 } from 'lucide-react';
@@ -511,46 +511,143 @@ export function StudentDashboard({ userName, userId, onLogout }: StudentDashboar
         </div>
       </div>
 
-      {/* 2. Notification Overlay Box */}
+      {/* 2. Executive Notification Overlay Box */}
       <AnimatePresence>
         {showNotifications && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: -15 }}
+            initial={{ opacity: 0, scale: 0.94, y: -12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: -15 }}
-            transition={{ type: "spring", stiffness: 450, damping: 30 }}
-            className="absolute top-20 left-4 right-4 bg-white text-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 p-4 z-45"
+            exit={{ opacity: 0, scale: 0.94, y: -12 }}
+            transition={{ type: "spring", stiffness: 400, damping: 28 }}
+            className="absolute top-20 left-4 right-4 bg-white/95 backdrop-blur-xl text-slate-900 rounded-3xl shadow-2xl border border-slate-200/90 p-4.5 z-50 overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-3 border-b border-neutral-100 pb-2">
-              <h4 className="font-bold text-neutral-800 text-xs">Notifications</h4>
-              <button 
-                onClick={handleClearNotifications} 
-                className="text-[10px] text-primary hover:text-primary-dark font-extrabold cursor-pointer focus:outline-none"
-              >
-                Mark Read
-              </button>
+            {/* Soft Ambient Radial Glow */}
+            <div className="absolute -top-12 -right-12 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100 relative z-10">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center border border-amber-200/60 shadow-3xs">
+                  <Bell className="w-4 h-4" />
+                </div>
+                <h4 className="font-black text-slate-900 text-sm tracking-tight flex items-center gap-2">
+                  Notifications
+                  {(notifications || []).filter((n: any) => !n.read).length > 0 && (
+                    <span className="bg-rose-500 text-white font-extrabold text-[9px] px-2 py-0.5 rounded-full shadow-3xs animate-pulse">
+                      {(notifications || []).filter((n: any) => !n.read).length} New
+                    </span>
+                  )}
+                </h4>
+              </div>
+
+              {(notifications || []).some((n: any) => !n.read) && (
+                <motion.button 
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleClearNotifications} 
+                  className="flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 font-black px-3 py-1 rounded-xl transition-all cursor-pointer shadow-3xs"
+                >
+                  <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Mark Read</span>
+                </motion.button>
+              )}
             </div>
-            <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+
+            {/* Notifications List (Newest / Recent First at the Top) */}
+            <div className="space-y-2.5 max-h-64 overflow-y-auto no-scrollbar relative z-10 pr-0.5">
               {(notifications || []).length > 0 ? (
-                (notifications || []).map((notif: any) => (
-                  <div key={notif.id} className={`text-xs p-2.5 rounded-xl border flex gap-2 transition-all ${
-                    notif.read 
-                      ? 'bg-neutral-50/50 border-neutral-100 text-neutral-400 font-semibold' 
-                      : 'bg-emerald-50/30 border-emerald-100 text-neutral-800 font-bold shadow-3xs'
-                  }`}>
-                    <span className="text-sm">🔔</span>
-                    <div className="flex-1">
-                      <p className={`text-[11px] leading-tight ${notif.read ? 'text-neutral-500 font-normal' : 'text-neutral-800 font-semibold'}`}>{notif.text}</p>
-                      <p className="text-neutral-450 text-[8px] mt-0.5 font-medium">
-                        {new Date(notif.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </div>
-                ))
+                [...(notifications || [])]
+                  .reverse()
+                  .sort((a: any, b: any) => {
+                    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                    if (timeA && timeB && timeA !== timeB) {
+                      return timeB - timeA;
+                    }
+                    return 0;
+                  })
+                  .map((notif: any, index: number) => {
+                    const text = notif.text || '';
+                    const isAbsent = text.toLowerCase().includes('absent') || text.toLowerCase().includes('cancelled');
+                    const isPresent = text.toLowerCase().includes('present') || text.toLowerCase().includes('paid') || text.toLowerCase().includes('approved');
+                    
+                    return (
+                      <motion.div 
+                        key={notif.id || index}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.04 }}
+                        whileHover={{ scale: 1.01, x: 2 }}
+                        className={`text-xs p-3 rounded-2xl border flex items-start gap-3 transition-all relative overflow-hidden ${
+                          notif.read 
+                            ? 'bg-slate-50/80 border-slate-200/60 text-slate-500 opacity-80 shadow-none' 
+                            : isAbsent
+                            ? 'bg-gradient-to-r from-rose-50/90 via-red-50/40 to-white border-rose-200/80 text-rose-950 shadow-3xs font-semibold'
+                            : isPresent
+                            ? 'bg-gradient-to-r from-emerald-50/90 via-teal-50/40 to-white border-emerald-200/80 text-emerald-950 shadow-3xs font-semibold'
+                            : 'bg-gradient-to-r from-amber-50/90 via-orange-50/40 to-white border-amber-200/80 text-slate-900 shadow-3xs font-semibold'
+                        }`}
+                      >
+                        {/* Left Status Bar Indicator */}
+                        <div className={`w-1 self-stretch rounded-full shrink-0 ${
+                          notif.read 
+                            ? 'bg-slate-300' 
+                            : isAbsent 
+                            ? 'bg-rose-500' 
+                            : isPresent 
+                            ? 'bg-emerald-500' 
+                            : 'bg-amber-500'
+                        }`} />
+
+                        {/* Status Icon Badge */}
+                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border shadow-3xs ${
+                          notif.read
+                            ? 'bg-slate-100 text-slate-400 border-slate-200'
+                            : isAbsent
+                            ? 'bg-rose-100 text-rose-600 border-rose-200'
+                            : isPresent
+                            ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                            : 'bg-amber-100 text-amber-700 border-amber-200'
+                        }`}>
+                          {isAbsent ? (
+                            <XCircle className="w-4 h-4" />
+                          ) : isPresent ? (
+                            <CheckCircle2 className="w-4 h-4" />
+                          ) : (
+                            <Sparkles className="w-4 h-4" />
+                          )}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0 pr-1">
+                          <p className={`text-[11.5px] leading-snug ${
+                            notif.read ? 'text-slate-500 font-normal' : 'text-slate-900 font-bold'
+                          }`}>
+                            {notif.text}
+                          </p>
+                          <div className="flex items-center gap-1.5 mt-1 text-[9px] font-bold text-slate-400">
+                            <Clock className="w-3 h-3 text-slate-400" />
+                            <span>
+                              {notif.createdAt 
+                                ? new Date(notif.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                                : 'Just now'}
+                            </span>
+                            {!notif.read && (
+                              <span className="w-1.5 h-1.5 bg-rose-500 rounded-full ml-auto animate-pulse" />
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })
               ) : (
-                <div className="text-center py-6 text-neutral-450 font-bold text-[10px] space-y-1">
-                  <p className="text-lg">📭</p>
-                  <p>No new notifications today</p>
+                <div className="text-center py-8 px-4 bg-slate-50/60 rounded-2xl border border-dashed border-slate-200 space-y-2">
+                  <div className="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto border border-slate-200">
+                    <Inbox className="w-5 h-5" />
+                  </div>
+                  <p className="text-xs font-black text-slate-700">No Notifications Yet</p>
+                  <p className="text-[10px] text-slate-400 font-medium">All attendance, menu & bill updates will appear here.</p>
                 </div>
               )}
             </div>
