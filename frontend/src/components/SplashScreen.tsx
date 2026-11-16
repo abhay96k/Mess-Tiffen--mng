@@ -72,22 +72,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
   return (
     <div 
-      onClick={onComplete}
-      className="absolute inset-0 bg-[#F6F2EB] flex flex-col items-center justify-between p-8 text-[#2C332E] z-50 overflow-hidden select-none cursor-pointer"
-      title="Click or tap to skip"
+      className="absolute inset-0 bg-[#F6F2EB] flex flex-col items-center justify-between p-8 text-[#2C332E] z-50 overflow-hidden select-none"
     >
-      {/* Top Skip Pill */}
-      <div className="w-full flex justify-end relative z-30">
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onComplete(); }}
-          className="text-xs font-bold text-white bg-black/40 hover:bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-md transition-all cursor-pointer flex items-center gap-1"
-        >
-          <span>Skip</span>
-          <span>➔</span>
-        </button>
-      </div>
-
       {/* Primary Video Element - Shows immediately on launch with zero photo flash */}
       {!hasVideoError && (
         <video
@@ -166,7 +152,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               />
             </div>
             <span className="text-[10px] font-extrabold tracking-widest text-[#35523A]/70 uppercase">
-              LOADING • TAP TO SKIP
+              LOADING
             </span>
           </motion.div>
         </div>
