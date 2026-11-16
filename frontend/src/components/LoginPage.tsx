@@ -82,10 +82,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F6F2EB] flex items-center justify-center p-0 sm:p-4 font-sans text-[#2C332E] select-none">
-      
-      {/* Frame Container matching reference layout */}
-      <div className="w-full max-w-sm sm:max-w-md h-screen sm:h-[760px] bg-gradient-to-b from-[#35523A] via-[#2A442E] to-[#1E3322] sm:rounded-[40px] shadow-2xl flex flex-col justify-between overflow-hidden relative border border-[#35523A]/30">
+    <div className="w-full h-full bg-gradient-to-b from-[#35523A] via-[#2A442E] to-[#1E3322] flex flex-col justify-between overflow-hidden relative font-sans text-[#2C332E] select-none">
         
         {/* Top Header Area matching reference image */}
         <div className="pt-8 px-6 pb-6 text-white flex flex-col justify-between shrink-0 relative z-10">
@@ -296,7 +293,6 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
           </form>
 
         </motion.div>
-      </div>
     </div>
   );
 }

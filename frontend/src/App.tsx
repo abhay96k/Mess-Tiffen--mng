@@ -11,9 +11,17 @@ type ScreenState = 'splash' | 'login' | 'student-dashboard' | 'admin-dashboard';
 export default function App() {
   const [screen, setScreen] = useState<ScreenState>('splash');
   const [user, setUser] = useState({ id: '', name: '', role: '', email: '' });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setScreen('splash');
+      return;
+    }
+
+    setLoading(true);
+
     // Safety fallback timer to prevent infinite loading screen (e.g. backend cold start or network delay)
     const timer = setTimeout(() => {
       setLoading(false);
@@ -21,33 +29,28 @@ export default function App() {
 
     // Check if token exists in localStorage to restore session
     const restoreSession = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const res = await authAPI.getMe();
-          if (res && res.success) {
-            setUser({
-              id: res._id,
-              name: res.name,
-              role: res.role,
-              email: res.email
-            });
-            setScreen(res.role === 'admin' ? 'admin-dashboard' : 'student-dashboard');
-          } else {
-            localStorage.removeItem('token');
-            setScreen('login');
-          }
-        } catch (error) {
-          console.error('Session restoration failed:', error);
+      try {
+        const res = await authAPI.getMe();
+        if (res && res.success) {
+          setUser({
+            id: res._id,
+            name: res.name,
+            role: res.role,
+            email: res.email
+          });
+          setScreen(res.role === 'admin' ? 'admin-dashboard' : 'student-dashboard');
+        } else {
           localStorage.removeItem('token');
           setScreen('login');
         }
-      } else {
-        // No token, show splash then login
-        setScreen('splash');
+      } catch (error) {
+        console.error('Session restoration failed:', error);
+        localStorage.removeItem('token');
+        setScreen('login');
+      } finally {
+        clearTimeout(timer);
+        setLoading(false);
       }
-      clearTimeout(timer);
-      setLoading(false);
     };
 
     restoreSession();

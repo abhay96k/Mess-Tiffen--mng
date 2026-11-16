@@ -1,0 +1,179 @@
+{
+  "users": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "name": "System Administrator",
+      "email": "admin@mess.com",
+      "password": "$2a$10$IfQ7ZrgFbotJb7bIlvAi8.Wx9VoVMEaX/C17GZrGJ6ce7R5h6vR6m",
+      "role": "admin",
+      "room": "",
+      "plan": "Admin",
+      "status": "active",
+      "bill_amount": 0,
+      "bill_status": "paid",
+      "profile_image": "",
+      "college_name": "",
+      "pg_name": "",
+      "phone": "9876543210",
+      "dietary_preference": "Veg",
+      "notifications": [],
+      "created_at": "2026-11-14T19:14:28.513Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    },
+    {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "name": "Abhay Chavan",
+      "email": "student@mess.com",
+      "password": "$2a$10$IfQ7ZrgFbotJb7bIlvAi8.Wx9VoVMEaX/C17GZrGJ6ce7R5h6vR6m",
+      "role": "student",
+      "room": "304",
+      "plan": "2-Meal Standard",
+      "status": "active",
+      "bill_amount": 2400,
+      "bill_status": "pending",
+      "profile_image": "",
+      "college_name": "COEP Tech University",
+      "pg_name": "Green View PG",
+      "phone": "9876543211",
+      "dietary_preference": "Veg",
+      "notifications": [
+        {
+          "id": "notif-welcome-1",
+          "text": "Welcome to Mess Tiffin! You are currently on the 2-Meal Standard plan.",
+          "createdAt": "2026-11-14T19:14:28.514Z",
+          "read": false
+        }
+      ],
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    }
+  ],
+  "menu": [
+    {
+      "id": "menu-1",
+      "day": "Monday",
+      "breakfast": "Idli, Sambar & Coconut Chutney",
+      "lunch": "Mix Veg Curry, Dal Tadka, Roti, Rice",
+      "dinner": "Aloo Gobhi, Chana Dal, Roti, Rice",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    },
+    {
+      "id": "menu-2",
+      "day": "Tuesday",
+      "breakfast": "Aloo Paratha with Curd & Pickle",
+      "lunch": "Paneer Bhurji, Yellow Dal, Paratha, Rice",
+      "dinner": "Veg Kofta, Masoor Dal, Roti, Rice",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    },
+    {
+      "id": "menu-3",
+      "day": "Wednesday",
+      "breakfast": "Poha with Sev & Tea",
+      "lunch": "Rajma Masala, Steamed Rice, Roti, Salad",
+      "dinner": "Kadhai Veg, Moong Dal, Roti, Rice",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    },
+    {
+      "id": "menu-4",
+      "day": "Thursday",
+      "breakfast": "Bread Butter Toast & Omelette/Sprouts",
+      "lunch": "Chole Bhature, Boondi Raita, Onion salad",
+      "dinner": "Bhindi Fry, Dal Fry, Roti, Rice",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    },
+    {
+      "id": "menu-5",
+      "day": "Friday",
+      "breakfast": "Uttapam with Tomato Chutney",
+      "lunch": "Veg Jalfrezi, Kadhi Pakora, Roti, Rice",
+      "dinner": "Egg Curry / Paneer Butter Masala, Roti, Rice",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    },
+    {
+      "id": "menu-6",
+      "day": "Saturday",
+      "breakfast": "Methi Thepla with Ginger Tea",
+      "lunch": "Aloo Gajar Matar, Dal Makhani, Roti, Jeera Rice",
+      "dinner": "Sev Tamatar Sabji, Tuvar Dal, Roti, Rice",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    },
+    {
+      "id": "menu-7",
+      "day": "Sunday",
+      "breakfast": "Puri Bhaji & Halwa",
+      "lunch": "Veg Biryani, Veg Raita, Salad, Papad",
+      "dinner": "Paneer Makhani, Butter Naan, Jeera Rice, Kheer",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    }
+  ],
+  "attendance": [
+    {
+      "id": "att-today-1",
+      "user_id": "22222222-2222-2222-2222-222222222222",
+      "date": "2026-11-14",
+      "breakfast": true,
+      "breakfast_pending_skip": false,
+      "lunch": false,
+      "lunch_pending_skip": false,
+      "dinner": true,
+      "dinner_pending_skip": false,
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    },
+    {
+      "user_id": "22222222-2222-2222-2222-222222222222",
+      "date": "2026-11-16",
+      "breakfast": true,
+      "breakfast_pending_skip": false,
+      "lunch": false,
+      "lunch_pending_skip": false,
+      "dinner": true,
+      "dinner_pending_skip": false,
+      "updated_at": "2026-11-16T17:41:16.690Z",
+      "id": "f5432ff1-39aa-4387-9471-249b4841ed8b",
+      "created_at": "2026-11-16T17:41:16.690Z"
+    }
+  ],
+  "feedbacks": [
+    {
+      "id": "feed-1",
+      "student_id": "22222222-2222-2222-2222-222222222222",
+      "student_name": "Abhay Chavan",
+      "rating": 5,
+      "comments": "Great food quality and clean mess facility. Prompt service!",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    }
+  ],
+  "announcements": [
+    {
+      "id": "ann-1",
+      "text": "Welcome to Mess Tiffin! Sunday special feast will include Veg Biryani & Paneer Makhani.",
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    }
+  ],
+  "settings": [
+    {
+      "id": "sett-1",
+      "key": "pricing",
+      "breakfast_only": 800,
+      "lunch_only": 1200,
+      "dinner_only": 1200,
+      "breakfast_lunch": 1850,
+      "breakfast_dinner": 1850,
+      "lunch_dinner": 2200,
+      "all_meals": 2800,
+      "created_at": "2026-11-14T19:14:28.514Z",
+      "updated_at": "2026-11-14T19:14:28.514Z"
+    }
+  ],
+  "holidays": []
+}
