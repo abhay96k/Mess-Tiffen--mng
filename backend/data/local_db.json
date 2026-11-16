@@ -139,6 +139,19 @@
       "updated_at": "2026-11-16T17:41:16.690Z",
       "id": "f5432ff1-39aa-4387-9471-249b4841ed8b",
       "created_at": "2026-11-16T17:41:16.690Z"
+    },
+    {
+      "user_id": "22222222-2222-2222-2222-222222222222",
+      "date": "2026-11-17",
+      "breakfast": true,
+      "breakfast_pending_skip": false,
+      "lunch": false,
+      "lunch_pending_skip": false,
+      "dinner": true,
+      "dinner_pending_skip": false,
+      "updated_at": "2026-11-16T18:30:07.197Z",
+      "id": "92dbd611-ec96-4c49-9e4e-084bc5781c92",
+      "created_at": "2026-11-16T18:30:07.197Z"
     }
   ],
   "feedbacks": [

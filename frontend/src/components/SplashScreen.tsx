@@ -7,97 +7,104 @@ interface SplashScreenProps {
 }
 
 const VIDEO_START_TIME = 2.22;
+const VIDEO_END_TIME = 6.72; // Plays for ~4.5 seconds of animation
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasVideoError, setHasVideoError] = useState(false);
-
-  // Set start position precisely to 2.22 seconds
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = VIDEO_START_TIME;
-    }
-  };
+  const hasSeekedRef = useRef(false);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      video.defaultMuted = true;
-      video.volume = 0;
-      video.setAttribute('playsinline', 'true');
-      video.setAttribute('webkit-playsinline', 'true');
-      video.setAttribute('x5-playsinline', 'true');
+    if (!video) return;
 
-      if (video.readyState >= 1) {
-        video.currentTime = VIDEO_START_TIME;
+    // Direct DOM property assignment required for reliable mobile/desktop browser autoplay
+    video.muted = true;
+    video.defaultMuted = true;
+    video.volume = 0;
+    video.setAttribute('playsinline', 'true');
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('x5-playsinline', 'true');
+
+    const handleReady = () => {
+      // Seek once to 2.22s
+      if (!hasSeekedRef.current) {
+        hasSeekedRef.current = true;
+        try {
+          video.currentTime = VIDEO_START_TIME;
+        } catch (e) {
+          console.warn('Initial seek failed:', e);
+        }
       }
 
-      // Attempt immediate video autoplay starting from 2.22 seconds
+      // Start playback cleanly after initial position is set
       const playPromise = video.play();
       if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            if (video.currentTime < VIDEO_START_TIME) {
-              video.currentTime = VIDEO_START_TIME;
-            }
-          })
-          .catch(() => {
-            // Only switch to fallback graphic if video playback completely fails/blocked
+        playPromise.catch((err) => {
+          // If browser strictly blocks autoplay (e.g. low power mode), switch to fallback
+          if (err.name === 'NotAllowedError') {
+            console.warn('Autoplay blocked by browser policy, showing fallback graphic');
             setHasVideoError(true);
-          });
+          } else {
+            // Ignore AbortError caused by normal media seeking
+            console.log('Playback notice:', err.message);
+          }
+        });
       }
+    };
+
+    // If metadata already loaded, trigger immediately; otherwise wait for loadedmetadata
+    if (video.readyState >= 1) {
+      handleReady();
+    } else {
+      video.addEventListener('loadedmetadata', handleReady, { once: true });
     }
 
-    // Auto-complete and transition to Login screen after intro plays (~4.5 seconds)
+    // Safety timeout: transition after 7 seconds if unattended
     const timer = setTimeout(() => {
       onComplete();
-    }, 4500);
+    }, 7000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      video.removeEventListener('loadedmetadata', handleReady);
+    };
   }, [onComplete]);
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      // Ensure video stays beyond 2.22 seconds mark
-      if (videoRef.current.currentTime < VIDEO_START_TIME) {
-        videoRef.current.currentTime = VIDEO_START_TIME;
-      }
-      // When video reaches 6.72s (4.5 seconds from the 2.22s mark), transition to login
-      if (videoRef.current.currentTime >= 6.72) {
-        onComplete();
-      }
+    const video = videoRef.current;
+    // Transition to login when intro animation reaches 6.72s
+    if (video && video.currentTime >= VIDEO_END_TIME) {
+      onComplete();
     }
   };
 
   return (
     <div 
-      className="absolute inset-0 bg-[#F6F2EB] flex flex-col items-center justify-between p-8 text-[#2C332E] z-50 overflow-hidden select-none"
+      onClick={onComplete}
+      className="absolute inset-0 bg-[#F6F2EB] flex flex-col items-center justify-between p-8 text-[#2C332E] z-50 overflow-hidden select-none cursor-pointer"
     >
-      {/* Primary Video Element - Shows immediately on launch with zero photo flash */}
+      {/* Primary Video Element - Plays cleanly from 2.22 seconds */}
       {!hasVideoError && (
         <video
           ref={videoRef}
-          src="/Tiffin_logo_splash_animation_1080p_20261004185906.mp4#t=2.22"
+          src="/Tiffin_logo_splash_animation_1080p_20261004185906.mp4"
           autoPlay
           muted
           playsInline
           preload="auto"
           controls={false}
-          onLoadedMetadata={handleLoadedMetadata}
-          onPlay={() => {
-            if (videoRef.current && videoRef.current.currentTime < VIDEO_START_TIME) {
-              videoRef.current.currentTime = VIDEO_START_TIME;
-            }
-          }}
           onTimeUpdate={handleTimeUpdate}
           onEnded={onComplete}
-          onError={() => setHasVideoError(true)}
+          onError={(e) => {
+            console.error('Video error event:', e);
+            setHasVideoError(true);
+          }}
           className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none"
         />
       )}
 
-      {/* Fallback Graphic - ONLY shown if video file fails to load or play */}
+      {/* Fallback Graphic - ONLY shown if video file is missing or unplayable */}
       {hasVideoError && (
         <div className="absolute inset-0 bg-[#F6F2EB] flex flex-col items-center justify-between p-8 z-20">
           <div className="absolute inset-0 bg-radial from-amber-100/40 via-transparent to-transparent pointer-events-none" />
@@ -152,7 +159,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               />
             </div>
             <span className="text-[10px] font-extrabold tracking-widest text-[#35523A]/70 uppercase">
-              LOADING
+              LOADING • TAP TO SKIP
             </span>
           </motion.div>
         </div>

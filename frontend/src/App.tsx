@@ -1,62 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PhoneFrame } from './components/PhoneFrame';
 import { SplashScreen } from './components/SplashScreen';
 import { LoginPage } from './components/LoginPage';
 import { StudentDashboard } from './components/StudentDashboard';
 import { AdminDashboard } from './components/AdminDashboard';
-import { authAPI } from './services/api';
 
 type ScreenState = 'splash' | 'login' | 'student-dashboard' | 'admin-dashboard';
 
 export default function App() {
   const [screen, setScreen] = useState<ScreenState>('splash');
   const [user, setUser] = useState({ id: '', name: '', role: '', email: '' });
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setScreen('splash');
-      return;
-    }
-
-    setLoading(true);
-
-    // Safety fallback timer to prevent infinite loading screen (e.g. backend cold start or network delay)
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500);
-
-    // Check if token exists in localStorage to restore session
-    const restoreSession = async () => {
-      try {
-        const res = await authAPI.getMe();
-        if (res && res.success) {
-          setUser({
-            id: res._id,
-            name: res.name,
-            role: res.role,
-            email: res.email
-          });
-          setScreen(res.role === 'admin' ? 'admin-dashboard' : 'student-dashboard');
-        } else {
-          localStorage.removeItem('token');
-          setScreen('login');
-        }
-      } catch (error) {
-        console.error('Session restoration failed:', error);
-        localStorage.removeItem('token');
-        setScreen('login');
-      } finally {
-        clearTimeout(timer);
-        setLoading(false);
-      }
-    };
-
-    restoreSession();
-    return () => clearTimeout(timer);
-  }, []);
-
+  // Transition straight to Login Page when the intro video completes
   const handleSplashComplete = () => {
     setScreen('login');
   };
@@ -77,23 +32,6 @@ export default function App() {
     setUser({ id: '', name: '', role: '', email: '' });
     setScreen('login');
   };
-
-  if (loading) {
-    return (
-      <PhoneFrame>
-        <div className="absolute inset-0 bg-primary flex flex-col items-center justify-center text-white px-6 text-center">
-          <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mb-4"></div>
-          <p className="text-sm font-medium opacity-90">Connecting to server...</p>
-          <button 
-            onClick={() => { localStorage.removeItem('token'); setLoading(false); setScreen('login'); }}
-            className="mt-6 text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-colors underline"
-          >
-            Skip to Login
-          </button>
-        </div>
-      </PhoneFrame>
-    );
-  }
 
   return (
     <PhoneFrame>
